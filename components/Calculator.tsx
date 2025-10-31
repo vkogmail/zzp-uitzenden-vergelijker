@@ -372,7 +372,7 @@ export default function Calculator({ values, onChange }: CalculatorProps) {
           </div>
         )}
       </div>
-      <div className="md:col-start-2 rounded-xl bg-white border border-gray-100 shadow-sm p-4">
+      <div className="md:col-start-2 rounded-xl bg-white border border-gray-100 shadow-sm p-4 self-start">
         <p className="text-sm text-gray-600 mb-2">Totaal werkgeverslasten (uitzenden)</p>
         <ul className="text-sm text-gray-700 space-y-1">
           <li className="flex justify-between"><span>• Sociale premies</span><span>{wgSocial.toFixed(2)}%</span></li>
@@ -381,7 +381,7 @@ export default function Calculator({ values, onChange }: CalculatorProps) {
           <li className="flex justify-between"><span>• Verzekeringen</span><span>{wgInsurance.toFixed(2)}%</span></li>
           <li className="flex justify-between"><span>• Overige werkgeverslasten</span><span>{wgOther.toFixed(2)}%</span></li>
         </ul>
-        <div className="mt-3 flex items-end justify-between">
+        <div className="mt-3 flex items-end justify-between pb-0 mb-0">
           <span className="text-xs text-gray-500">Som onderdelen</span>
           <span className="text-base font-semibold">41.60%</span>
         </div>
