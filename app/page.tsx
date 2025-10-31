@@ -13,22 +13,6 @@ export default function Home() {
   const result = useMemo(() => calculateAll(inputs), [inputs]);
   const exportRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem("zzp-emp-calculator-2026");
-      if (raw) {
-        const parsed = JSON.parse(raw) as Partial<CalculatorInputs>;
-        setInputs((prev) => ({ ...prev, ...parsed }));
-      }
-    } catch {}
-  }, []);
-
-  useEffect(() => {
-    try {
-      localStorage.setItem("zzp-emp-calculator-2026", JSON.stringify(inputs));
-    } catch {}
-  }, [inputs]);
-
   const setValue = useCallback((key: keyof CalculatorInputs, value: number) => {
     setInputs((prev) => ({ ...prev, [key]: value }));
   }, []);
@@ -59,7 +43,7 @@ export default function Home() {
           <h1 className="text-2xl md:text-3xl font-bold">
             ZZP vs Uitzenden Vergelijker
           </h1>
-          <p className="mt-2 text-gray-600">Vergelijk netto inkomen per maand met reële aannames (2026).</p>
+          <p className="mt-2 text-gray-600">Vergelijk netto inkomen per maand met reële aannames (2026). Alle berekeningen gaan uit van 12 maanden (jaar).</p>
         </header>
 
         <section className="mb-6">
