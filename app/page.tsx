@@ -2,9 +2,8 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Calculator from "@/components/Calculator";
-import ResultTable from "@/components/ResultTable";
 import ResultChart from "@/components/ResultChart";
-import { CalculatorInputs, calculateAll, defaultInputs, formatCurrency, formatPercent } from "@/lib/calculations";
+import { CalculatorInputs, calculateAll, defaultInputs, formatCurrency, formatCurrencyWithDecimals, formatPercent } from "@/lib/calculations";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 
@@ -54,19 +53,26 @@ export default function Home() {
 
         <section ref={exportRef} className="space-y-6">
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            {/* ZZP Column */}
             <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
-              <h2 className="mb-3 text-lg font-semibold">Resultaten</h2>
-              <div className="flex items-baseline gap-3">
-                <span className="text-sm text-gray-600">Netto per maand:</span>
-                <span className="text-2xl font-bold text-[#00B37E]">{formatCurrency(result.zzp.nettoMaand)}</span>
-                <span className="text-gray-400">vs</span>
-                <span className="text-2xl font-bold">{formatCurrency(result.emp.nettoMaand)}</span>
+              <h2 className="mb-3 text-lg font-semibold">ZZP</h2>
+              <div className="mb-4">
+                <div className="text-sm text-gray-600 mb-2">Netto per maand:</div>
+                <div className="text-2xl font-bold">{formatCurrencyWithDecimals(result.zzp.nettoMaand)}</div>
               </div>
+              <ResultChart data={result} type="zzp" />
             </div>
-            <ResultChart data={result} />
+            
+            {/* Uitzenden Column */}
+            <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+              <h2 className="mb-3 text-lg font-semibold">Uitzenden</h2>
+              <div className="mb-4">
+                <div className="text-sm text-gray-600 mb-2">Netto per maand:</div>
+                <div className="text-2xl font-bold">{formatCurrencyWithDecimals(result.emp.nettoMaand)}</div>
+              </div>
+              <ResultChart data={result} type="uitzenden" />
+            </div>
           </div>
-
-          <ResultTable data={result} />
         </section>
 
         <div className="mt-6 flex flex-wrap items-center gap-3">

@@ -1,7 +1,7 @@
 "use client";
 
-import { ChangeEvent } from "react";
-import { formatCurrency, formatCurrencyWithDecimals, getWorkableAnnualHours, calculateIncomeTax } from "@/lib/calculations";
+import { ChangeEvent, useState } from "react";
+import { formatCurrency, formatCurrencyWithDecimals, getWorkableAnnualHours, calculateIncomeTax, calculateZzp } from "@/lib/calculations";
 
 type NumericKey =
   | "rate"
@@ -104,6 +104,50 @@ export default function Calculator({ values, onChange }: CalculatorProps) {
   const nettoUurloon = nettoJaar / annualHours;
   const nettoMaand = nettoJaar / 12;
   
+  // ZZP netto uit lib-berekening (zelfde inputs)
+  const zzpCalc = calculateZzp(values as any);
+  
+  // Bereken alle tussenstappen voor ZZP breakdown (gebruik bestaande variabelen waar mogelijk)
+  const costsPct = values.costs ?? 10;
+  const pensionTotalPct = values.pensionTotal ?? 20;
+  const pensionBasePct = pensionBase; // gebruik bestaande variabele
+  
+  // Tussenstappen berekenen
+  const omzet = effectiveRateZzp * annualHours;
+  const bedrijfskosten = omzet * (costsPct / 100);
+  const winstVoorBelasting = omzet - bedrijfskosten;
+  const aov = omzet * 0.065; // 6.5% van omzet voor AOV
+  const wwBuffer = omzet * 0.03; // 3% van omzet als WW buffer/sparen
+  const pensioenBasis = winstVoorBelasting * (pensionBasePct / 100);
+  const pensioen = pensioenBasis * (pensionTotalPct / 100);
+  const winstNaVerzekeringen = Math.max(0, winstVoorBelasting - aov - wwBuffer);
+  const winstNaPensioen = Math.max(0, winstNaVerzekeringen - pensioen);
+  const zelfstandigenaftrek = 3750;
+  const winstNaZelfstandig = Math.max(0, winstNaPensioen - zelfstandigenaftrek);
+  const mkbVrijstelling = winstNaZelfstandig * 0.14;
+  const belastbaarInkomen = Math.max(0, winstNaZelfstandig - mkbVrijstelling);
+  
+  let brutoBelasting = 0;
+  if (belastbaarInkomen <= 73031) {
+    brutoBelasting = belastbaarInkomen * 0.3693;
+  } else {
+    brutoBelasting = 73031 * 0.3693 + (belastbaarInkomen - 73031) * 0.495;
+  }
+  
+  let arbeidskorting = 0;
+  if (belastbaarInkomen <= 40000) {
+    arbeidskorting = 4000;
+  } else if (belastbaarInkomen < 130000) {
+    arbeidskorting = 4000 * (1 - (belastbaarInkomen - 40000) / 90000);
+  }
+  
+  const inkomstenbelasting = Math.max(0, brutoBelasting - arbeidskorting);
+  const vakantiegeld = omzet * (vacationPct / 100);
+  const nettoJaarBerekend = (winstVoorBelasting - inkomstenbelasting) - aov - wwBuffer - pensioen - vakantiegeld;
+  const nettoUurloonZzp = nettoJaarBerekend / annualHours;
+  
+  const [showZzpBreakdown, setShowZzpBreakdown] = useState(false);
+  
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div>
@@ -157,10 +201,151 @@ export default function Calculator({ values, onChange }: CalculatorProps) {
           <span className="text-xs text-gray-500">{formatCurrencyWithDecimals(clientRateEmp)} × (1 − {marginEmp.toFixed(1)}%)</span>
         </div>
       </div>
-      <div className="space-y-4">
-        <NumberField label="Kosten ZZP" min={0} max={50} step={0.5} value={values.costs} onChange={(v) => onChange("costs", v)} suffix="%" />
-        <NumberField label="Belastingdruk ZZP" min={0} max={60} step={0.5} value={values.taxZzp} onChange={(v) => onChange("taxZzp", v)} suffix="%" />
-        <NumberField label="Pensioenpremie totaal ZZP" min={0} max={40} step={0.1} value={values.pensionTotal} onChange={(v) => onChange("pensionTotal", v)} suffix="%" />
+      {/* UITGEZET: handmatige ZZP schuifjes */}
+      {false && (
+        <div className="space-y-4">
+          <NumberField label="Kosten ZZP" min={0} max={50} step={0.5} value={values.costs} onChange={(v) => onChange("costs", v)} suffix="%" />
+          <NumberField label="Belastingdruk ZZP" min={0} max={60} step={0.5} value={values.taxZzp} onChange={(v) => onChange("taxZzp", v)} suffix="%" />
+          <NumberField label="Pensioenpremie totaal ZZP" min={0} max={40} step={0.1} value={values.pensionTotal} onChange={(v) => onChange("pensionTotal", v)} suffix="%" />
+        </div>
+      )}
+      <div className="rounded-xl bg-white border border-gray-100 shadow-sm p-4">
+        <p className="text-sm text-gray-600 mb-2">ZZP opbouw (van omzet)</p>
+        <ul className="text-sm text-gray-700 space-y-1">
+          <li className="flex justify-between"><span>• Bedrijfskosten</span><span>{costsPct.toFixed(1)}%</span></li>
+          <li className="flex justify-between"><span>• AOV</span><span>6.5%</span></li>
+          <li className="flex justify-between"><span>• WW buffer/sparen</span><span>3.0%</span></li>
+          <li className="flex justify-between"><span>• Pensioen (grondslag {pensionBasePct}%)</span><span>{(pensionBasePct * pensionTotalPct / 100).toFixed(1)}%</span></li>
+          <li className="flex justify-between"><span>• Vakantiegeld</span><span>{vacationPct.toFixed(1)}%</span></li>
+        </ul>
+        <div className="mt-3 pt-2 border-t border-gray-100 space-y-1">
+          <div className="flex justify-between text-xs text-gray-600">
+            <span>Zelfstandigenaftrek</span>
+            <span>{formatCurrency(zelfstandigenaftrek)}</span>
+          </div>
+          <div className="flex justify-between text-xs text-gray-600">
+            <span>MKB-vrijstelling</span>
+            <span>14%</span>
+          </div>
+          <div className="flex justify-between text-xs text-gray-600">
+            <span>Belasting (box 1)</span>
+            <span>36.93% / 49.5%</span>
+          </div>
+        </div>
+        <button
+          onClick={() => setShowZzpBreakdown(!showZzpBreakdown)}
+          className="mt-3 w-full flex items-center justify-between px-3 py-2 text-sm font-medium text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-lg border border-gray-200 transition-colors"
+        >
+          <span>{showZzpBreakdown ? "Verberg detail" : "Meer detail"}</span>
+          <svg
+            className={`w-4 h-4 text-gray-500 transition-transform ${showZzpBreakdown ? "rotate-180" : ""}`}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+        {showZzpBreakdown && (
+          <div className="mt-3 pt-3 border-t border-gray-200 space-y-2 text-xs">
+            <div className="flex justify-between">
+              <span className="text-gray-600">Effectieve rate ZZP</span>
+              <span className="font-semibold">{formatCurrencyWithDecimals(effectiveRateZzp)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">× Jaaruren ({annualHours.toLocaleString("nl-NL")} uur)</span>
+              <span className="text-gray-500">= {formatCurrency(omzet)}</span>
+            </div>
+            <div className="flex justify-between text-gray-700 pl-4">
+              <span>Omzet (jaar)</span>
+              <span className="font-medium">{formatCurrency(omzet)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">− Bedrijfskosten ({costsPct}%)</span>
+              <span className="text-gray-500">{formatCurrency(bedrijfskosten)}</span>
+            </div>
+            <div className="flex justify-between text-gray-700 pl-4">
+              <span>Winst voor belasting</span>
+              <span className="font-medium">{formatCurrency(winstVoorBelasting)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">− AOV (6.5% van omzet)</span>
+              <span className="text-gray-500">{formatCurrency(aov)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">− WW buffer/sparen (3% van omzet)</span>
+              <span className="text-gray-500">{formatCurrency(wwBuffer)}</span>
+            </div>
+            <div className="flex justify-between text-gray-700 pl-4">
+              <span>Winst na verzekeringen</span>
+              <span className="font-medium">{formatCurrency(winstNaVerzekeringen)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">− Pensioen ({pensionBasePct}% × {pensionTotalPct}%)</span>
+              <span className="text-gray-500">{formatCurrency(pensioen)}</span>
+            </div>
+            <div className="flex justify-between text-gray-700 pl-4">
+              <span>Winst na pensioen</span>
+              <span className="font-medium">{formatCurrency(winstNaPensioen)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">− Zelfstandigenaftrek</span>
+              <span className="text-gray-500">{formatCurrency(zelfstandigenaftrek)}</span>
+            </div>
+            <div className="flex justify-between text-gray-700 pl-4">
+              <span>Winst na zelfstandigenaftrek</span>
+              <span className="font-medium">{formatCurrency(winstNaZelfstandig)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">− MKB-vrijstelling (14%)</span>
+              <span className="text-gray-500">{formatCurrency(mkbVrijstelling)}</span>
+            </div>
+            <div className="flex justify-between text-gray-700 pl-4">
+              <span>Belastbaar inkomen</span>
+              <span className="font-medium">{formatCurrency(belastbaarInkomen)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">Bruto belasting</span>
+              <span className="text-gray-500">{formatCurrency(brutoBelasting)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">− Arbeidskorting</span>
+              <span className="text-gray-500">{formatCurrency(arbeidskorting)}</span>
+            </div>
+            <div className="flex justify-between text-gray-700 pl-4">
+              <span>Inkomstenbelasting</span>
+              <span className="font-medium">{formatCurrency(inkomstenbelasting)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">Winst na belasting</span>
+              <span className="text-gray-500">{formatCurrency(winstVoorBelasting - inkomstenbelasting)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">− AOV (6.5% van omzet)</span>
+              <span className="text-gray-500">{formatCurrency(aov)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">− WW buffer/sparen (3% van omzet)</span>
+              <span className="text-gray-500">{formatCurrency(wwBuffer)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">− Pensioen</span>
+              <span className="text-gray-500">{formatCurrency(pensioen)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">− Vakantiegeld ({vacationPct}%)</span>
+              <span className="text-gray-500">{formatCurrency(vakantiegeld)}</span>
+            </div>
+            <div className="flex justify-between pt-2 border-t border-gray-200">
+              <span className="text-gray-700 font-semibold">Netto per jaar</span>
+              <span className="font-bold">{formatCurrency(nettoJaarBerekend)}</span>
+            </div>
+            <div className="flex justify-between pb-0 mb-0">
+              <span className="text-gray-600">÷ 12 maanden</span>
+              <span className="text-gray-500">= {formatCurrencyWithDecimals(nettoJaarBerekend / 12)}</span>
+            </div>
+          </div>
+        )}
       </div>
       <div className="md:col-start-2 rounded-xl bg-white border border-gray-100 shadow-sm p-4">
         <p className="text-sm text-gray-600 mb-2">Totaal werkgeverslasten (uitzenden)</p>
@@ -184,6 +369,16 @@ export default function Calculator({ values, onChange }: CalculatorProps) {
         </div>
         <p className="text-xs text-gray-500">Werkgeverslasten per uur = effectieve rate × {employerTotal.toFixed(2)}%</p>
       </div>
+      <div className="rounded-xl bg-white border border-gray-100 shadow-sm p-4">
+        <p className="text-sm text-gray-600 mb-1">Netto uurloon (ZZP)</p>
+        <div className="flex items-end justify-between mb-2">
+          <span className="text-2xl font-semibold">{formatCurrencyWithDecimals(nettoUurloonZzp)}</span>
+          <span className="text-xs text-gray-500">= {formatCurrencyWithDecimals(nettoJaarBerekend)} ÷ {annualHours.toLocaleString("nl-NL")} uur</span>
+        </div>
+        <div className="space-y-1 mt-2 pt-2 border-t border-gray-100">
+          <p className="text-xs text-gray-500">Na belasting, AOV (6.5%), WW buffer (3%), pensioen en vakantiegeld</p>
+        </div>
+      </div>
       <div className="md:col-start-2 rounded-xl bg-white border border-gray-100 shadow-sm p-4">
         <p className="text-sm text-gray-600 mb-1">Netto uurloon (Uitzenden)</p>
         <div className="flex items-end justify-between mb-2">
@@ -193,6 +388,13 @@ export default function Calculator({ values, onChange }: CalculatorProps) {
         <div className="space-y-1 mt-2 pt-2 border-t border-gray-100">
           <p className="text-xs text-gray-500">Inclusief {vacationPct.toFixed(1)}% vakantiegeld: {formatCurrencyWithDecimals(vakantiegeldBedrag)}</p>
           <p className="text-xs text-gray-500">Met pensioeninhouding {pensionEmployee.toFixed(1)}% vóór belasting: {formatCurrencyWithDecimals(pensioenWerknemer)}</p>
+        </div>
+      </div>
+      <div className="rounded-xl bg-white border border-gray-100 shadow-sm p-4 self-start">
+        <p className="text-sm text-gray-600 mb-1">Netto maandloon (ZZP)</p>
+        <div className="flex items-end justify-between mb-2">
+          <span className="text-2xl font-semibold">{formatCurrencyWithDecimals(zzpCalc.nettoMaand)}</span>
+          <span className="text-xs text-gray-500">= {formatCurrencyWithDecimals(zzpCalc.nettoJaar)} ÷ 12</span>
         </div>
       </div>
       <div className="md:col-start-2 rounded-xl bg-white border border-gray-100 shadow-sm p-4">

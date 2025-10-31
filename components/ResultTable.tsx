@@ -1,6 +1,6 @@
 "use client";
 
-import { ComparisonResult, formatCurrency } from "@/lib/calculations";
+import { ComparisonResult, formatCurrency, formatCurrencyWithDecimals } from "@/lib/calculations";
 
 export default function ResultTable({ data }: { data: ComparisonResult }) {
   const { zzp, emp } = data;
@@ -17,23 +17,23 @@ export default function ResultTable({ data }: { data: ComparisonResult }) {
         <tbody className="divide-y divide-gray-100">
           <tr>
             <td className="px-4 py-3 text-sm text-gray-600">Netto per maand</td>
-            <td className="px-4 py-3 font-semibold">{formatCurrency(zzp.nettoMaand)}</td>
-            <td className="px-4 py-3 font-semibold">{formatCurrency(emp.nettoMaand)}</td>
+            <td className="px-4 py-3 font-semibold">{formatCurrencyWithDecimals(zzp.nettoMaand)}</td>
+            <td className="px-4 py-3 font-semibold">{formatCurrencyWithDecimals(emp.nettoMaand)}</td>
           </tr>
           <tr>
             <td className="px-4 py-3 text-sm text-gray-600">Netto per jaar</td>
-            <td className="px-4 py-3">{formatCurrency(zzp.nettoJaar)}</td>
-            <td className="px-4 py-3">{formatCurrency(emp.nettoJaar)}</td>
+            <td className="px-4 py-3">{formatCurrencyWithDecimals(zzp.nettoJaar)}</td>
+            <td className="px-4 py-3">{formatCurrencyWithDecimals(emp.nettoJaar)}</td>
           </tr>
           <tr>
             <td className="px-4 py-3 text-sm text-gray-600">Vakantiegeld</td>
-            <td className="px-4 py-3">{formatCurrency(zzp.vakantiegeld)}</td>
-            <td className="px-4 py-3">{formatCurrency(emp.vakantiegeldEmp)}</td>
+            <td className="px-4 py-3">{formatCurrencyWithDecimals(zzp.vakantiegeld)}</td>
+            <td className="px-4 py-3">{formatCurrencyWithDecimals(emp.vakantiegeldEmp)}</td>
           </tr>
           <tr>
             <td className="px-4 py-3 text-sm text-gray-600">Pensioen (werknemer)</td>
-            <td className="px-4 py-3">{formatCurrency(zzp.pensioen)}</td>
-            <td className="px-4 py-3">{formatCurrency(emp.pensioenWerknemer)}</td>
+            <td className="px-4 py-3">{formatCurrencyWithDecimals(zzp.pensioen)}</td>
+            <td className="px-4 py-3">{formatCurrencyWithDecimals(emp.pensioenWerknemer)}</td>
           </tr>
         </tbody>
       </table>

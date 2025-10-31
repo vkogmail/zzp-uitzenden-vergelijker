@@ -65,25 +65,68 @@ export function calculateZzp(inputs: CalculatorInputs): ZzpResult {
     marginZzp,
   } = inputs;
 
+  // === Stap 1: Basisberekening (tarief, omzet, kosten) ===
   const effectiveRateZzp = clientRateZzp != null && marginZzp != null
     ? clientRateZzp * (1 - toPct(marginZzp))
     : rate;
-  // Use same hoursPerWeek for both ZZP and Employee for fair comparison
   const hoursPerWeekActual = hoursPerWeek && hoursPerWeek > 0 ? hoursPerWeek : 36;
   const annualHours = getWorkableAnnualHours(hoursPerWeekActual);
-  const omzet = effectiveRateZzp * annualHours;
-  const winstVoorBelasting = omzet * (1 - toPct(costs));
-  const belasting = winstVoorBelasting * toPct(taxZzp);
-  const winstNaBelasting = winstVoorBelasting - belasting;
-  const vakantiegeld = omzet * toPct(vacation);
-  const pensioen = omzet * toPct(pensionBase) * toPct(pensionTotal);
-  const nettoJaar = winstNaBelasting - vakantiegeld - pensioen;
+  const omzet = effectiveRateZzp * annualHours; // revenue
+  const businessCosts = omzet * toPct(costs);
+  const winstVoorBelasting = omzet - businessCosts; // grossProfit
+
+  // === Stap 2: Verzekeringen en buffers (aftrekbaar vóór belasting, berekend op omzet) ===
+  const aov = omzet * 0.065; // 6.5% van omzet voor AOV
+  const wwBuffer = omzet * 0.03; // 3% van omzet als WW buffer/sparen
+
+  // === Stap 3: Pensioeninleg (aftrekbaar vóór belasting) ===
+  // pensionBase: % van loon dat meetelt voor pensioenbasis (bijv. 90)
+  // pensionTotal: totale inleg (%), hier gebruikt als zelfstandige lijfrente-inleg
+  const pensionBasePct = toPct(pensionBase);
+  const pensionPct = toPct(pensionTotal);
+  const pensioenBasis = winstVoorBelasting * pensionBasePct;
+  const pensioen = pensioenBasis * pensionPct; // pensionContribution
+
+  // === Stap 4: Fiscale winstberekening ===
+  const zelfstandigenaftrek = 3750; // 2026
+  const mkbVrijstellingPct = 0.14;
+  const winstNaVerzekeringen = Math.max(0, winstVoorBelasting - aov - wwBuffer);
+  const winstNaPensioen = Math.max(0, winstNaVerzekeringen - pensioen);
+  const winstNaZelfstandig = Math.max(0, winstNaPensioen - zelfstandigenaftrek);
+  const mkbVrijstelling = winstNaZelfstandig * mkbVrijstellingPct;
+  const belastbaarInkomen = Math.max(0, winstNaZelfstandig - mkbVrijstelling);
+
+  // === Stap 5: Box 1 belasting ===
+  let brutoBelasting = 0;
+  if (belastbaarInkomen <= 73031) {
+    brutoBelasting = belastbaarInkomen * 0.3693;
+  } else {
+    brutoBelasting = 73031 * 0.3693 + (belastbaarInkomen - 73031) * 0.495;
+  }
+
+  // === Stap 6: Arbeidskorting (benadering) ===
+  let arbeidskorting = 0;
+  if (belastbaarInkomen <= 40000) {
+    arbeidskorting = 4000;
+  } else if (belastbaarInkomen < 130000) {
+    arbeidskorting = 4000 * (1 - (belastbaarInkomen - 40000) / 90000);
+  } else {
+    arbeidskorting = 0;
+  }
+
+  const inkomstenbelasting = Math.max(0, brutoBelasting - arbeidskorting);
+
+  // === Stap 7: Netto resultaat ===
+  const winstNaBelasting = winstVoorBelasting - inkomstenbelasting; // for reporting parity
+  const vakantiegeld = omzet * toPct(vacation); // reserve on revenue
+  // Netto = winst na belasting - AOV - WW buffer - pensioen - vakantiegeld
+  const nettoJaar = (winstVoorBelasting - inkomstenbelasting) - aov - wwBuffer - pensioen - vakantiegeld;
   const nettoMaand = nettoJaar / 12;
 
   return {
     omzet,
     winstVoorBelasting,
-    belasting,
+    belasting: inkomstenbelasting,
     winstNaBelasting,
     vakantiegeld,
     pensioen,
@@ -119,8 +162,10 @@ export function calculateEmployee(inputs: CalculatorInputs): EmployeeResult {
     ? clientRateEmp * (1 - toPct(marginEmp))
     : rate;
   const wgPct = employerTotalPct != null ? employerTotalPct : 41.6;
-  // kostprijs = bruto * (1 + wgPct); dus bruto = kostprijs / (1 + wgPct)
-  const brutoUurloon = effectiveClientToAgency / (1 + toPct(wgPct));
+  // Werkgeverslasten per uur = effectief tarief × werkgeverslasten%
+  // Bruto uurloon = effectief tarief - werkgeverslasten per uur
+  const employerCostsPerHour = effectiveClientToAgency * toPct(wgPct);
+  const brutoUurloon = effectiveClientToAgency - employerCostsPerHour;
   const hoursPerWeekActual = hoursPerWeek && hoursPerWeek > 0 ? hoursPerWeek : 36;
   const annualHours = getWorkableAnnualHours(hoursPerWeekActual);
   
@@ -129,7 +174,9 @@ export function calculateEmployee(inputs: CalculatorInputs): EmployeeResult {
   const jaarLoonMetVakantie = brutoJaarloon * 1.08;
   
   const vakantiegeldEmp = brutoJaarloon * toPct(vacation);
-  const pensioenWerknemer = brutoJaarloon * toPct(pensionBase) * toPct(pensionEmployee);
+  const pensionEmployeeActual = pensionEmployee ?? 7.5;
+  const pensionBaseActual = pensionBase ?? 90;
+  const pensioenWerknemer = brutoJaarloon * toPct(pensionBaseActual) * toPct(pensionEmployeeActual);
   
   // Pensioen is aftrekbaar voor belasting (belastbaar = jaarloon met vakantie - pensioen)
   const belastbaarBedrag = jaarLoonMetVakantie - pensioenWerknemer;
