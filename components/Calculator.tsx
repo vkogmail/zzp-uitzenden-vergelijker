@@ -115,16 +115,21 @@ export default function Calculator({ values, onChange }: CalculatorProps) {
   // Tussenstappen berekenen (volgens nieuwe logica)
   const omzet = effectiveRateZzp * annualHours;
   const bedrijfskosten = omzet * (costsPct / 100);
-  const aov = omzet * 0.065; // 6.5% van omzet voor AOV (fiscaal aftrekbaar)
   
-  // Pensioen wordt berekend op (omzet - bedrijfskosten - AOV)
-  const pensioen = (omzet - bedrijfskosten - aov) * (pensionBasePct / 100) * (pensionTotalPct / 100);
+  // AOV alleen aftrekbaar bij echte verzekering
+  const heeftEchteAovVerzekering = false; // TODO: moet input worden
+  const aov = heeftEchteAovVerzekering ? omzet * 0.065 : 0;
   
-  // Winst voor belasting = omzet - bedrijfskosten - AOV - pensioen
-  const winstVoorBelasting = omzet - bedrijfskosten - aov - pensioen;
+  // Pensioen wordt berekend op (omzet - bedrijfskosten - AOV) met plafond van 30% jaarruimte
+  const pensioenZonderPlafond = (omzet - bedrijfskosten - aov) * (pensionBasePct / 100) * (pensionTotalPct / 100);
+  const jaarruimteMax = (omzet - bedrijfskosten - aov) * 0.30;
+  const pensioen = Math.min(pensioenZonderPlafond, jaarruimteMax);
+  
+  // Winst voor belasting = omzet - bedrijfskosten - AOV (alleen bij echte verzekering) - pensioen
+  const winstVoorBelasting = omzet - bedrijfskosten - (heeftEchteAovVerzekering ? aov : 0) - pensioen;
   
   // Ondernemersaftrekken
-  const zelfstandigenaftrek = 3750;
+  const zelfstandigenaftrek = 3360; // Gecorrigeerd naar €3360
   const winstNaZelfstandig = Math.max(0, winstVoorBelasting - zelfstandigenaftrek);
   const mkbVrijstelling = winstNaZelfstandig * 0.14;
   const belastbaarInkomen = Math.max(0, winstNaZelfstandig - mkbVrijstelling);
@@ -154,9 +159,16 @@ export default function Calculator({ values, onChange }: CalculatorProps) {
   
   const inkomstenbelasting = Math.max(0, brutoBelasting - algemeneHeffingskorting - arbeidskorting);
   
+  // Effectieve belastingdruk berekenen
+  const effectieveBelastingdruk = belastbaarInkomen > 0 ? inkomstenbelasting / belastbaarInkomen : 0;
+  
   // POST-TAX kosten (niet fiscaal aftrekbaar)
+  // WW-buffer wordt na belasting afgetrokken
   const wwBuffer = omzet * 0.03; // 3% van omzet als WW buffer/sparen
-  const vakantiegeld = (omzet - bedrijfskosten - aov) * (vacationPct / 100); // vakantiereserve
+  // Vakantiegeld: 8.33% met effectieve belastingdruk toegepast
+  const vakantiegeldBasePct = 8.33; // Basis percentage
+  const vakantiegeldEffectiefPct = vakantiegeldBasePct * (1 - effectieveBelastingdruk);
+  const vakantiegeld = (omzet - bedrijfskosten - (heeftEchteAovVerzekering ? aov : 0)) * (vakantiegeldEffectiefPct / 100); // vakantiereserve
   
   // Netto = winst voor belasting - belasting - WW buffer - vakantiegeld
   const nettoJaarBerekend = winstVoorBelasting - inkomstenbelasting - wwBuffer - vakantiegeld;
@@ -231,15 +243,17 @@ export default function Calculator({ values, onChange }: CalculatorProps) {
           <p className="text-xs text-gray-500 mb-1 font-medium">Voor belasting:</p>
           <ul className="text-sm text-gray-700 space-y-1">
             <li className="flex justify-between"><span>• Bedrijfskosten</span><span>{costsPct.toFixed(1)}%</span></li>
-            <li className="flex justify-between"><span>• AOV</span><span>6.5%</span></li>
-            <li className="flex justify-between"><span>• Pensioen (grondslag {pensionBasePct}%)</span><span>{(pensionBasePct * pensionTotalPct / 100).toFixed(1)}%</span></li>
+            {heeftEchteAovVerzekering && (
+              <li className="flex justify-between"><span>• AOV</span><span>6.5%</span></li>
+            )}
+            <li className="flex justify-between"><span>• Pensioen (grondslag {pensionBasePct}%, max 30% jaarruimte)</span><span>{(pensionBasePct * pensionTotalPct / 100).toFixed(1)}%</span></li>
           </ul>
         </div>
         <div className="mb-3">
           <p className="text-xs text-gray-500 mb-1 font-medium">Na belasting:</p>
           <ul className="text-sm text-gray-700 space-y-1">
             <li className="flex justify-between"><span>• WW-buffer</span><span>3.0%</span></li>
-            <li className="flex justify-between"><span>• Vakantiegeld</span><span>{vacationPct.toFixed(1)}%</span></li>
+            <li className="flex justify-between"><span>• Vakantiegeld (8.33% × {((1 - effectieveBelastingdruk) * 100).toFixed(1)}%)</span><span>{vakantiegeldEffectiefPct.toFixed(2)}%</span></li>
           </ul>
         </div>
         <div className="mt-3 pt-2 border-t border-gray-100 space-y-1">
@@ -292,12 +306,14 @@ export default function Calculator({ values, onChange }: CalculatorProps) {
                   <span className="text-gray-600">− Bedrijfskosten ({costsPct}%)</span>
                   <span className="text-gray-500">{formatCurrency(bedrijfskosten)}</span>
                 </div>
+                {heeftEchteAovVerzekering && (
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">− AOV (6.5% van omzet)</span>
+                    <span className="text-gray-500">{formatCurrency(aov)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between">
-                  <span className="text-gray-600">− AOV (6.5% van omzet)</span>
-                  <span className="text-gray-500">{formatCurrency(aov)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">− Pensioen ({pensionBasePct}% × {pensionTotalPct}%)</span>
+                  <span className="text-gray-600">− Pensioen ({pensionBasePct}% × {pensionTotalPct}%, max 30% jaarruimte)</span>
                   <span className="text-gray-500">{formatCurrency(pensioen)}</span>
                 </div>
                 <div className="flex justify-between text-gray-700 pl-4 pt-1">
@@ -356,7 +372,7 @@ export default function Calculator({ values, onChange }: CalculatorProps) {
                   <span className="text-gray-500">{formatCurrency(wwBuffer)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">− Vakantiegeld ({vacationPct}%)</span>
+                  <span className="text-gray-600">− Vakantiegeld ({vakantiegeldEffectiefPct.toFixed(2)}% = 8.33% × {((1 - effectieveBelastingdruk) * 100).toFixed(1)}%)</span>
                   <span className="text-gray-500">{formatCurrency(vakantiegeld)}</span>
                 </div>
                 <div className="flex justify-between pt-2 border-t border-gray-200">

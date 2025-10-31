@@ -73,19 +73,27 @@ export function calculateZzp(inputs: CalculatorInputs): ZzpResult {
   const annualHours = getWorkableAnnualHours(hoursPerWeekActual);
   const omzet = effectiveRateZzp * annualHours; // revenue
   const businessCosts = omzet * toPct(costs); // bedrijfskosten
-  const aov = omzet * 0.065; // 6.5% van omzet voor AOV (fiscaal aftrekbaar)
+  
+  // AOV alleen aftrekbaar bij echte verzekering (voor nu niet aftrekbaar als voorbeeld)
+  // TODO: Dit moet een input worden om aan te geven of er een echte AOV verzekering is
+  const heeftEchteAovVerzekering = false; // placeholder - moet input worden
+  const aov = heeftEchteAovVerzekering ? omzet * 0.065 : 0; // AOV alleen bij echte verzekering
 
   // === Stap 2: Pensioeninleg (aftrekbaar vóór belasting) ===
   // Pensioen wordt berekend op (omzet - bedrijfskosten - AOV)
+  // Maximaal 30% jaarruimte (pensioenplafond)
   const pensionBasePct = toPct(pensionBase);
   const pensionPct = toPct(pensionTotal);
-  const pensioen = (omzet - businessCosts - aov) * pensionBasePct * pensionPct;
+  const pensioenZonderPlafond = (omzet - businessCosts - aov) * pensionBasePct * pensionPct;
+  // Pensioenplafond: max 30% van jaarruimte
+  const jaarruimteMax = (omzet - businessCosts - aov) * 0.30;
+  const pensioen = Math.min(pensioenZonderPlafond, jaarruimteMax);
 
   // === Stap 3: Winst voor belasting ===
-  const winstVoorBelasting = omzet - businessCosts - aov - pensioen;
+  const winstVoorBelasting = omzet - businessCosts - (heeftEchteAovVerzekering ? aov : 0) - pensioen;
 
   // === Stap 4: Fiscale winstberekening (ondernemersaftrekken) ===
-  const zelfstandigenaftrek = 3750; // 2026
+  const zelfstandigenaftrek = 3360; // Gecorrigeerd naar €3360
   const mkbVrijstellingPct = 0.14;
   const winstNaZelfstandig = Math.max(0, winstVoorBelasting - zelfstandigenaftrek);
   const mkbVrijstelling = winstNaZelfstandig * mkbVrijstellingPct;
@@ -118,13 +126,24 @@ export function calculateZzp(inputs: CalculatorInputs): ZzpResult {
 
   const inkomstenbelasting = Math.max(0, brutoBelasting - algemeneHeffingskorting - arbeidskorting);
 
-  // === Stap 7: POST-TAX kosten (niet fiscaal aftrekbaar) ===
-  const wwBuffer = omzet * 0.03; // 3% van omzet als WW buffer/sparen (niet fiscaal)
-  const vakantiegeld = (omzet - businessCosts - aov) * toPct(vacation); // vakantiereserve (niet fiscaal)
+  // === Stap 7: Effectieve belastingdruk berekenen ===
+  // Effectieve belastingdruk = inkomstenbelasting / belastbaar inkomen
+  const effectieveBelastingdruk = belastbaarInkomen > 0 ? inkomstenbelasting / belastbaarInkomen : 0;
 
-  // === Stap 8: Netto resultaat ===
+  // === Stap 8: POST-TAX kosten (niet fiscaal aftrekbaar) ===
+  // WW-buffer wordt na belasting afgetrokken (al correct)
+  const wwBuffer = omzet * 0.03; // 3% van omzet als WW buffer/sparen (niet fiscaal)
+  
+  // Vakantiegeld: 8.33% met effectieve belastingdruk toegepast
+  // Vakantiegeld percentage = 8.33% × (1 - effectieve belastingdruk)
+  const vakantiegeldBasePct = 8.33; // Basis percentage
+  const vakantiegeldEffectiefPct = vakantiegeldBasePct * (1 - effectieveBelastingdruk);
+  const vakantiegeld = (omzet - businessCosts - (heeftEchteAovVerzekering ? aov : 0)) * (vakantiegeldEffectiefPct / 100); // vakantiereserve (niet fiscaal)
+
+  // === Stap 9: Netto resultaat ===
   const winstNaBelasting = winstVoorBelasting - inkomstenbelasting; // for reporting parity
   // Netto = winst voor belasting - belasting - WW buffer - vakantiegeld
+  // WW buffer en vakantiegeld worden na belasting afgetrokken
   const nettoJaar = winstVoorBelasting - inkomstenbelasting - wwBuffer - vakantiegeld;
   const nettoMaand = nettoJaar / 12;
 
