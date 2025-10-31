@@ -1,4 +1,8 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ZZP vs Uitzenden Vergelijker
+
+Interactive financial comparison tool comparing net monthly income between freelancer (ZZP) and employee (Uitzenden) using realistic Dutch tax and pension assumptions for 2026.
+
+Built with [Next.js 14](https://nextjs.org), TypeScript, Tailwind CSS, and Recharts.
 
 ## Getting Started
 
