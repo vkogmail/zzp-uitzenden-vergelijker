@@ -23,6 +23,7 @@ export type ZzpResult = {
   winstNaBelasting: number;
   vakantiegeld: number;
   pensioen: number;
+  zvwPremie: number; // Zorgverzekeringswet premie (inkomensafhankelijke bijdrage)
   nettoJaar: number;
   nettoMaand: number;
 };
@@ -134,6 +135,14 @@ export function calculateZzp(inputs: CalculatorInputs): ZzpResult {
   // WW-buffer wordt na belasting afgetrokken (al correct)
   const wwBuffer = omzet * 0.03; // 3% van omzet als WW buffer/sparen (niet fiscaal)
   
+  // Zvw-premie (Zorgverzekeringswet): inkomensafhankelijke bijdrage voor ZZP'ers
+  // ZZP'ers betalen zelf de Zvw-bijdrage: ~5.75% over belastbaar inkomen (max €75.860 voor 2026)
+  // Dit wordt berekend over het belastbaar inkomen (niet over winst)
+  const zvwMaxBasis = 75860; // Maximum bijdrage-inkomen voor 2026
+  const zvwPercentage = 0.0575; // 5.75% voor 2026 (kan variëren per jaar)
+  const zvwBasis = Math.min(belastbaarInkomen, zvwMaxBasis);
+  const zvwPremie = zvwBasis * zvwPercentage;
+  
   // Vakantiegeld: 8.33% met effectieve belastingdruk toegepast
   // Vakantiegeld percentage = 8.33% × (1 - effectieve belastingdruk)
   const vakantiegeldBasePct = 8.33; // Basis percentage
@@ -142,9 +151,9 @@ export function calculateZzp(inputs: CalculatorInputs): ZzpResult {
 
   // === Stap 9: Netto resultaat ===
   const winstNaBelasting = winstVoorBelasting - inkomstenbelasting; // for reporting parity
-  // Netto = winst voor belasting - belasting - WW buffer - vakantiegeld
-  // WW buffer en vakantiegeld worden na belasting afgetrokken
-  const nettoJaar = winstVoorBelasting - inkomstenbelasting - wwBuffer - vakantiegeld;
+  // Netto = winst voor belasting - belasting - WW buffer - Zvw-premie - vakantiegeld
+  // WW buffer, Zvw-premie en vakantiegeld worden na belasting afgetrokken
+  const nettoJaar = winstVoorBelasting - inkomstenbelasting - wwBuffer - zvwPremie - vakantiegeld;
   const nettoMaand = nettoJaar / 12;
 
   return {
@@ -154,6 +163,7 @@ export function calculateZzp(inputs: CalculatorInputs): ZzpResult {
     winstNaBelasting,
     vakantiegeld,
     pensioen,
+    zvwPremie,
     nettoJaar,
     nettoMaand,
   };
@@ -186,32 +196,69 @@ export function calculateEmployee(inputs: CalculatorInputs): EmployeeResult {
     ? clientRateEmp * (1 - toPct(marginEmp))
     : rate;
   const wgPct = employerTotalPct != null ? employerTotalPct : 41.6;
-  // Werkgeverslasten per uur = effectief tarief × werkgeverslasten%
-  // Bruto uurloon = effectief tarief - werkgeverslasten per uur
-  const employerCostsPerHour = effectiveClientToAgency * toPct(wgPct);
-  const brutoUurloon = effectiveClientToAgency - employerCostsPerHour;
+  
+  // FISCALE/HR CORRECTIE:
+  // Bruto uurloon berekenen: effectief tarief ÷ (1 + werkgeverslasten%)
+  // Dit geeft het BASIS bruto uurloon (zonder vakantiegeld)
+  // Formule: effectief tarief = bruto uurloon × (1 + werkgeverslasten%)
+  // Dus: bruto uurloon = effectief tarief ÷ (1 + werkgeverslasten%)
+  const brutoUurloon = effectiveClientToAgency / (1 + toPct(wgPct));
+  
   const hoursPerWeekActual = hoursPerWeek && hoursPerWeek > 0 ? hoursPerWeek : 36;
   const annualHours = getWorkableAnnualHours(hoursPerWeekActual);
   
-  // Jaarloon = bruto uurloon * jaaruren * 1.08 (vakantiegeld inclusief)
-  const brutoJaarloon = brutoUurloon * annualHours;
-  const jaarLoonMetVakantie = brutoJaarloon * 1.08;
+  // BASIS bruto jaarloon (zonder vakantiegeld)
+  const brutoJaarloonBasis = brutoUurloon * annualHours;
   
-  const vakantiegeldEmp = brutoJaarloon * toPct(vacation);
+  // Vakantiegeld: 8% van het BASIS bruto jaarloon
+  // Vakantiegeld is een KOST voor de werkgever (zit in de 41.6% werkgeverslasten)
+  // MAAR vakantiegeld is OOK deel van het BRUTO jaarsalaris van de werknemer (belastbaar!)
+  const vacationPct = vacation ?? 8;
+  const vakantiegeldEmp = brutoJaarloonBasis * toPct(vacationPct);
+  
+  // Bruto jaarloon MET vakantiegeld = basis + vakantiegeld
+  // Dit is het volledige bruto jaarsalaris waarover belasting wordt berekend
+  const brutoJaarloonMetVakantie = brutoJaarloonBasis + vakantiegeldEmp;
+  
+  // Pensioen werknemer: berekend op BASIS bruto uurloon (niet op vakantiegeld)
+  // Pensioen wordt berekend op: bruto uurloon × pensioengrondslag% × pensioenpercentage% × jaaruren
   const pensionEmployeeActual = pensionEmployee ?? 7.5;
   const pensionBaseActual = pensionBase ?? 90;
-  const pensioenWerknemer = brutoJaarloon * toPct(pensionBaseActual) * toPct(pensionEmployeeActual);
+  const pensioenWerknemer = brutoUurloon * toPct(pensionBaseActual) * toPct(pensionEmployeeActual) * annualHours;
   
-  // Pensioen is aftrekbaar voor belasting (belastbaar = jaarloon met vakantie - pensioen)
-  const belastbaarBedrag = jaarLoonMetVakantie - pensioenWerknemer;
-  const loonbelasting = calculateIncomeTax(belastbaarBedrag);
+  // Belastbaar bedrag = bruto jaarloon MET vakantiegeld - pensioen werknemer
+  // Pensioen is fiscaal aftrekbaar voor de werknemer
+  const belastbaarBedrag = brutoJaarloonMetVakantie - pensioenWerknemer;
   
-  const nettoJaar = jaarLoonMetVakantie - loonbelasting - pensioenWerknemer;
+  // Heffingskortingen worden berekend op het belastbare bedrag
+  // Algemene heffingskorting
+  let algemeneHeffingskorting = 0;
+  if (belastbaarBedrag <= 23000) {
+    algemeneHeffingskorting = 3100;
+  } else if (belastbaarBedrag <= 73031) {
+    algemeneHeffingskorting = 3100 * (1 - (belastbaarBedrag - 23000) / 50000);
+  }
+  
+  // Arbeidskorting
+  let arbeidskorting = 0;
+  if (belastbaarBedrag <= 40000) {
+    arbeidskorting = 4000;
+  } else if (belastbaarBedrag < 130000) {
+    arbeidskorting = 4000 * (1 - (belastbaarBedrag - 40000) / 90000);
+  }
+  
+  // Loonbelasting = bruto inkomstenbelasting - heffingskortingen
+  const brutoBelasting = calculateIncomeTax(belastbaarBedrag);
+  const loonbelasting = Math.max(0, brutoBelasting - algemeneHeffingskorting - arbeidskorting);
+  
+  // Netto jaarloon = bruto jaarloon MET vakantiegeld - loonbelasting - pensioen werknemer
+  // Pensioen wordt ingehouden op het loon (na belasting)
+  const nettoJaar = brutoJaarloonMetVakantie - loonbelasting - pensioenWerknemer;
   const nettoMaand = nettoJaar / 12;
 
   return {
-    brutoUurloon,
-    brutoJaarloon,
+    brutoUurloon, // Basis bruto uurloon (zonder vakantiegeld)
+    brutoJaarloon: brutoJaarloonMetVakantie, // Volledige bruto jaarloon MET vakantiegeld
     vakantiegeldEmp,
     pensioenWerknemer,
     loonbelasting,

@@ -81,7 +81,7 @@ export default function Home() {
         </div>
 
         <footer className="mt-8 rounded-2xl border border-gray-100 bg-white p-5 text-sm text-gray-600 shadow-sm">
-          Bij gelijke voorwaarden (uurtarief €{inputs.rate}) {result.diffPercent >= 0 ? 'verdient' : 'krijgt'} een ZZP'er netto ongeveer {Math.abs(result.diffPercent * 100).toFixed(1)}% {result.diffPercent >= 0 ? 'meer' : 'minder'} dan bij uitzenden, mits vakantiegeld en pensioen eerlijk worden meegerekend. De echte verschillen zitten in zekerheid versus vrijheid.
+          {result.diffPercent >= 0 ? 'Verdient' : 'Krijgt'} een ZZP'er netto ongeveer {Math.abs(result.diffPercent * 100).toFixed(1)}% {result.diffPercent >= 0 ? 'meer' : 'minder'} dan bij uitzenden bij de huidige tarieven (ZZP: €{(inputs as any).clientRateZzp ?? inputs.rate}/uur, Uitzenden: €{(inputs as any).clientRateEmp ?? inputs.rate}/uur). Let op: pensioen percentages en marges kunnen verschillen. De echte verschillen zitten in zekerheid versus vrijheid.
         </footer>
       </div>
     </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { ChangeEvent, useState } from "react";
-import { formatCurrency, formatCurrencyWithDecimals, getWorkableAnnualHours, calculateIncomeTax, calculateZzp } from "@/lib/calculations";
+import { formatCurrency, formatCurrencyWithDecimals, getWorkableAnnualHours, calculateIncomeTax, calculateZzp, calculateEmployee } from "@/lib/calculations";
 
 type NumericKey =
   | "rate"
@@ -72,37 +72,43 @@ export default function Calculator({ values, onChange }: CalculatorProps) {
   const effectiveRateZzp = clientRateZzp * (1 - marginZzp / 100);
   const effectiveRateEmp = clientRateEmp * (1 - marginEmp / 100);
   // Werkgeverslasten (vaste componenten volgens specificatie)
-  const wgSocial = 11.0;
-  const wgVacation = 8.33;
-  const wgPensionEmployer = 14.31;
-  const wgInsurance = 2.0;
-  const wgOther = 6.0;
+  // Opbouw 41.6% werkgeverslasten:
+  const wgSocial = 11.0; // Sociale premies (WW, WIA, ZW)
+  const wgZvw = 6.75; // Zorgverzekeringswet heffing (werkgeversheffing Zvw)
+  const wgVacation = 8.33; // Vakantiegeld
+  const wgPensionEmployer = 14.31; // Pensioen werkgeversdeel
+  const wgInsurance = 1.21; // Overige verzekeringen (aangepast voor Zvw)
+  const wgOther = 0; // Overige (nu 0 omdat Zvw expliciet is opgenomen)
   const employerTotal = 41.6;
+  
+  // Bereken som expliciet voor verificatie
+  const werkgeverslastenSom = wgSocial + wgZvw + wgVacation + wgPensionEmployer + wgInsurance;
   const employerTotalFraction = employerTotal / 100;
-  const employerCostsPerHour = effectiveRateEmp * employerTotalFraction;
-  const brutoUurloonEmp = effectiveRateEmp - employerCostsPerHour;
   
   // Calculate annual hours based on hours per week
   const hoursPerWeekInput = (values as any).hoursPerWeek ?? 36;
   const annualHours = getWorkableAnnualHours(hoursPerWeekInput);
   
-  // Calculate netto uurloon for display
-  const brutoJaarloon = brutoUurloonEmp * annualHours;
-  const jaarLoonMetVakantie = brutoJaarloon * 1.08;
+  // Use calculateEmployee for consistent calculations (includes fix for vacation pay double-counting)
+  const empCalc = calculateEmployee(values as any);
+  const brutoUurloonEmp = empCalc.brutoUurloon;
+  const brutoJaarloon = empCalc.brutoJaarloon; // This is already WITH vacation pay included
   const vacationPct = values.vacation ?? 8;
   const pensionEmployee = (values as any).pensionEmployee ?? 7.5;
   const pensionBase = values.pensionBase ?? 90;
   
-  const vakantiegeldBedrag = brutoJaarloon * (vacationPct / 100);
-  const pensioenWerknemer = brutoJaarloon * (pensionBase / 100) * (pensionEmployee / 100);
-  
-  // Pensioen is aftrekbaar voor belasting (belastbaar = jaarloon met vakantie - pensioen)
-  const belastbaarBedrag = jaarLoonMetVakantie - pensioenWerknemer;
-  const loonbelasting = calculateIncomeTax(belastbaarBedrag);
-  
-  const nettoJaar = jaarLoonMetVakantie - loonbelasting - pensioenWerknemer;
+  // Calculate vacation pay amount (for display purposes)
+  // Note: vacation pay is already included in brutoJaarloon, so we calculate it separately for display
+  const brutoJaarloonZonderVakantie = brutoUurloonEmp * annualHours;
+  const vakantiegeldBedrag = empCalc.vakantiegeldEmp;
+  const pensioenWerknemer = empCalc.pensioenWerknemer;
+  const loonbelasting = empCalc.loonbelasting;
+  const nettoJaar = empCalc.nettoJaar;
   const nettoUurloon = nettoJaar / annualHours;
-  const nettoMaand = nettoJaar / 12;
+  const nettoMaand = empCalc.nettoMaand;
+  
+  // For display: employer costs per hour
+  const employerCostsPerHour = effectiveRateEmp * employerTotalFraction;
   
   // ZZP netto uit lib-berekening (zelfde inputs)
   const zzpCalc = calculateZzp(values as any);
@@ -165,13 +171,15 @@ export default function Calculator({ values, onChange }: CalculatorProps) {
   // POST-TAX kosten (niet fiscaal aftrekbaar)
   // WW-buffer wordt na belasting afgetrokken
   const wwBuffer = omzet * 0.03; // 3% van omzet als WW buffer/sparen
+  // Zvw-premie gebruiken uit de berekening
+  const zvwPremie = zzpCalc.zvwPremie;
   // Vakantiegeld: 8.33% met effectieve belastingdruk toegepast
   const vakantiegeldBasePct = 8.33; // Basis percentage
   const vakantiegeldEffectiefPct = vakantiegeldBasePct * (1 - effectieveBelastingdruk);
   const vakantiegeld = (omzet - bedrijfskosten - (heeftEchteAovVerzekering ? aov : 0)) * (vakantiegeldEffectiefPct / 100); // vakantiereserve
   
-  // Netto = winst voor belasting - belasting - WW buffer - vakantiegeld
-  const nettoJaarBerekend = winstVoorBelasting - inkomstenbelasting - wwBuffer - vakantiegeld;
+  // Netto = winst voor belasting - belasting - WW buffer - Zvw-premie - vakantiegeld
+  const nettoJaarBerekend = winstVoorBelasting - inkomstenbelasting - wwBuffer - zvwPremie - vakantiegeld;
   const nettoUurloonZzp = nettoJaarBerekend / annualHours;
   
   const [showZzpBreakdown, setShowZzpBreakdown] = useState(false);
@@ -186,8 +194,61 @@ export default function Calculator({ values, onChange }: CalculatorProps) {
       </div>
       <NumberField label="Klanttarief ZZP" min={10} max={300} step={1} value={(values as any).clientRateZzp ?? values.rate} onChange={(v) => onChange("clientRateZzp" as any, v)} suffix="€" />
       <NumberField label="Klanttarief Uitzenden" min={10} max={300} step={1} value={(values as any).clientRateEmp ?? values.rate} onChange={(v) => onChange("clientRateEmp" as any, v)} suffix="€" />
-      <NumberField label="Marge ZZP" min={0} max={50} step={0.5} value={(values as any).marginZzp ?? 0} onChange={(v) => onChange("marginZzp" as any, v)} suffix="%" />
-      <NumberField label="Marge Uitzenden" min={0} max={50} step={0.5} value={(values as any).marginEmp ?? 0} onChange={(v) => onChange("marginEmp" as any, v)} suffix="%" />
+      <div className="rounded-xl bg-white border border-gray-100 shadow-sm p-4">
+        <div className="flex items-center gap-2 mb-2">
+          <label className="text-sm text-gray-600">Marge ZZP (ingehouden %)</label>
+          <div className="group relative">
+            <svg className="w-4 h-4 text-gray-400 cursor-help" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-.715-1.5A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
+            </svg>
+            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-64 p-2 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
+              Percentage dat wordt ingehouden door tussenpartij voordat het tarief aan de ZZP'er wordt doorbetaald.
+            </div>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <input
+            type="number"
+            min={0}
+            max={50}
+            step={0.5}
+            value={(values as any).marginZzp ?? 0}
+            onChange={(e) => onChange("marginZzp" as any, Number(e.target.value))}
+            className="flex-1 rounded-lg border border-gray-200 px-3 py-2"
+          />
+          <span className="text-sm text-gray-500">%</span>
+        </div>
+      </div>
+      <div className="rounded-xl bg-white border border-gray-100 shadow-sm p-4">
+        <div className="flex items-center gap-2 mb-2">
+          <label className="text-sm text-gray-600">Marge Uitzenden (ingehouden %)</label>
+          <div className="group relative">
+            <svg className="w-4 h-4 text-gray-400 cursor-help" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-.715-1.5A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
+            </svg>
+            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-72 p-2 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
+              Percentage dat wordt ingehouden door uitzendbureau. Marges zijn vaak hoger bij uitzenden omdat het bureau voorfinanciert (je krijgt direct betaald aan het einde van de maand).
+            </div>
+          </div>
+        </div>
+        {(marginZzp > 0 && marginEmp > 0 && Math.abs(marginZzp - marginEmp) > 1) && (
+          <div className="mb-2 p-2 bg-amber-50 border border-amber-200 rounded text-xs text-amber-800">
+            ⚠️ Let op: Marges verschillen ({marginZzp.toFixed(1)}% vs {marginEmp.toFixed(1)}%). Dit beïnvloedt de vergelijking.
+          </div>
+        )}
+        <div className="flex items-center gap-2">
+          <input
+            type="number"
+            min={0}
+            max={50}
+            step={0.5}
+            value={(values as any).marginEmp ?? 0}
+            onChange={(e) => onChange("marginEmp" as any, Number(e.target.value))}
+            className="flex-1 rounded-lg border border-gray-200 px-3 py-2"
+          />
+          <span className="text-sm text-gray-500">%</span>
+        </div>
+      </div>
       <div className="md:col-span-2 rounded-xl bg-white border border-gray-100 shadow-sm p-4">
         <label className="text-sm text-gray-600 mb-2 block">Uren per week</label>
         <div className="flex items-center gap-2 mb-3">
@@ -246,14 +307,22 @@ export default function Calculator({ values, onChange }: CalculatorProps) {
             {heeftEchteAovVerzekering && (
               <li className="flex justify-between"><span>• AOV</span><span>6.5%</span></li>
             )}
-            <li className="flex justify-between"><span>• Pensioen (grondslag {pensionBasePct}%, max 30% jaarruimte)</span><span>{(pensionBasePct * pensionTotalPct / 100).toFixed(1)}%</span></li>
+            <li className="flex justify-between">
+              <span>• Pensioen totaal (grondslag {pensionBasePct}%, max 30% jaarruimte)</span>
+              <span>{pensionTotalPct.toFixed(1)}%</span>
+            </li>
+            <li className="flex justify-between text-xs text-gray-500 pl-4">
+              <span>→ Effectief: {((pensionBasePct * pensionTotalPct) / 100).toFixed(1)}% van winst</span>
+              <span className="text-amber-600">⚠️ vs Uitzenden: 21.81% totaal</span>
+            </li>
           </ul>
         </div>
         <div className="mb-3">
-          <p className="text-xs text-gray-500 mb-1 font-medium">Na belasting:</p>
+          <p className="text-xs text-gray-500 mb-1 font-medium">Na belasting (reserves, aanbevolen):</p>
           <ul className="text-sm text-gray-700 space-y-1">
-            <li className="flex justify-between"><span>• WW-buffer</span><span>3.0%</span></li>
-            <li className="flex justify-between"><span>• Vakantiegeld (8.33% × {((1 - effectieveBelastingdruk) * 100).toFixed(1)}%)</span><span>{vakantiegeldEffectiefPct.toFixed(2)}%</span></li>
+            <li className="flex justify-between"><span>• Zvw-premie (verplicht)</span><span>5.75%</span></li>
+            <li className="flex justify-between"><span>• WW-buffer (reserve, niet verplicht)</span><span>3.0%</span></li>
+            <li className="flex justify-between"><span>• Vakantiegeld reserve (8.33% × {((1 - effectieveBelastingdruk) * 100).toFixed(1)}%), niet verplicht</span><span>{vakantiegeldEffectiefPct.toFixed(2)}%</span></li>
           </ul>
         </div>
         <div className="mt-3 pt-2 border-t border-gray-100 space-y-1">
@@ -365,14 +434,18 @@ export default function Calculator({ values, onChange }: CalculatorProps) {
             </div>
 
             <div className="pt-2 border-t border-gray-100">
-              <p className="text-gray-500 font-medium mb-2">Na belasting:</p>
+              <p className="text-gray-500 font-medium mb-2">Na belasting (reserves, aanbevolen):</p>
               <div className="space-y-2">
                 <div className="flex justify-between">
-                  <span className="text-gray-600">− WW-buffer (3% van omzet)</span>
+                  <span className="text-gray-600">− Zvw-premie (verplicht: 5.75% van belastbaar inkomen, max €75.860)</span>
+                  <span className="text-gray-500">{formatCurrency(zzpCalc.zvwPremie)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">− WW-buffer (reserve, niet verplicht: 3% van omzet)</span>
                   <span className="text-gray-500">{formatCurrency(wwBuffer)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">− Vakantiegeld ({vakantiegeldEffectiefPct.toFixed(2)}% = 8.33% × {((1 - effectieveBelastingdruk) * 100).toFixed(1)}%)</span>
+                  <span className="text-gray-600">− Vakantiegeld reserve (niet verplicht: {vakantiegeldEffectiefPct.toFixed(2)}% = 8.33% × {((1 - effectieveBelastingdruk) * 100).toFixed(1)}%)</span>
                   <span className="text-gray-500">{formatCurrency(vakantiegeld)}</span>
                 </div>
                 <div className="flex justify-between pt-2 border-t border-gray-200">
@@ -389,17 +462,39 @@ export default function Calculator({ values, onChange }: CalculatorProps) {
         )}
       </div>
       <div className="md:col-start-2 rounded-xl bg-white border border-gray-100 shadow-sm p-4 self-start">
-        <p className="text-sm text-gray-600 mb-2">Totaal werkgeverslasten (uitzenden)</p>
-        <ul className="text-sm text-gray-700 space-y-1">
-          <li className="flex justify-between"><span>• Sociale premies</span><span>{wgSocial.toFixed(2)}%</span></li>
-          <li className="flex justify-between"><span>• Vakantiegeld</span><span>{wgVacation.toFixed(2)}%</span></li>
-          <li className="flex justify-between"><span>• Pensioen</span><span>{wgPensionEmployer.toFixed(2)}%</span></li>
-          <li className="flex justify-between"><span>• Verzekeringen</span><span>{wgInsurance.toFixed(2)}%</span></li>
-          <li className="flex justify-between"><span>• Overige werkgeverslasten</span><span>{wgOther.toFixed(2)}%</span></li>
-        </ul>
-        <div className="mt-3 flex items-end justify-between pb-0 mb-0">
+        <p className="text-sm text-gray-600 mb-3 font-medium">Totaal werkgeverslasten (uitzenden)</p>
+        <div className="space-y-2">
+          <div className="flex justify-between items-center text-sm text-gray-700">
+            <span>• Sociale premies</span>
+            <span className="font-medium">{wgSocial.toFixed(2)}%</span>
+          </div>
+          <div className="flex justify-between items-center text-sm text-gray-700">
+            <span>• Zvw-heffing</span>
+            <span className="font-medium">{wgZvw.toFixed(2)}%</span>
+          </div>
+          <div className="flex justify-between items-center text-sm text-gray-700">
+            <span>• Vakantiegeld</span>
+            <span className="font-medium">{wgVacation.toFixed(2)}%</span>
+          </div>
+          <div className="flex justify-between items-center text-sm text-gray-700">
+            <span>• Pensioen werkgever</span>
+            <span className="font-medium">{wgPensionEmployer.toFixed(2)}%</span>
+          </div>
+          <div className="mt-2 pt-2 border-t border-gray-200 flex justify-between items-center text-xs">
+            <span className="text-gray-600">Totaal pensioen (werknemer {pensionEmployee.toFixed(1)}% + werkgever {wgPensionEmployer.toFixed(2)}%):</span>
+            <span className="font-semibold text-gray-900">{(pensionEmployee + wgPensionEmployer).toFixed(2)}%</span>
+          </div>
+          <div className="text-xs text-amber-600 mt-1">
+            ⚠️ Let op: ZZP pensioen = {pensionTotalPct.toFixed(1)}% vs Uitzenden = {(pensionEmployee + wgPensionEmployer).toFixed(2)}%
+          </div>
+          <div className="flex justify-between items-center text-sm text-gray-700">
+            <span>• Overige verzekeringen</span>
+            <span className="font-medium">{wgInsurance.toFixed(2)}%</span>
+          </div>
+        </div>
+        <div className="mt-4 pt-3 border-t border-gray-200 flex items-end justify-between pb-0 mb-0">
           <span className="text-xs text-gray-500">Som onderdelen</span>
-          <span className="text-base font-semibold">41.60%</span>
+          <span className="text-base font-semibold text-gray-900">{werkgeverslastenSom.toFixed(2)}%</span>
         </div>
       </div>
       <div className="md:col-start-2 rounded-xl bg-white border border-gray-100 shadow-sm p-4">
