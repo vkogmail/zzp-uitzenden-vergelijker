@@ -72,27 +72,22 @@ export function calculateZzp(inputs: CalculatorInputs): ZzpResult {
   const hoursPerWeekActual = hoursPerWeek && hoursPerWeek > 0 ? hoursPerWeek : 36;
   const annualHours = getWorkableAnnualHours(hoursPerWeekActual);
   const omzet = effectiveRateZzp * annualHours; // revenue
-  const businessCosts = omzet * toPct(costs);
-  const winstVoorBelasting = omzet - businessCosts; // grossProfit
+  const businessCosts = omzet * toPct(costs); // bedrijfskosten
+  const aov = omzet * 0.065; // 6.5% van omzet voor AOV (fiscaal aftrekbaar)
 
-  // === Stap 2: Verzekeringen en buffers (aftrekbaar vóór belasting, berekend op omzet) ===
-  const aov = omzet * 0.065; // 6.5% van omzet voor AOV
-  const wwBuffer = omzet * 0.03; // 3% van omzet als WW buffer/sparen
-
-  // === Stap 3: Pensioeninleg (aftrekbaar vóór belasting) ===
-  // pensionBase: % van loon dat meetelt voor pensioenbasis (bijv. 90)
-  // pensionTotal: totale inleg (%), hier gebruikt als zelfstandige lijfrente-inleg
+  // === Stap 2: Pensioeninleg (aftrekbaar vóór belasting) ===
+  // Pensioen wordt berekend op (omzet - bedrijfskosten - AOV)
   const pensionBasePct = toPct(pensionBase);
   const pensionPct = toPct(pensionTotal);
-  const pensioenBasis = winstVoorBelasting * pensionBasePct;
-  const pensioen = pensioenBasis * pensionPct; // pensionContribution
+  const pensioen = (omzet - businessCosts - aov) * pensionBasePct * pensionPct;
 
-  // === Stap 4: Fiscale winstberekening ===
+  // === Stap 3: Winst voor belasting ===
+  const winstVoorBelasting = omzet - businessCosts - aov - pensioen;
+
+  // === Stap 4: Fiscale winstberekening (ondernemersaftrekken) ===
   const zelfstandigenaftrek = 3750; // 2026
   const mkbVrijstellingPct = 0.14;
-  const winstNaVerzekeringen = Math.max(0, winstVoorBelasting - aov - wwBuffer);
-  const winstNaPensioen = Math.max(0, winstNaVerzekeringen - pensioen);
-  const winstNaZelfstandig = Math.max(0, winstNaPensioen - zelfstandigenaftrek);
+  const winstNaZelfstandig = Math.max(0, winstVoorBelasting - zelfstandigenaftrek);
   const mkbVrijstelling = winstNaZelfstandig * mkbVrijstellingPct;
   const belastbaarInkomen = Math.max(0, winstNaZelfstandig - mkbVrijstelling);
 
@@ -104,23 +99,33 @@ export function calculateZzp(inputs: CalculatorInputs): ZzpResult {
     brutoBelasting = 73031 * 0.3693 + (belastbaarInkomen - 73031) * 0.495;
   }
 
-  // === Stap 6: Arbeidskorting (benadering) ===
+  // === Stap 6: Heffingskortingen ===
+  // Algemene heffingskorting
+  let algemeneHeffingskorting = 0;
+  if (belastbaarInkomen <= 23000) {
+    algemeneHeffingskorting = 3100;
+  } else if (belastbaarInkomen <= 73031) {
+    algemeneHeffingskorting = 3100 * (1 - (belastbaarInkomen - 23000) / 50000);
+  }
+
+  // Arbeidskorting
   let arbeidskorting = 0;
   if (belastbaarInkomen <= 40000) {
     arbeidskorting = 4000;
   } else if (belastbaarInkomen < 130000) {
     arbeidskorting = 4000 * (1 - (belastbaarInkomen - 40000) / 90000);
-  } else {
-    arbeidskorting = 0;
   }
 
-  const inkomstenbelasting = Math.max(0, brutoBelasting - arbeidskorting);
+  const inkomstenbelasting = Math.max(0, brutoBelasting - algemeneHeffingskorting - arbeidskorting);
 
-  // === Stap 7: Netto resultaat ===
+  // === Stap 7: POST-TAX kosten (niet fiscaal aftrekbaar) ===
+  const wwBuffer = omzet * 0.03; // 3% van omzet als WW buffer/sparen (niet fiscaal)
+  const vakantiegeld = (omzet - businessCosts - aov) * toPct(vacation); // vakantiereserve (niet fiscaal)
+
+  // === Stap 8: Netto resultaat ===
   const winstNaBelasting = winstVoorBelasting - inkomstenbelasting; // for reporting parity
-  const vakantiegeld = omzet * toPct(vacation); // reserve on revenue
-  // Netto = winst na belasting - AOV - WW buffer - pensioen - vakantiegeld
-  const nettoJaar = (winstVoorBelasting - inkomstenbelasting) - aov - wwBuffer - pensioen - vakantiegeld;
+  // Netto = winst voor belasting - belasting - WW buffer - vakantiegeld
+  const nettoJaar = winstVoorBelasting - inkomstenbelasting - wwBuffer - vakantiegeld;
   const nettoMaand = nettoJaar / 12;
 
   return {

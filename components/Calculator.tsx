@@ -112,26 +112,37 @@ export default function Calculator({ values, onChange }: CalculatorProps) {
   const pensionTotalPct = values.pensionTotal ?? 20;
   const pensionBasePct = pensionBase; // gebruik bestaande variabele
   
-  // Tussenstappen berekenen
+  // Tussenstappen berekenen (volgens nieuwe logica)
   const omzet = effectiveRateZzp * annualHours;
   const bedrijfskosten = omzet * (costsPct / 100);
-  const winstVoorBelasting = omzet - bedrijfskosten;
-  const aov = omzet * 0.065; // 6.5% van omzet voor AOV
-  const wwBuffer = omzet * 0.03; // 3% van omzet als WW buffer/sparen
-  const pensioenBasis = winstVoorBelasting * (pensionBasePct / 100);
-  const pensioen = pensioenBasis * (pensionTotalPct / 100);
-  const winstNaVerzekeringen = Math.max(0, winstVoorBelasting - aov - wwBuffer);
-  const winstNaPensioen = Math.max(0, winstNaVerzekeringen - pensioen);
+  const aov = omzet * 0.065; // 6.5% van omzet voor AOV (fiscaal aftrekbaar)
+  
+  // Pensioen wordt berekend op (omzet - bedrijfskosten - AOV)
+  const pensioen = (omzet - bedrijfskosten - aov) * (pensionBasePct / 100) * (pensionTotalPct / 100);
+  
+  // Winst voor belasting = omzet - bedrijfskosten - AOV - pensioen
+  const winstVoorBelasting = omzet - bedrijfskosten - aov - pensioen;
+  
+  // Ondernemersaftrekken
   const zelfstandigenaftrek = 3750;
-  const winstNaZelfstandig = Math.max(0, winstNaPensioen - zelfstandigenaftrek);
+  const winstNaZelfstandig = Math.max(0, winstVoorBelasting - zelfstandigenaftrek);
   const mkbVrijstelling = winstNaZelfstandig * 0.14;
   const belastbaarInkomen = Math.max(0, winstNaZelfstandig - mkbVrijstelling);
   
+  // Belasting berekening
   let brutoBelasting = 0;
   if (belastbaarInkomen <= 73031) {
     brutoBelasting = belastbaarInkomen * 0.3693;
   } else {
     brutoBelasting = 73031 * 0.3693 + (belastbaarInkomen - 73031) * 0.495;
+  }
+  
+  // Heffingskortingen
+  let algemeneHeffingskorting = 0;
+  if (belastbaarInkomen <= 23000) {
+    algemeneHeffingskorting = 3100;
+  } else if (belastbaarInkomen <= 73031) {
+    algemeneHeffingskorting = 3100 * (1 - (belastbaarInkomen - 23000) / 50000);
   }
   
   let arbeidskorting = 0;
@@ -141,9 +152,14 @@ export default function Calculator({ values, onChange }: CalculatorProps) {
     arbeidskorting = 4000 * (1 - (belastbaarInkomen - 40000) / 90000);
   }
   
-  const inkomstenbelasting = Math.max(0, brutoBelasting - arbeidskorting);
-  const vakantiegeld = omzet * (vacationPct / 100);
-  const nettoJaarBerekend = (winstVoorBelasting - inkomstenbelasting) - aov - wwBuffer - pensioen - vakantiegeld;
+  const inkomstenbelasting = Math.max(0, brutoBelasting - algemeneHeffingskorting - arbeidskorting);
+  
+  // POST-TAX kosten (niet fiscaal aftrekbaar)
+  const wwBuffer = omzet * 0.03; // 3% van omzet als WW buffer/sparen
+  const vakantiegeld = (omzet - bedrijfskosten - aov) * (vacationPct / 100); // vakantiereserve
+  
+  // Netto = winst voor belasting - belasting - WW buffer - vakantiegeld
+  const nettoJaarBerekend = winstVoorBelasting - inkomstenbelasting - wwBuffer - vakantiegeld;
   const nettoUurloonZzp = nettoJaarBerekend / annualHours;
   
   const [showZzpBreakdown, setShowZzpBreakdown] = useState(false);
@@ -211,13 +227,21 @@ export default function Calculator({ values, onChange }: CalculatorProps) {
       )}
       <div className="rounded-xl bg-white border border-gray-100 shadow-sm p-4">
         <p className="text-sm text-gray-600 mb-2">ZZP opbouw (van omzet)</p>
-        <ul className="text-sm text-gray-700 space-y-1">
-          <li className="flex justify-between"><span>• Bedrijfskosten</span><span>{costsPct.toFixed(1)}%</span></li>
-          <li className="flex justify-between"><span>• AOV</span><span>6.5%</span></li>
-          <li className="flex justify-between"><span>• WW buffer/sparen</span><span>3.0%</span></li>
-          <li className="flex justify-between"><span>• Pensioen (grondslag {pensionBasePct}%)</span><span>{(pensionBasePct * pensionTotalPct / 100).toFixed(1)}%</span></li>
-          <li className="flex justify-between"><span>• Vakantiegeld</span><span>{vacationPct.toFixed(1)}%</span></li>
-        </ul>
+        <div className="mb-3">
+          <p className="text-xs text-gray-500 mb-1 font-medium">Voor belasting:</p>
+          <ul className="text-sm text-gray-700 space-y-1">
+            <li className="flex justify-between"><span>• Bedrijfskosten</span><span>{costsPct.toFixed(1)}%</span></li>
+            <li className="flex justify-between"><span>• AOV</span><span>6.5%</span></li>
+            <li className="flex justify-between"><span>• Pensioen (grondslag {pensionBasePct}%)</span><span>{(pensionBasePct * pensionTotalPct / 100).toFixed(1)}%</span></li>
+          </ul>
+        </div>
+        <div className="mb-3">
+          <p className="text-xs text-gray-500 mb-1 font-medium">Na belasting:</p>
+          <ul className="text-sm text-gray-700 space-y-1">
+            <li className="flex justify-between"><span>• WW-buffer</span><span>3.0%</span></li>
+            <li className="flex justify-between"><span>• Vakantiegeld</span><span>{vacationPct.toFixed(1)}%</span></li>
+          </ul>
+        </div>
         <div className="mt-3 pt-2 border-t border-gray-100 space-y-1">
           <div className="flex justify-between text-xs text-gray-600">
             <span>Zelfstandigenaftrek</span>
@@ -247,7 +271,7 @@ export default function Calculator({ values, onChange }: CalculatorProps) {
           </svg>
         </button>
         {showZzpBreakdown && (
-          <div className="mt-3 pt-3 border-t border-gray-200 space-y-2 text-xs">
+          <div className="mt-3 pt-3 border-t border-gray-200 space-y-3 text-xs">
             <div className="flex justify-between">
               <span className="text-gray-600">Effectieve rate ZZP</span>
               <span className="font-semibold">{formatCurrencyWithDecimals(effectiveRateZzp)}</span>
@@ -260,89 +284,90 @@ export default function Calculator({ values, onChange }: CalculatorProps) {
               <span>Omzet (jaar)</span>
               <span className="font-medium">{formatCurrency(omzet)}</span>
             </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">− Bedrijfskosten ({costsPct}%)</span>
-              <span className="text-gray-500">{formatCurrency(bedrijfskosten)}</span>
+            
+            <div className="pt-2 border-t border-gray-100">
+              <p className="text-gray-500 font-medium mb-2">Voor belasting:</p>
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">− Bedrijfskosten ({costsPct}%)</span>
+                  <span className="text-gray-500">{formatCurrency(bedrijfskosten)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">− AOV (6.5% van omzet)</span>
+                  <span className="text-gray-500">{formatCurrency(aov)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">− Pensioen ({pensionBasePct}% × {pensionTotalPct}%)</span>
+                  <span className="text-gray-500">{formatCurrency(pensioen)}</span>
+                </div>
+                <div className="flex justify-between text-gray-700 pl-4 pt-1">
+                  <span>Winst voor belasting</span>
+                  <span className="font-medium">{formatCurrency(winstVoorBelasting)}</span>
+                </div>
+              </div>
             </div>
-            <div className="flex justify-between text-gray-700 pl-4">
-              <span>Winst voor belasting</span>
-              <span className="font-medium">{formatCurrency(winstVoorBelasting)}</span>
+
+            <div className="pt-2 border-t border-gray-100">
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">− Zelfstandigenaftrek</span>
+                  <span className="text-gray-500">{formatCurrency(zelfstandigenaftrek)}</span>
+                </div>
+                <div className="flex justify-between text-gray-700 pl-4">
+                  <span>Winst na zelfstandigenaftrek</span>
+                  <span className="font-medium">{formatCurrency(winstNaZelfstandig)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">− MKB-vrijstelling (14%)</span>
+                  <span className="text-gray-500">{formatCurrency(mkbVrijstelling)}</span>
+                </div>
+                <div className="flex justify-between text-gray-700 pl-4">
+                  <span>Belastbaar inkomen</span>
+                  <span className="font-medium">{formatCurrency(belastbaarInkomen)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Bruto belasting</span>
+                  <span className="text-gray-500">{formatCurrency(brutoBelasting)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">− Algemene heffingskorting</span>
+                  <span className="text-gray-500">{formatCurrency(algemeneHeffingskorting)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">− Arbeidskorting</span>
+                  <span className="text-gray-500">{formatCurrency(arbeidskorting)}</span>
+                </div>
+                <div className="flex justify-between text-gray-700 pl-4 pt-1">
+                  <span>Inkomstenbelasting</span>
+                  <span className="font-medium">{formatCurrency(inkomstenbelasting)}</span>
+                </div>
+                <div className="flex justify-between text-gray-700 pl-4">
+                  <span>Winst na belasting</span>
+                  <span className="font-medium">{formatCurrency(winstVoorBelasting - inkomstenbelasting)}</span>
+                </div>
+              </div>
             </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">− AOV (6.5% van omzet)</span>
-              <span className="text-gray-500">{formatCurrency(aov)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">− WW buffer/sparen (3% van omzet)</span>
-              <span className="text-gray-500">{formatCurrency(wwBuffer)}</span>
-            </div>
-            <div className="flex justify-between text-gray-700 pl-4">
-              <span>Winst na verzekeringen</span>
-              <span className="font-medium">{formatCurrency(winstNaVerzekeringen)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">− Pensioen ({pensionBasePct}% × {pensionTotalPct}%)</span>
-              <span className="text-gray-500">{formatCurrency(pensioen)}</span>
-            </div>
-            <div className="flex justify-between text-gray-700 pl-4">
-              <span>Winst na pensioen</span>
-              <span className="font-medium">{formatCurrency(winstNaPensioen)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">− Zelfstandigenaftrek</span>
-              <span className="text-gray-500">{formatCurrency(zelfstandigenaftrek)}</span>
-            </div>
-            <div className="flex justify-between text-gray-700 pl-4">
-              <span>Winst na zelfstandigenaftrek</span>
-              <span className="font-medium">{formatCurrency(winstNaZelfstandig)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">− MKB-vrijstelling (14%)</span>
-              <span className="text-gray-500">{formatCurrency(mkbVrijstelling)}</span>
-            </div>
-            <div className="flex justify-between text-gray-700 pl-4">
-              <span>Belastbaar inkomen</span>
-              <span className="font-medium">{formatCurrency(belastbaarInkomen)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">Bruto belasting</span>
-              <span className="text-gray-500">{formatCurrency(brutoBelasting)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">− Arbeidskorting</span>
-              <span className="text-gray-500">{formatCurrency(arbeidskorting)}</span>
-            </div>
-            <div className="flex justify-between text-gray-700 pl-4">
-              <span>Inkomstenbelasting</span>
-              <span className="font-medium">{formatCurrency(inkomstenbelasting)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">Winst na belasting</span>
-              <span className="text-gray-500">{formatCurrency(winstVoorBelasting - inkomstenbelasting)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">− AOV (6.5% van omzet)</span>
-              <span className="text-gray-500">{formatCurrency(aov)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">− WW buffer/sparen (3% van omzet)</span>
-              <span className="text-gray-500">{formatCurrency(wwBuffer)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">− Pensioen</span>
-              <span className="text-gray-500">{formatCurrency(pensioen)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">− Vakantiegeld ({vacationPct}%)</span>
-              <span className="text-gray-500">{formatCurrency(vakantiegeld)}</span>
-            </div>
-            <div className="flex justify-between pt-2 border-t border-gray-200">
-              <span className="text-gray-700 font-semibold">Netto per jaar</span>
-              <span className="font-bold">{formatCurrency(nettoJaarBerekend)}</span>
-            </div>
-            <div className="flex justify-between pb-0 mb-0">
-              <span className="text-gray-600">÷ 12 maanden</span>
-              <span className="text-gray-500">= {formatCurrencyWithDecimals(nettoJaarBerekend / 12)}</span>
+
+            <div className="pt-2 border-t border-gray-100">
+              <p className="text-gray-500 font-medium mb-2">Na belasting:</p>
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">− WW-buffer (3% van omzet)</span>
+                  <span className="text-gray-500">{formatCurrency(wwBuffer)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">− Vakantiegeld ({vacationPct}%)</span>
+                  <span className="text-gray-500">{formatCurrency(vakantiegeld)}</span>
+                </div>
+                <div className="flex justify-between pt-2 border-t border-gray-200">
+                  <span className="text-gray-700 font-semibold">Netto per jaar</span>
+                  <span className="font-bold">{formatCurrency(nettoJaarBerekend)}</span>
+                </div>
+                <div className="flex justify-between pb-0 mb-0">
+                  <span className="text-gray-600">÷ 12 maanden</span>
+                  <span className="text-gray-500">= {formatCurrencyWithDecimals(nettoJaarBerekend / 12)}</span>
+                </div>
+              </div>
             </div>
           </div>
         )}
