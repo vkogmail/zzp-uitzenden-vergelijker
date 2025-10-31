@@ -89,7 +89,6 @@ export default function ResultChart({ data, type }: { data: ComparisonResult; ty
               <LabelList 
                 dataKey="label" 
                 position="top" 
-                formatter={(value: string) => value}
                 style={{ fill: '#374151', fontSize: '14px', fontWeight: 600 }}
               />
             </Bar>
