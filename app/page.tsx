@@ -91,7 +91,7 @@ export default function Home() {
         </div>
 
         <footer className="mt-8 rounded-2xl border border-gray-100 bg-white p-5 text-sm text-gray-600 shadow-sm">
-          Bij gelijke voorwaarden (uurtarief €{inputs.rate}) verdient een ZZP’er netto ongeveer {formatPercent(result.diffPercent, 1)} meer dan bij uitzenden, mits vakantiegeld en pensioen eerlijk worden meegerekend. De echte verschillen zitten in zekerheid versus vrijheid.
+          Bij gelijke voorwaarden (uurtarief €{inputs.rate}) {result.diffPercent >= 0 ? 'verdient' : 'krijgt'} een ZZP'er netto ongeveer {Math.abs(result.diffPercent * 100).toFixed(1)}% {result.diffPercent >= 0 ? 'meer' : 'minder'} dan bij uitzenden, mits vakantiegeld en pensioen eerlijk worden meegerekend. De echte verschillen zitten in zekerheid versus vrijheid.
         </footer>
       </div>
     </div>

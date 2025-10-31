@@ -110,7 +110,7 @@ export const defaultInputs: CalculatorInputs = {
   vacation: 8,
   costs: 10,
   taxZzp: 36,
-  pensionTotal: 23.4,
+  pensionTotal: 20.0, // Adjusted to match "20% pensioen" from new spec
   pensionEmployer: 15.9,
   pensionEmployee: 7.5,
   pensionBase: 90,
