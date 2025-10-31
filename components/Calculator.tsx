@@ -102,6 +102,7 @@ export default function Calculator({ values, onChange }: CalculatorProps) {
   
   const nettoJaar = jaarLoonMetVakantie - loonbelasting - pensioenWerknemer;
   const nettoUurloon = nettoJaar / annualHours;
+  const nettoMaand = nettoJaar / 12;
   
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -149,12 +150,17 @@ export default function Calculator({ values, onChange }: CalculatorProps) {
           <span className="text-xs text-gray-500">{formatCurrencyWithDecimals(clientRateZzp)} × (1 − {marginZzp.toFixed(1)}%)</span>
         </div>
       </div>
-      <div className="rounded-xl bg-white border border-gray-100 shadow-sm p-4">
+      <div className="md:col-start-2 rounded-xl bg-white border border-gray-100 shadow-sm p-4">
         <p className="text-sm text-gray-600 mb-1">Effectieve rate Uitzenden</p>
         <div className="flex items-end justify-between">
           <span className="text-2xl font-semibold">{formatCurrencyWithDecimals(effectiveRateEmp)}</span>
           <span className="text-xs text-gray-500">{formatCurrencyWithDecimals(clientRateEmp)} × (1 − {marginEmp.toFixed(1)}%)</span>
         </div>
+      </div>
+      <div className="space-y-4">
+        <NumberField label="Kosten ZZP" min={0} max={50} step={0.5} value={values.costs} onChange={(v) => onChange("costs", v)} suffix="%" />
+        <NumberField label="Belastingdruk ZZP" min={0} max={60} step={0.5} value={values.taxZzp} onChange={(v) => onChange("taxZzp", v)} suffix="%" />
+        <NumberField label="Pensioenpremie totaal ZZP" min={0} max={40} step={0.1} value={values.pensionTotal} onChange={(v) => onChange("pensionTotal", v)} suffix="%" />
       </div>
       <div className="md:col-start-2 rounded-xl bg-white border border-gray-100 shadow-sm p-4">
         <p className="text-sm text-gray-600 mb-2">Totaal werkgeverslasten (uitzenden)</p>
@@ -189,13 +195,17 @@ export default function Calculator({ values, onChange }: CalculatorProps) {
           <p className="text-xs text-gray-500">Met pensioeninhouding {pensionEmployee.toFixed(1)}% vóór belasting: {formatCurrencyWithDecimals(pensioenWerknemer)}</p>
         </div>
       </div>
-      <NumberField label="Vakantiegeld" min={0} max={20} step={0.5} value={values.vacation} onChange={(v) => onChange("vacation", v)} suffix="%" />
-      <NumberField label="Kosten ZZP" min={0} max={50} step={0.5} value={values.costs} onChange={(v) => onChange("costs", v)} suffix="%" />
-      <NumberField label="Belastingdruk ZZP" min={0} max={60} step={0.5} value={values.taxZzp} onChange={(v) => onChange("taxZzp", v)} suffix="%" />
-      <NumberField label="Pensioenpremie totaal" min={0} max={40} step={0.1} value={values.pensionTotal} onChange={(v) => onChange("pensionTotal", v)} suffix="%" />
-      <NumberField label="Werkgeverbijdrage" min={0} max={40} step={0.1} value={values.pensionEmployer} onChange={(v) => onChange("pensionEmployer", v)} suffix="%" />
-      <NumberField label="Werknemerbijdrage" min={0} max={20} step={0.1} value={values.pensionEmployee} onChange={(v) => onChange("pensionEmployee", v)} suffix="%" />
-      <NumberField label="Pensioengrondslag" min={0} max={100} step={0.5} value={values.pensionBase} onChange={(v) => onChange("pensionBase", v)} suffix="%" />
+      <div className="md:col-start-2 rounded-xl bg-white border border-gray-100 shadow-sm p-4">
+        <p className="text-sm text-gray-600 mb-1">Netto maandloon (Uitzenden)</p>
+        <div className="flex items-end justify-between mb-2">
+          <span className="text-2xl font-semibold">{formatCurrencyWithDecimals(nettoMaand)}</span>
+          <span className="text-xs text-gray-500">= {formatCurrencyWithDecimals(nettoJaar)} ÷ 12</span>
+        </div>
+      </div>
+      {/* <NumberField label="Vakantiegeld" min={0} max={20} step={0.5} value={values.vacation} onChange={(v) => onChange("vacation", v)} suffix="%" /> */}
+      {/* <NumberField label="Werkgeverbijdrage" min={0} max={40} step={0.1} value={values.pensionEmployer} onChange={(v) => onChange("pensionEmployer", v)} suffix="%" /> */}
+      {/* <NumberField label="Werknemerbijdrage" min={0} max={20} step={0.1} value={values.pensionEmployee} onChange={(v) => onChange("pensionEmployee", v)} suffix="%" /> */}
+      {/* <NumberField label="Pensioengrondslag" min={0} max={100} step={0.5} value={values.pensionBase} onChange={(v) => onChange("pensionBase", v)} suffix="%" /> */}
     </div>
   );
 }
