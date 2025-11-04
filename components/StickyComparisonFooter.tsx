@@ -12,11 +12,19 @@ export default function StickyComparisonFooter({ data, inputs }: StickyCompariso
   
   // Calculate annual hours for netto per uur calculation
   const hoursPerWeek = (inputs as any).hoursPerWeek ?? 36;
-  const annualHours = getWorkableAnnualHours(hoursPerWeek);
+  const theoreticalAnnualHours = hoursPerWeek * 52; // Theoretische uren (volledig)
+  
+  // Voor ZZP: betaalde uren (10.87% onbetaalde vakantie)
+  const unpaidVacationPercentage = 0.1087;
+  const paidHoursRatio = 1 - unpaidVacationPercentage; // 89.13%
+  const zzpPaidHours = theoreticalAnnualHours * paidHoursRatio; // Betaalde uren voor ZZP
+  
+  // Voor Uitzenden: theoretische uren (inclusief betaalde vakantiedagen)
+  const empAnnualHours = theoreticalAnnualHours; // Volledige theoretische uren
   
   // Calculate netto per uur
-  const nettoPerUurZzp = zzp.nettoJaar / annualHours;
-  const nettoPerUurEmp = emp.nettoJaar / annualHours;
+  const nettoPerUurZzp = zzp.nettoJaar / zzpPaidHours;
+  const nettoPerUurEmp = emp.nettoJaar / empAnnualHours;
   
   // Determine which option is better (for green border)
   const zzpIsBetter = zzp.nettoMaand > emp.nettoMaand;

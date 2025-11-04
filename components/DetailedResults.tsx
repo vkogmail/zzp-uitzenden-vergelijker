@@ -29,7 +29,15 @@ export default function DetailedResults({ data, inputs }: DetailedResultsProps) 
   const effectiveRateZzp = clientRateZzp * (1 - marginZzp / 100);
   const effectiveRateEmp = clientRateEmp * (1 - marginEmp / 100);
   const hoursPerWeek = (inputs as any).hoursPerWeek ?? 36;
-  const annualHours = getWorkableAnnualHours(hoursPerWeek);
+  const theoreticalAnnualHours = hoursPerWeek * 52; // Theoretische uren (volledig)
+  
+  // Voor ZZP: betaalde uren (10.87% onbetaalde vakantie)
+  const unpaidVacationPercentage = 0.1087;
+  const paidHoursRatio = 1 - unpaidVacationPercentage; // 89.13%
+  const zzpPaidHours = theoreticalAnnualHours * paidHoursRatio; // Betaalde uren voor ZZP
+  
+  // Voor Uitzenden: theoretische uren (inclusief betaalde vakantiedagen)
+  const empAnnualHours = theoreticalAnnualHours; // Volledige theoretische uren
   
   // Detail cards variables (commented out - cards are hidden)
   // const employerTotal = 41.6;
@@ -38,7 +46,7 @@ export default function DetailedResults({ data, inputs }: DetailedResultsProps) 
   // ZZP calculations
   const zzpCalc = calculateZzp(inputs as any);
   const costsPct = inputs.costs ?? 10;
-  const omzet = effectiveRateZzp * annualHours;
+  const omzet = effectiveRateZzp * zzpPaidHours;
   const bedrijfskosten = omzet * (costsPct / 100);
   const pensionTotalPct = inputs.pensionTotal ?? 20;
   const pensionBasePct = inputs.pensionBase ?? 90;

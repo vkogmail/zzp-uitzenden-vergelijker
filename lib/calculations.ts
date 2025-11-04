@@ -71,8 +71,15 @@ export function calculateZzp(inputs: CalculatorInputs): ZzpResult {
     ? clientRateZzp * (1 - toPct(marginZzp))
     : rate;
   const hoursPerWeekActual = hoursPerWeek && hoursPerWeek > 0 ? hoursPerWeek : 36;
-  const annualHours = getWorkableAnnualHours(hoursPerWeekActual);
-  const omzet = effectiveRateZzp * annualHours; // revenue
+  const theoreticalAnnualHours = hoursPerWeekActual * 52; // Theoretische uren (volledig)
+  
+  // Voor ZZP: rekening houden met 10.87% onbetaalde vakantie-uren
+  // Je krijgt alleen betaald voor gewerkte uren, niet voor vakantiedagen
+  const unpaidVacationPercentage = 0.1087; // 10.87% onbetaalde vakantie
+  const paidHoursRatio = 1 - unpaidVacationPercentage; // 89.13% betaalde uren
+  const effectivePaidHours = theoreticalAnnualHours * paidHoursRatio; // Betaalde uren
+  
+  const omzet = effectiveRateZzp * effectivePaidHours; // revenue (alleen voor gewerkte uren)
   const businessCosts = omzet * toPct(costs); // bedrijfskosten
   
   // AOV alleen aftrekbaar bij echte verzekering (voor nu niet aftrekbaar als voorbeeld)
@@ -192,46 +199,50 @@ export function calculateIncomeTax(jaarLoon: number): number {
 export function calculateEmployee(inputs: CalculatorInputs): EmployeeResult {
   const { rate, vacation, pensionEmployee, pensionBase, clientRateEmp, marginEmp, employerTotalPct, hoursPerWeek } = inputs;
 
-  const effectiveClientToAgency = clientRateEmp != null && marginEmp != null
-    ? clientRateEmp * (1 - toPct(marginEmp))
-    : rate;
-  const wgPct = employerTotalPct != null ? employerTotalPct : 41.6;
+  // === NIEUWE BEREKENING VOLGORDE (zoals Publieke Partner model) ===
   
-  // FISCALE/HR CORRECTIE:
-  // Bruto uurloon berekenen: effectief tarief ÷ (1 + werkgeverslasten%)
-  // Dit geeft het BASIS bruto uurloon (zonder vakantiegeld)
-  // Formule: effectief tarief = bruto uurloon × (1 + werkgeverslasten%)
-  // Dus: bruto uurloon = effectief tarief ÷ (1 + werkgeverslasten%)
-  const brutoUurloon = effectiveClientToAgency / (1 + toPct(wgPct));
-  
+  // Stap 1: Factuurwaarde berekenen (theoretische uren, inclusief vakantiedagen)
   const hoursPerWeekActual = hoursPerWeek && hoursPerWeek > 0 ? hoursPerWeek : 36;
-  const annualHours = getWorkableAnnualHours(hoursPerWeekActual);
+  const theoreticalAnnualHours = hoursPerWeekActual * 52; // Theoretische uren (volledig, inclusief vakantie)
   
-  // BASIS bruto jaarloon (zonder vakantiegeld)
-  const brutoJaarloonBasis = brutoUurloon * annualHours;
+  const uurtarief = clientRateEmp != null ? clientRateEmp : rate;
+  const factuurwaarde = uurtarief * theoreticalAnnualHours; // Totale factuurwaarde
   
-  // Vakantiegeld: 8% van het BASIS bruto jaarloon
-  // Vakantiegeld is een KOST voor de werkgever (zit in de 41.6% werkgeverslasten)
-  // MAAR vakantiegeld is OOK deel van het BRUTO jaarsalaris van de werknemer (belastbaar!)
-  const vacationPct = vacation ?? 8;
-  const vakantiegeldEmp = brutoJaarloonBasis * toPct(vacationPct);
+  // Stap 2: Fee aftrekken (jullie marge van 15%)
+  const marginPct = marginEmp != null ? marginEmp : 15;
+  const fee = factuurwaarde * toPct(marginPct); // Fee die het bureau houdt
+  const totaalBeschikbaar = factuurwaarde - fee; // Beschikbaar voor werkgeverskosten en loon
   
-  // Bruto jaarloon MET vakantiegeld = basis + vakantiegeld
-  // Dit is het volledige bruto jaarsalaris waarover belasting wordt berekend
-  const brutoJaarloonMetVakantie = brutoJaarloonBasis + vakantiegeldEmp;
+  // Stap 3: Werkgeverskosten berekenen
+  // Gebruik jullie bestaande employerTotalPct, maar pas deze toe op totaal beschikbaar
+  const wgPct = employerTotalPct != null ? employerTotalPct : 41.6;
+  const werkgeverskosten = totaalBeschikbaar * toPct(wgPct); // Werkgeverskosten
   
-  // Pensioen werknemer: berekend op BASIS bruto uurloon (niet op vakantiegeld)
-  // Pensioen wordt berekend op: bruto uurloon × pensioengrondslag% × pensioenpercentage% × jaaruren
+  // Stap 4: Bruto salaris (basis, zonder toeslagen)
+  const brutoSalaris = totaalBeschikbaar - werkgeverskosten; // Basis bruto salaris
+  
+  // Stap 5: Toeslagen bovenop bruto salaris (zoals Publieke Partner)
+  const vakantiegeldPct = 8.33; // 8.33% (zoals Publieke Partner)
+  const bovenwettelijkeVakantiePct = 2.18; // 2.18% bovenwettelijke vakantiedagen
+  const pawwPct = 0.10; // 0.10% PAWW (Premie Arbeidsongeschiktheidsverzekering Werknemers)
+  
+  const vakantiegeldEmp = brutoSalaris * toPct(vakantiegeldPct);
+  const bovenwettelijkeVakantie = brutoSalaris * toPct(bovenwettelijkeVakantiePct);
+  const pawwWerkgever = brutoSalaris * toPct(pawwPct);
+  
+  // Stap 6: Bruto loon (voor belasting) - inclusief alle toeslagen
+  const brutoLoon = brutoSalaris + vakantiegeldEmp + bovenwettelijkeVakantie + pawwWerkgever;
+  
+  // Stap 7: Pensioen werknemer berekenen (op bruto salaris, niet op bruto loon)
   const pensionEmployeeActual = pensionEmployee ?? 7.5;
   const pensionBaseActual = pensionBase ?? 90;
-  const pensioenWerknemer = brutoUurloon * toPct(pensionBaseActual) * toPct(pensionEmployeeActual) * annualHours;
+  const pensioenWerknemer = brutoSalaris * toPct(pensionBaseActual) * toPct(pensionEmployeeActual);
   
-  // Belastbaar bedrag = bruto jaarloon MET vakantiegeld - pensioen werknemer
+  // Stap 8: Belastbaar bedrag (bruto loon - pensioen werknemer)
   // Pensioen is fiscaal aftrekbaar voor de werknemer
-  const belastbaarBedrag = brutoJaarloonMetVakantie - pensioenWerknemer;
+  const belastbaarBedrag = brutoLoon - pensioenWerknemer;
   
-  // Heffingskortingen worden berekend op het belastbare bedrag
-  // Algemene heffingskorting
+  // Stap 9: Loonheffing berekenen
   let algemeneHeffingskorting = 0;
   if (belastbaarBedrag <= 23000) {
     algemeneHeffingskorting = 3100;
@@ -239,7 +250,6 @@ export function calculateEmployee(inputs: CalculatorInputs): EmployeeResult {
     algemeneHeffingskorting = 3100 * (1 - (belastbaarBedrag - 23000) / 50000);
   }
   
-  // Arbeidskorting
   let arbeidskorting = 0;
   if (belastbaarBedrag <= 40000) {
     arbeidskorting = 4000;
@@ -247,18 +257,32 @@ export function calculateEmployee(inputs: CalculatorInputs): EmployeeResult {
     arbeidskorting = 4000 * (1 - (belastbaarBedrag - 40000) / 90000);
   }
   
-  // Loonbelasting = bruto inkomstenbelasting - heffingskortingen
   const brutoBelasting = calculateIncomeTax(belastbaarBedrag);
   const loonbelasting = Math.max(0, brutoBelasting - algemeneHeffingskorting - arbeidskorting);
   
-  // Netto jaarloon = bruto jaarloon MET vakantiegeld - loonbelasting - pensioen werknemer
-  // Pensioen wordt ingehouden op het loon (na belasting)
-  const nettoJaar = brutoJaarloonMetVakantie - loonbelasting - pensioenWerknemer;
+  // Stap 10: Werknemersinhoudingen
+  const pawwWerknemer = -pawwWerkgever; // PAWW premie werknemer (aftrekbaar, netto effect = 0)
+  
+  // Stap 11: Netto loon
+  const nettoLoon = brutoLoon + pawwWerknemer - pensioenWerknemer - loonbelasting;
+  
+  // Stap 12: WKR onkostenvergoeding (optioneel, kan worden toegevoegd)
+  // In de Publieke Partner breakdown: ~2.62% van werkgeverskosten
+  // Dit wordt als vergoeding toegevoegd aan het netto loon
+  const wkrOnkostenPct = 0.0262; // 2.62% van werkgeverskosten
+  const wkrOnkosten = werkgeverskosten * wkrOnkostenPct;
+  const teOntvangen = nettoLoon + wkrOnkosten; // Netto + WKR vergoeding
+  
+  // Voor consistentie met huidige return: gebruik teOntvangen als nettoJaar
+  const nettoJaar = teOntvangen;
   const nettoMaand = nettoJaar / 12;
+  
+  // Bruto uurloon voor display (bruto salaris per uur)
+  const brutoUurloon = brutoSalaris / theoreticalAnnualHours;
 
   return {
-    brutoUurloon, // Basis bruto uurloon (zonder vakantiegeld)
-    brutoJaarloon: brutoJaarloonMetVakantie, // Volledige bruto jaarloon MET vakantiegeld
+    brutoUurloon, // Basis bruto uurloon (bruto salaris per uur)
+    brutoJaarloon: brutoLoon, // Volledige bruto loon (met alle toeslagen)
     vakantiegeldEmp,
     pensioenWerknemer,
     loonbelasting,

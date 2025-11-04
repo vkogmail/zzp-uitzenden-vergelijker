@@ -74,22 +74,39 @@ export default function Calculator({ values, onChange }: CalculatorProps) {
   const effectiveRateZzp = clientRateZzp * (1 - marginZzp / 100);
   const effectiveRateEmp = clientRateEmp * (1 - marginEmp / 100);
   // Werkgeverslasten (vaste componenten volgens specificatie)
-  // Opbouw 41.6% werkgeverslasten:
+  // Basis werkgeverslasten (41.6%):
   const wgSocial = 11.0; // Sociale premies (WW, WIA, ZW)
   const wgZvw = 6.75; // Zorgverzekeringswet heffing (werkgeversheffing Zvw)
-  const wgVacation = 8.33; // Vakantiegeld
+  const wgVacation = 8.33; // Vakantiegeld (wettelijk)
   const wgPensionEmployer = 14.31; // Pensioen werkgeversdeel
   const wgInsurance = 1.21; // Overige verzekeringen (aangepast voor Zvw)
-  const wgOther = 0; // Overige (nu 0 omdat Zvw expliciet is opgenomen)
-  const employerTotal = 41.6;
   
-  // Bereken som expliciet voor verificatie
-  const werkgeverslastenSom = wgSocial + wgZvw + wgVacation + wgPensionEmployer + wgInsurance;
+  // Toeslagen bovenop bruto salaris (deze komen bovenop de basis werkgeverslasten):
+  const wgBovenwettelijkeVakantie = 2.18; // Bovenwettelijke vakantiedagen
+  const wgPaww = 0.10; // PAWW (Premie Arbeidsongeschiktheidsverzekering Werknemers)
+  
+  // Basis werkgeverslasten som - berekend dynamisch voor accurate weergave
+  const werkgeverslastenBasisSom = wgSocial + wgZvw + wgVacation + wgPensionEmployer + wgInsurance; // Dynamisch berekend
+  
+  // Totaal werkgeverslasten inclusief toeslagen
+  // Let op: bovenwettelijke vakantie en PAWW zijn percentages van bruto salaris,
+  // maar moeten meegenomen worden in de totale kosten. De effectieve percentage 
+  // op totaal beschikbaar is ongeveer: basis + (toeslagen × (1 - basis%))
+  // Voor nauwkeurigheid gebruiken we de berekening uit calculateEmployee
+  const employerTotal = 41.6; // Basis percentage (wordt gebruikt in berekening)
   const employerTotalFraction = employerTotal / 100;
   
   // Calculate annual hours based on hours per week
   const hoursPerWeekInput = (values as any).hoursPerWeek ?? 36;
-  const annualHours = getWorkableAnnualHours(hoursPerWeekInput);
+  const theoreticalAnnualHours = hoursPerWeekInput * 52; // Theoretische uren (volledig)
+  
+  // Voor ZZP: betaalde uren (10.87% onbetaalde vakantie)
+  const unpaidVacationPercentage = 0.1087;
+  const paidHoursRatio = 1 - unpaidVacationPercentage; // 89.13%
+  const zzpPaidHours = theoreticalAnnualHours * paidHoursRatio; // Betaalde uren voor ZZP
+  
+  // Voor Uitzenden: theoretische uren (inclusief betaalde vakantiedagen)
+  const empAnnualHours = theoreticalAnnualHours; // Volledige theoretische uren
   
   // Use calculateEmployee for consistent calculations (includes fix for vacation pay double-counting)
   const empCalc = calculateEmployee(values as any);
@@ -99,14 +116,47 @@ export default function Calculator({ values, onChange }: CalculatorProps) {
   const pensionEmployee = (values as any).pensionEmployee ?? 7.5;
   const pensionBase = values.pensionBase ?? 90;
   
+  // Calculate bruto salaris (basis, zonder toeslagen) voor berekening van percentages
+  // Dit is nodig om de toeslagen percentages te kunnen tonen
+  const brutoSalarisJaar = brutoUurloonEmp * empAnnualHours;
+  
   // Calculate vacation pay amount (for display purposes)
   // Note: vacation pay is already included in brutoJaarloon, so we calculate it separately for display
-  const brutoJaarloonZonderVakantie = brutoUurloonEmp * annualHours;
+  const brutoJaarloonZonderVakantie = brutoUurloonEmp * empAnnualHours;
   const vakantiegeldBedrag = empCalc.vakantiegeldEmp;
+  
+  // Bovenwettelijke vakantiedagen en PAWW (zoals in calculateEmployee)
+  const bovenwettelijkeVakantiePct = 2.18; // 2.18% bovenwettelijke vakantiedagen
+  const pawwPct = 0.10; // 0.10% PAWW
+  const bovenwettelijkeVakantieBedrag = brutoSalarisJaar * (bovenwettelijkeVakantiePct / 100);
+  const pawwBedrag = brutoSalarisJaar * (pawwPct / 100);
+  
+  // Bereken totale werkgeverskosten inclusief bovenwettelijke vakantie en PAWW
+  // Deze worden berekend als percentage van bruto salaris, maar moeten weergegeven worden
+  // Basis werkgeverskosten = 41.6% van totaal beschikbaar
+  // Extra kosten = (2.18% + 0.10%) van bruto salaris = 2.28% van bruto salaris
+  // Bruto salaris = totaal beschikbaar × (1 - 0.416) = totaal beschikbaar × 0.584
+  // Extra kosten als % van totaal beschikbaar = 2.28% × 0.584 = 1.33%
+  // Totaal werkgeverskosten = 41.6% + 1.33% = 42.93% van totaal beschikbaar
+  const extraKostenPctVanBrutoSalaris = bovenwettelijkeVakantiePct + pawwPct; // 2.28%
+  const brutoSalarisRatio = 1 - (employerTotal / 100); // 0.584 (als employerTotal = 41.6%)
+  const extraKostenPctVanTotaalBeschikbaar = extraKostenPctVanBrutoSalaris * brutoSalarisRatio; // ~1.33%
+  const totaleWerkgeverskostenPct = employerTotal + extraKostenPctVanTotaalBeschikbaar; // ~42.93%
+  
+  // WKR onkostenvergoeding (2.62% van werkgeverskosten)
+  // Dit wordt berekend in calculateEmployee en toegevoegd aan netto loon
+  const wkrOnkostenPct = 0.0262; // 2.62% van werkgeverskosten
+  // Bereken werkgeverskosten bedrag voor WKR berekening
+  const factuurwaardeEmp = clientRateEmp * empAnnualHours;
+  const feeEmp = factuurwaardeEmp * (marginEmp / 100);
+  const totaalBeschikbaarEmp = factuurwaardeEmp - feeEmp;
+  const werkgeverskostenBedrag = totaalBeschikbaarEmp * (employerTotal / 100);
+  const wkrOnkostenBedrag = werkgeverskostenBedrag * wkrOnkostenPct;
+  const wkrOnkostenPctVanTotaalBeschikbaar = (wkrOnkostenBedrag / totaalBeschikbaarEmp) * 100;
   const pensioenWerknemer = empCalc.pensioenWerknemer;
   const loonbelasting = empCalc.loonbelasting;
   const nettoJaar = empCalc.nettoJaar;
-  const nettoUurloon = nettoJaar / annualHours;
+  const nettoUurloon = nettoJaar / empAnnualHours;
   const nettoMaand = empCalc.nettoMaand;
   
   // For display: employer costs per hour
@@ -120,8 +170,8 @@ export default function Calculator({ values, onChange }: CalculatorProps) {
   const pensionTotalPct = values.pensionTotal ?? 20;
   const pensionBasePct = pensionBase; // gebruik bestaande variabele
   
-  // Tussenstappen berekenen (volgens nieuwe logica)
-  const omzet = effectiveRateZzp * annualHours;
+  // Tussenstappen berekenen (volgens nieuwe logica - gebruik betaalde uren voor ZZP)
+  const omzet = effectiveRateZzp * zzpPaidHours;
   const bedrijfskosten = omzet * (costsPct / 100);
   
   // AOV alleen aftrekbaar bij echte verzekering
@@ -182,7 +232,7 @@ export default function Calculator({ values, onChange }: CalculatorProps) {
   
   // Netto = winst voor belasting - belasting - WW buffer - Zvw-premie - vakantiegeld
   const nettoJaarBerekend = winstVoorBelasting - inkomstenbelasting - wwBuffer - zvwPremie - vakantiegeld;
-  const nettoUurloonZzp = nettoJaarBerekend / annualHours;
+  const nettoUurloonZzp = nettoJaarBerekend / zzpPaidHours;
   
   const [showZzpBreakdown, setShowZzpBreakdown] = useState(false);
   const [activeTab, setActiveTab] = useState<TabType>("zzp");
@@ -335,7 +385,7 @@ export default function Calculator({ values, onChange }: CalculatorProps) {
               <span className="font-semibold">{formatCurrencyWithDecimals(effectiveRateZzp)}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600">× Jaaruren ({annualHours.toLocaleString("nl-NL")} uur)</span>
+              <span className="text-gray-600">× Betaalde uren ({zzpPaidHours.toLocaleString("nl-NL")} uur, 89.13% van {theoreticalAnnualHours.toLocaleString("nl-NL")})</span>
               <span className="text-gray-500">= {formatCurrency(omzet)}</span>
             </div>
             <div className="flex justify-between text-gray-700 pl-4">
@@ -442,7 +492,7 @@ export default function Calculator({ values, onChange }: CalculatorProps) {
           <p className="text-sm text-gray-600 mb-1">Netto uurloon (ZZP)</p>
           <div className="flex items-end justify-between mb-2">
             <span className="text-2xl font-semibold">{formatCurrencyWithDecimals(nettoUurloonZzp)}</span>
-            <span className="text-xs text-gray-500">= {formatCurrencyWithDecimals(nettoJaarBerekend)} ÷ {annualHours.toLocaleString("nl-NL")} uur</span>
+            <span className="text-xs text-gray-500">= {formatCurrencyWithDecimals(nettoJaarBerekend)} ÷ {zzpPaidHours.toLocaleString("nl-NL")} uur</span>
           </div>
           <div className="space-y-1 mt-2 pt-2 border-t border-gray-100">
             <p className="text-xs text-gray-500">Na belasting, AOV (6.5%), WW buffer (3%), pensioen en vakantiegeld</p>
@@ -486,6 +536,7 @@ export default function Calculator({ values, onChange }: CalculatorProps) {
         
         {/* Totaal werkgeverslasten */}
         <div className="md:col-start-2 md:row-start-4 md:self-start rounded-xl bg-white border border-gray-100 shadow-sm p-4">
+          <p className="text-xs text-gray-500 mb-2 font-medium">Werkgeverskosten (van totaal beschikbaar):</p>
           <div className="space-y-2">
             <div className="flex justify-between items-center text-sm text-gray-700">
               <span>• Sociale premies</span>
@@ -496,14 +547,33 @@ export default function Calculator({ values, onChange }: CalculatorProps) {
               <span className="font-medium">{wgZvw.toFixed(2)}%</span>
             </div>
             <div className="flex justify-between items-center text-sm text-gray-700">
-              <span>• Vakantiegeld</span>
+              <span>• Vakantiegeld (wettelijk)</span>
               <span className="font-medium">{wgVacation.toFixed(2)}%</span>
             </div>
             <div className="flex justify-between items-center text-sm text-gray-700">
               <span>• Pensioen werkgever</span>
               <span className="font-medium">{wgPensionEmployer.toFixed(2)}%</span>
             </div>
-            <div className="mt-2 pt-2 border-t border-gray-200 flex justify-between items-center text-xs">
+            <div className="flex justify-between items-center text-sm text-gray-700">
+              <span>• Overige verzekeringen</span>
+              <span className="font-medium">{wgInsurance.toFixed(2)}%</span>
+            </div>
+          </div>
+          <div className="mt-3 pt-2 border-t border-gray-200">
+            <p className="text-xs text-gray-500 mb-2 font-medium">Toeslagen (van bruto salaris):</p>
+            <div className="space-y-2">
+              <div className="flex justify-between items-center text-sm text-gray-700">
+                <span>• Bovenwettelijke vakantiedagen</span>
+                <span className="font-medium">{bovenwettelijkeVakantiePct.toFixed(2)}%</span>
+              </div>
+              <div className="flex justify-between items-center text-sm text-gray-700">
+                <span>• PAWW (werkgever)</span>
+                <span className="font-medium">{pawwPct.toFixed(2)}%</span>
+              </div>
+            </div>
+          </div>
+          <div className="mt-3 pt-2 border-t border-gray-200">
+            <div className="flex justify-between items-center text-xs mb-2">
               <div className="flex items-center gap-2">
                 <span className="text-gray-600">Totaal pensioen (werknemer {pensionEmployee.toFixed(1)}% + werkgever {wgPensionEmployer.toFixed(2)}%):</span>
                 <div className="group relative">
@@ -522,14 +592,28 @@ export default function Calculator({ values, onChange }: CalculatorProps) {
               </div>
               <span className="font-semibold text-gray-900">{(pensionEmployee + wgPensionEmployer).toFixed(2)}%</span>
             </div>
-            <div className="flex justify-between items-center text-sm text-gray-700">
-              <span>• Overige verzekeringen</span>
-              <span className="font-medium">{wgInsurance.toFixed(2)}%</span>
-            </div>
           </div>
-          <div className="mt-4 pt-3 border-t border-gray-200 flex items-end justify-between pb-0 mb-0">
-            <span className="text-xs text-gray-500">Som onderdelen</span>
-            <span className="text-base font-semibold text-gray-900">{werkgeverslastenSom.toFixed(2)}%</span>
+          <div className="mt-4 pt-3 border-t border-gray-200 space-y-2">
+            <div className="flex items-end justify-between pb-0 mb-0">
+              <span className="text-xs text-gray-500">Som basis werkgeverslasten</span>
+              <span className="text-sm font-semibold text-gray-900">{werkgeverslastenBasisSom.toFixed(2)}%</span>
+            </div>
+            <div className="text-xs text-gray-400 italic pl-2">
+              ({wgSocial.toFixed(2)}% + {wgZvw.toFixed(2)}% + {wgVacation.toFixed(2)}% + {wgPensionEmployer.toFixed(2)}% + {wgInsurance.toFixed(2)}% = {werkgeverslastenBasisSom.toFixed(2)}%)
+            </div>
+            <div className="flex items-end justify-between pb-0 mb-0 text-xs text-gray-600">
+              <span>+ Toeslagen (effectief van totaal beschikbaar):</span>
+            </div>
+            <div className="flex items-end justify-between pb-0 mb-0 text-xs text-gray-600 pl-4">
+              <span>• Bovenwettelijke vakantie + PAWW: ~{extraKostenPctVanTotaalBeschikbaar.toFixed(2)}%</span>
+            </div>
+            <div className="flex items-end justify-between pb-1 mb-0 pt-2 border-t border-gray-200">
+              <span className="text-sm font-semibold text-gray-700">Totaal werkgeverskosten</span>
+              <span className="text-base font-bold text-gray-900">{totaleWerkgeverskostenPct.toFixed(2)}%</span>
+            </div>
+            <div className="text-xs text-gray-500 italic">
+              * Bovenwettelijke vakantie (2.18%) en PAWW (0.10%) zijn percentages van bruto salaris, effectief ~{extraKostenPctVanTotaalBeschikbaar.toFixed(2)}% van totaal beschikbaar
+            </div>
           </div>
         </div>
         
@@ -548,7 +632,7 @@ export default function Calculator({ values, onChange }: CalculatorProps) {
           <p className="text-sm text-gray-600 mb-1">Netto uurloon (Uitzenden)</p>
           <div className="flex items-end justify-between mb-2">
             <span className="text-2xl font-semibold">{formatCurrencyWithDecimals(nettoUurloon)}</span>
-            <span className="text-xs text-gray-500">= {formatCurrencyWithDecimals(nettoJaar)} ÷ {annualHours.toLocaleString("nl-NL")} uur</span>
+            <span className="text-xs text-gray-500">= {formatCurrencyWithDecimals(nettoJaar)} ÷ {empAnnualHours.toLocaleString("nl-NL")} uur</span>
           </div>
           <div className="space-y-1 mt-2 pt-2 border-t border-gray-100">
             <p className="text-xs text-gray-500">Inclusief {vacationPct.toFixed(1)}% vakantiegeld: {formatCurrencyWithDecimals(vakantiegeldBedrag)}</p>
