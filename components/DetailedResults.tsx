@@ -127,22 +127,6 @@ export default function DetailedResults({ data, inputs }: DetailedResultsProps) 
               />
             </div>
             
-            {/* Opbouw uitklapper */}
-            <button
-              onClick={() => setShowZzpBreakdown(!showZzpBreakdown)}
-              className="mt-4 w-full flex items-center justify-between px-3 py-2 text-sm font-medium text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-lg border border-gray-200 transition-colors"
-            >
-              <span>{showZzpBreakdown ? "Verberg opbouw" : "Toon opbouw"}</span>
-              <svg
-                className={`w-4 h-4 text-gray-500 transition-transform ${showZzpBreakdown ? "rotate-180" : ""}`}
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
-            
             {showZzpBreakdown && (
               <div className="mt-4 pt-4 border-t border-gray-200">
                 <h3 className="text-sm font-semibold text-gray-700 mb-3">ZZP opbouw van netto</h3>
@@ -240,22 +224,6 @@ export default function DetailedResults({ data, inputs }: DetailedResultsProps) 
               />
             </div>
             
-            {/* Opbouw uitklapper */}
-            <button
-              onClick={() => setShowEmpBreakdown(!showEmpBreakdown)}
-              className="mt-4 w-full flex items-center justify-between px-3 py-2 text-sm font-medium text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-lg border border-gray-200 transition-colors"
-            >
-              <span>{showEmpBreakdown ? "Verberg opbouw" : "Toon opbouw"}</span>
-              <svg
-                className={`w-4 h-4 text-gray-500 transition-transform ${showEmpBreakdown ? "rotate-180" : ""}`}
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
-            
             {showEmpBreakdown && (
               <div className="mt-4 pt-4 border-t border-gray-200">
                 <h3 className="text-sm font-semibold text-gray-700 mb-3">Uitzenden opbouw van netto</h3>
@@ -284,17 +252,6 @@ export default function DetailedResults({ data, inputs }: DetailedResultsProps) 
                 </div>
               </div>
             )}
-          </div>
-        </div>
-
-        {/* Verschil - duidelijk */}
-        <div className={`text-center p-5 rounded-lg ${data.diffPercent >= 0 ? 'bg-green-50 border-2 border-green-300' : 'bg-orange-50 border-2 border-orange-300'}`}>
-          <div className="text-sm font-medium text-gray-700 mb-2">Het verschil:</div>
-          <div className="text-3xl font-bold mb-2 text-gray-900">
-            {data.diffPercent >= 0 ? '+' : ''}{formatCurrency(data.diffMonthly)} per maand
-          </div>
-          <div className="text-sm text-gray-700 font-medium">
-            Als ZZP'er krijg je {Math.abs(data.diffPercent * 100).toFixed(1)}% {data.diffPercent >= 0 ? 'meer' : 'minder'} dan bij uitzenden
           </div>
         </div>
       </div>

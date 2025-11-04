@@ -195,93 +195,6 @@ export default function Home() {
           </section>
         ) : (
           <>
-            {/* Input Fields for Expert Mode Mobile */}
-            <section className="mb-6 md:hidden space-y-3">
-              {/* Gross Hourly Rate Inputs */}
-              <div className="grid grid-cols-2 gap-3">
-                <div className="rounded-xl bg-white border border-gray-100 shadow-sm p-4">
-                  <label className="block text-xs text-gray-600 mb-2 font-medium">Wat maak je bruto per uur als ZZP'er?</label>
-                  <div className="flex items-center gap-2 mb-2">
-                    <input
-                      type="number"
-                      min={10}
-                      max={300}
-                      step={0.5}
-                      value={Math.round(((inputs as any).clientRateZzp ? (inputs as any).clientRateZzp * (1 - ((inputs as any).marginZzp ?? 0) / 100) : inputs.rate) * 100) / 100}
-                      onChange={(e) => {
-                        const newEffectiveRate = Number(e.target.value);
-                        const marginZzp = (inputs as any).marginZzp ?? 0;
-                        const newClientRate = marginZzp === 0 ? newEffectiveRate : newEffectiveRate / (1 - marginZzp / 100);
-                        setValue("clientRateZzp" as any, newClientRate);
-                      }}
-                      className="flex-1 rounded-lg border border-gray-300 px-3 py-2.5 text-lg font-bold focus:ring-2 focus:ring-[#00B37E] focus:border-[#00B37E] touch-manipulation"
-                    />
-                    <span className="text-sm text-gray-500 font-medium">€/uur</span>
-                  </div>
-                  <p className="text-xs text-gray-500 leading-relaxed">
-                    Klant betaalt: {formatCurrencyWithDecimals((inputs as any).clientRateZzp ?? inputs.rate)}/uur (incl. {(inputs as any).marginZzp ?? 0}% marge)
-                  </p>
-                </div>
-                <div className="rounded-xl bg-white border border-gray-100 shadow-sm p-4">
-                  <label className="block text-xs text-gray-600 mb-2 font-medium">Wat zou je krijgen bij uitzenden?</label>
-                  <div className="flex items-center gap-2 mb-2">
-                    <input
-                      type="number"
-                      min={10}
-                      max={300}
-                      step={0.5}
-                      value={Math.round(((inputs as any).clientRateEmp ? (inputs as any).clientRateEmp * (1 - ((inputs as any).marginEmp ?? 0) / 100) : inputs.rate) * 100) / 100}
-                      onChange={(e) => {
-                        const newEffectiveRate = Number(e.target.value);
-                        const marginEmp = (inputs as any).marginEmp ?? 0;
-                        const newClientRate = marginEmp === 0 ? newEffectiveRate : newEffectiveRate / (1 - marginEmp / 100);
-                        setValue("clientRateEmp" as any, newClientRate);
-                      }}
-                      className="flex-1 rounded-lg border border-gray-300 px-3 py-2.5 text-lg font-bold focus:ring-2 focus:ring-[#00B37E] focus:border-[#00B37E] touch-manipulation"
-                    />
-                    <span className="text-sm text-gray-500 font-medium">€/uur</span>
-                  </div>
-                  <p className="text-xs text-gray-500 leading-relaxed">
-                    Bruto {formatCurrency(result.emp.brutoJaarloon / 12)} per maand
-                  </p>
-                </div>
-              </div>
-              
-              {/* Margin Difference Warning */}
-              {/* {(() => {
-                const marginZzp = (inputs as any).marginZzp ?? 0;
-                const marginEmp = (inputs as any).marginEmp ?? 0;
-                if (marginZzp > 0 && marginEmp > 0 && Math.abs(marginZzp - marginEmp) > 1) {
-                  return (
-                    <div className="rounded-xl bg-amber-50 border border-amber-200 shadow-sm p-3">
-                      <div className="text-xs text-amber-800">
-                        ⚠️ Let op: Marges verschillen ({marginZzp.toFixed(1)}% vs {marginEmp.toFixed(1)}%). Dit beïnvloedt de vergelijking.
-                      </div>
-                    </div>
-                  );
-                }
-                return null;
-              })()} */}
-              
-              {/* Pension Comparison Warning */}
-              {/* {(() => {
-                const pensionTotalPct = inputs.pensionTotal ?? 20;
-                const pensionEmployee = (inputs as any).pensionEmployee ?? 7.5;
-                const wgPensionEmployer = 14.31;
-                const totalPensionEmp = pensionEmployee + wgPensionEmployer;
-                if (Math.abs(pensionTotalPct - totalPensionEmp) > 1) {
-                  return (
-                    <div className="rounded-xl bg-amber-50 border border-amber-200 shadow-sm p-3">
-                      <div className="text-xs text-amber-800">
-                        ⚠️ Let op: ZZP pensioen = {pensionTotalPct.toFixed(1)}% vs Uitzenden = {totalPensionEmp.toFixed(2)}%
-                      </div>
-                    </div>
-                  );
-                }
-                return null;
-              })()} */}
-            </section>
-
             {/* Calculator Section - Visible on both Mobile and Desktop */}
             <section className="mb-6">
               <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
@@ -329,6 +242,22 @@ export default function Home() {
               <li>• Daarom kan je als uitzendkracht soms netto meer overhouden, ondanks een lager tarief</li>
               <li>• De keuze gaat vooral om zekerheid (uitzenden) versus vrijheid (ZZP)</li>
             </ul>
+          </div>
+        </section>
+
+        {/* Disclaimer */}
+        <section className="mb-6 mt-8 pt-6 border-t border-gray-200">
+          <div className="text-xs text-gray-500 leading-relaxed">
+            <p className="font-medium text-gray-600 mb-2">Disclaimer</p>
+            <p className="mb-2">
+              Deze calculator is uitsluitend bedoeld als indicatief hulpmiddel. De berekeningen zijn gebaseerd op algemene aannames en standaard tarieven voor 2026. Werkelijke bedragen kunnen afwijken door individuele omstandigheden, wijzigingen in wetgeving, specifieke arbeidsvoorwaarden en andere factoren.
+            </p>
+            <p className="mb-2">
+              Aan de resultaten van deze calculator kunnen geen rechten worden ontleend. Wij aanvaarden geen aansprakelijkheid voor beslissingen die worden genomen op basis van deze berekeningen. Raadpleeg altijd een belastingadviseur, accountant of andere deskundige voor persoonlijk advies.
+            </p>
+            <p>
+              De maker van deze tool is niet verantwoordelijk voor eventuele fouten of onjuistheden in de berekeningen of voor schade die voortvloeit uit het gebruik van deze calculator.
+            </p>
           </div>
         </section>
       </div>

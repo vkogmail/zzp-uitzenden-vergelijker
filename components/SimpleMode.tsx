@@ -84,17 +84,6 @@ export default function SimpleMode({ inputs }: SimpleModeProps) {
             </div>
           </div>
         </div>
-
-        {/* Verschil - duidelijk */}
-        <div className={`text-center p-5 rounded-lg ${result.diffPercent >= 0 ? 'bg-green-50 border-2 border-green-300' : 'bg-orange-50 border-2 border-orange-300'}`}>
-          <div className="text-sm font-medium text-gray-700 mb-2">Het verschil:</div>
-          <div className="text-3xl font-bold mb-2 text-gray-900">
-            {result.diffPercent >= 0 ? '+' : ''}{formatCurrency(result.diffMonthly)} per maand
-          </div>
-          <div className="text-sm text-gray-700 font-medium">
-            Als ZZP'er krijg je {Math.abs(result.diffPercent * 100).toFixed(1)}% {result.diffPercent >= 0 ? 'meer' : 'minder'} dan bij uitzenden
-          </div>
-        </div>
       </div>
 
     </div>

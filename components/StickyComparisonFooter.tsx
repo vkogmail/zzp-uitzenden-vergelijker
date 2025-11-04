@@ -1,6 +1,6 @@
 "use client";
 
-import { CalculatorInputs, ComparisonResult, formatCurrency, formatCurrencyWithDecimals, formatPercent, getWorkableAnnualHours } from "@/lib/calculations";
+import { CalculatorInputs, ComparisonResult, formatCurrencyWithDecimals, getWorkableAnnualHours } from "@/lib/calculations";
 
 interface StickyComparisonFooterProps {
   data: ComparisonResult;
@@ -8,7 +8,7 @@ interface StickyComparisonFooterProps {
 }
 
 export default function StickyComparisonFooter({ data, inputs }: StickyComparisonFooterProps) {
-  const { zzp, emp, diffMonthly, diffPercent } = data;
+  const { zzp, emp } = data;
   
   // Calculate annual hours for netto per uur calculation
   const hoursPerWeek = (inputs as any).hoursPerWeek ?? 36;
@@ -19,7 +19,7 @@ export default function StickyComparisonFooter({ data, inputs }: StickyCompariso
   const nettoPerUurEmp = emp.nettoJaar / annualHours;
   
   // Determine which option is better (for green border)
-  const zzpIsBetter = diffPercent >= 0;
+  const zzpIsBetter = zzp.nettoMaand > emp.nettoMaand;
   
   // Calculate bar percentages and colors (hoogste waarde = 100%)
   const maxValue = Math.max(zzp.nettoMaand, emp.nettoMaand);
@@ -91,17 +91,6 @@ export default function StickyComparisonFooter({ data, inputs }: StickyCompariso
                 }}
               />
             </div>
-          </div>
-        </div>
-        
-        {/* Difference Section */}
-        <div className={`text-center p-3 rounded-lg ${diffPercent >= 0 ? 'bg-green-50 border-2 border-green-300' : 'bg-orange-50 border-2 border-orange-300'}`}>
-          <div className="text-xs font-medium text-gray-700 mb-1">Het verschil:</div>
-          <div className="text-lg md:text-xl font-bold mb-1 text-gray-900">
-            {diffPercent >= 0 ? "+" : ""}{formatCurrency(diffMonthly)} per maand
-          </div>
-          <div className="text-xs text-gray-700 font-medium">
-            Als ZZP'er krijg je {Math.abs(diffPercent * 100).toFixed(1)}% {diffPercent >= 0 ? "meer" : "minder"} dan bij uitzenden
           </div>
         </div>
       </div>
