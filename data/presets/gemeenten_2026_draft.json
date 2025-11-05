@@ -1,0 +1,27 @@
+{
+  "id": "gemeenten_2026_draft",
+  "label": "Cao Gemeenten — 2026 (draft)",
+  "version": "2026.01",
+  "peildatum": "2025-11-05",
+  "sources": [
+    "Cao Gemeenten (officiële publicatie, 2026 — TBD)",
+    "Rijksoverheid/Belastingdienst — Zvw 2026 (5,75% cap ~€75.860): https://www.belastingdienst.nl/"
+  ],
+  "vacationDays": 25,
+  "holidaysPaid": 7,
+  "advDays": 0,
+  "vakantiegeldPct": 8.0,
+  "ikbPct": 17.05,
+  "pension": {
+    "fund": "ABP",
+    "phase": "Regulier",
+    "employerPct": null,
+    "employeePct": null,
+    "basePct": 90,
+    "note": "ABP premie 2026 TBD; vul bij publicatie aan"
+  },
+  "zvw": { "pct": 5.75, "cap": 75860, "basis": "belastbaar" },
+  "employerOther": []
+}
+
+

@@ -1,0 +1,50 @@
+{
+  "id": "current_2025_baseline",
+  "label": "Huidige calculatorwaarden — 2025 (baseline)",
+  "version": "2025.11",
+  "peildatum": "2025-11-05",
+  "sources": [
+    "Repo constants: lib/calculations.ts (wgSocial, wgZvw, wgVacation, wgPensionEmployer, wgInsurance, wgPct, bovenwettelijkeVakantiePct, pawwPct, wkrOnkostenPct, zvwPercentage, zvwMaxBasis) — Commit: d7a8666",
+    "Belastingdienst — Zorgverzekeringswet 2026 (bijdrage 5,75%, max. bijdrage-inkomen ~€75.860): https://www.belastingdienst.nl/",
+    "Algemene cao-praktijk: vakantiegeld 8,33% (BW), bovenwettelijke dagen 2,18% (Publieke sector), PAWW 0,10% (stelselbreed)."
+  ],
+  "zzp": {
+    "effectiveRateFactor": 0.8913,
+    "vacationUnpaidPct": 10.87,
+    "costsPct": 10.0,
+    "pensionTotalPct": 20.0,
+    "pensionBasePct": 90.0,
+    "vacationReservePctBase": 8.33,
+    "wwBufferPct": 3.0,
+    "zvwPct": 5.75,
+    "zvwCap": 75860
+  },
+  "emp": {
+    "employer": {
+      "socialPct": 11.0,
+      "zvwPct": 6.75,
+      "vacationPct": 8.33,
+      "pensionEmployerPct": 14.31,
+      "insuranceOtherPct": 1.21,
+      "employerTotalPct": 41.6
+    },
+    "extraOnSalary": {
+      "bovenwettelijkeVacationPct": 2.18,
+      "pawwEmployerPct": 0.10
+    },
+    "employee": {
+      "pensionEmployeePct": 7.5,
+      "pensionBasePct": 90.0
+    },
+    "wkrOnkostenPctOfEmployerCosts": 2.62
+  },
+  "notes": [
+    "Deze JSON legt de huidige (nov 2025) vaste waarden uit lib/calculations.ts vast, zodat we ze kunnen vergelijken zodra we overstappen op CAO‑presets.
+    Werkgeverskosten‑optelsom (basis): 11.0 + 6.75 + 8.33 + 14.31 + 1.21 = 41.60%.
+    Extra op bruto salaris: bovenwettelijke 2,18% + PAWW 0,10% (effectief ~1,33% van totaal beschikbaar bij 41,6% basis).",
+    "Zvw‑parameters zijn voor 2026 al bekend (5,75%, cap ±€75.860). Pas aan zodra officiële publicatie wijzigt.
+    Pensioenpercentages voor 2026 (StiPP/ABP) zijn nog te bevestigen."
+  ]
+}
+
+

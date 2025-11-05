@@ -1,3 +1,11 @@
+import BASE_CONFIG from "@/data/presets/current_2025_baseline.json";
+
+// Active preset configuration (can be updated at runtime from the UI)
+let ACTIVE_CONFIG: any = BASE_CONFIG;
+export function setActivePresetConfig(config: any) {
+  ACTIVE_CONFIG = config ?? BASE_CONFIG;
+}
+
 export type CalculatorInputs = {
   // Contract and pricing
   clientRateZzp?: number; // rate charged to client for ZZP
@@ -73,10 +81,8 @@ export function calculateZzp(inputs: CalculatorInputs): ZzpResult {
   const hoursPerWeekActual = hoursPerWeek && hoursPerWeek > 0 ? hoursPerWeek : 36;
   const theoreticalAnnualHours = hoursPerWeekActual * 52; // Theoretische uren (volledig)
   
-  // Voor ZZP: rekening houden met 10.87% onbetaalde vakantie-uren
-  // Je krijgt alleen betaald voor gewerkte uren, niet voor vakantiedagen
-  const unpaidVacationPercentage = 0.1087; // 10.87% onbetaalde vakantie
-  const paidHoursRatio = 1 - unpaidVacationPercentage; // 89.13% betaalde uren
+  // Voor ZZP: rekening houden met onbetaalde vakantie-uren (baseline-config)
+  const paidHoursRatio = (ACTIVE_CONFIG as any)?.zzp?.effectiveRateFactor ?? (1 - 0.1087);
   const effectivePaidHours = theoreticalAnnualHours * paidHoursRatio; // Betaalde uren
   
   const omzet = effectiveRateZzp * effectivePaidHours; // revenue (alleen voor gewerkte uren)
@@ -140,19 +146,17 @@ export function calculateZzp(inputs: CalculatorInputs): ZzpResult {
 
   // === Stap 8: POST-TAX kosten (niet fiscaal aftrekbaar) ===
   // WW-buffer wordt na belasting afgetrokken (al correct)
-  const wwBuffer = omzet * 0.03; // 3% van omzet als WW buffer/sparen (niet fiscaal)
+  const wwBufferPct = ((ACTIVE_CONFIG as any)?.zzp?.wwBufferPct ?? 3) / 100;
+  const wwBuffer = omzet * wwBufferPct; // WW buffer/sparen (niet fiscaal)
   
-  // Zvw-premie (Zorgverzekeringswet): inkomensafhankelijke bijdrage voor ZZP'ers
-  // ZZP'ers betalen zelf de Zvw-bijdrage: ~5.75% over belastbaar inkomen (max €75.860 voor 2026)
-  // Dit wordt berekend over het belastbaar inkomen (niet over winst)
-  const zvwMaxBasis = 75860; // Maximum bijdrage-inkomen voor 2026
-  const zvwPercentage = 0.0575; // 5.75% voor 2026 (kan variëren per jaar)
+  // Zvw-premie (Zorgverzekeringswet): gebruik baseline/preset waarden waar beschikbaar
+  const zvwMaxBasis = (ACTIVE_CONFIG as any)?.zzp?.zvwCap ?? 75860;
+  const zvwPercentage = (((ACTIVE_CONFIG as any)?.zzp?.zvwPct ?? 5.75) as number) / 100;
   const zvwBasis = Math.min(belastbaarInkomen, zvwMaxBasis);
   const zvwPremie = zvwBasis * zvwPercentage;
   
-  // Vakantiegeld: 8.33% met effectieve belastingdruk toegepast
-  // Vakantiegeld percentage = 8.33% × (1 - effectieve belastingdruk)
-  const vakantiegeldBasePct = 8.33; // Basis percentage
+  // Vakantiegeld basis uit baseline/preset (bijv. 8.33% of 8.0%)
+  const vakantiegeldBasePct = (ACTIVE_CONFIG as any)?.zzp?.vacationReservePctBase ?? 8.33; // %
   const vakantiegeldEffectiefPct = vakantiegeldBasePct * (1 - effectieveBelastingdruk);
   const vakantiegeld = (omzet - businessCosts - (heeftEchteAovVerzekering ? aov : 0)) * (vakantiegeldEffectiefPct / 100); // vakantiereserve (niet fiscaal)
 
@@ -208,23 +212,24 @@ export function calculateEmployee(inputs: CalculatorInputs): EmployeeResult {
   const uurtarief = clientRateEmp != null ? clientRateEmp : rate;
   const factuurwaarde = uurtarief * theoreticalAnnualHours; // Totale factuurwaarde
   
-  // Stap 2: Fee aftrekken (jullie marge van 15%)
+  // Stap 2: Fee aftrekken (marge uit inputs; default blijft 15)
   const marginPct = marginEmp != null ? marginEmp : 15;
   const fee = factuurwaarde * toPct(marginPct); // Fee die het bureau houdt
   const totaalBeschikbaar = factuurwaarde - fee; // Beschikbaar voor werkgeverskosten en loon
   
   // Stap 3: Werkgeverskosten berekenen
-  // Gebruik jullie bestaande employerTotalPct, maar pas deze toe op totaal beschikbaar
-  const wgPct = employerTotalPct != null ? employerTotalPct : 41.6;
+  // Gebruik bestaande employerTotalPct of baseline-config
+  const baselineWgPct = (ACTIVE_CONFIG as any)?.emp?.employer?.employerTotalPct ?? 41.6;
+  const wgPct = employerTotalPct != null ? employerTotalPct : baselineWgPct;
   const werkgeverskosten = totaalBeschikbaar * toPct(wgPct); // Werkgeverskosten
   
   // Stap 4: Bruto salaris (basis, zonder toeslagen)
   const brutoSalaris = totaalBeschikbaar - werkgeverskosten; // Basis bruto salaris
   
-  // Stap 5: Toeslagen bovenop bruto salaris (zoals Publieke Partner)
-  const vakantiegeldPct = 8.33; // 8.33% (zoals Publieke Partner)
-  const bovenwettelijkeVakantiePct = 2.18; // 2.18% bovenwettelijke vakantiedagen
-  const pawwPct = 0.10; // 0.10% PAWW (Premie Arbeidsongeschiktheidsverzekering Werknemers)
+  // Stap 5: Toeslagen bovenop bruto salaris (uit baseline/preset waar beschikbaar)
+  const vakantiegeldPct = (ACTIVE_CONFIG as any)?.emp?.employer?.vacationPct ?? 8.33;
+  const bovenwettelijkeVakantiePct = (ACTIVE_CONFIG as any)?.emp?.extraOnSalary?.bovenwettelijkeVacationPct ?? 2.18;
+  const pawwPct = (ACTIVE_CONFIG as any)?.emp?.extraOnSalary?.pawwEmployerPct ?? 0.10;
   
   const vakantiegeldEmp = brutoSalaris * toPct(vakantiegeldPct);
   const bovenwettelijkeVakantie = brutoSalaris * toPct(bovenwettelijkeVakantiePct);
@@ -269,7 +274,7 @@ export function calculateEmployee(inputs: CalculatorInputs): EmployeeResult {
   // Stap 12: WKR onkostenvergoeding (optioneel, kan worden toegevoegd)
   // In de Publieke Partner breakdown: ~2.62% van werkgeverskosten
   // Dit wordt als vergoeding toegevoegd aan het netto loon
-  const wkrOnkostenPct = 0.0262; // 2.62% van werkgeverskosten
+  const wkrOnkostenPct = (((ACTIVE_CONFIG as any)?.emp?.wkrOnkostenPctOfEmployerCosts ?? 2.62) as number) / 100;
   const wkrOnkosten = werkgeverskosten * wkrOnkostenPct;
   const teOntvangen = nettoLoon + wkrOnkosten; // Netto + WKR vergoeding
   

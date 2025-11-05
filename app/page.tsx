@@ -5,12 +5,32 @@ import Calculator from "@/components/Calculator";
 import SimpleMode from "@/components/SimpleMode";
 import DetailedResults from "@/components/DetailedResults";
 import StickyComparisonFooter from "@/components/StickyComparisonFooter";
-import { CalculatorInputs, calculateAll, defaultInputs, formatCurrency, formatCurrencyWithDecimals, formatPercent, getWorkableAnnualHours } from "@/lib/calculations";
+import { CalculatorInputs, calculateAll, defaultInputs, formatCurrency, formatCurrencyWithDecimals, formatPercent, getWorkableAnnualHours, setActivePresetConfig } from "@/lib/calculations";
+import BASELINE from "@/data/presets/current_2025_baseline.json";
+import STIPP_BASIS_2026 from "@/data/presets/stipp_basis_2026_draft.json";
+import STIPP_PLUS_2026 from "@/data/presets/stipp_plus_2026_draft.json";
+import GEMEENTEN_2026 from "@/data/presets/gemeenten_2026_draft.json";
+import GENERIEK_2026 from "@/data/presets/generiek_2026_draft.json";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 
 export default function Home() {
   const [inputs, setInputs] = useState<CalculatorInputs>(defaultInputs);
+  const [preset, setPreset] = useState<string>("baseline");
+  const presets = {
+    baseline: { label: "Baseline (huidig)", config: BASELINE },
+    stipp_basis_2026: { label: "ABU/NBBU • StiPP Basis 2026 (draft)", config: STIPP_BASIS_2026 },
+    stipp_plus_2026: { label: "ABU/NBBU • StiPP Plus 2026 (draft)", config: STIPP_PLUS_2026 },
+    gemeenten_2026: { label: "Gemeenten 2026 (draft)", config: GEMEENTEN_2026 },
+    generiek_2026: { label: "Generiek 2026 (draft)", config: GENERIEK_2026 },
+  } as const;
+
+  // Initialize active preset (and update when preset changes)
+  useMemo(() => {
+    const cfg = (presets as any)[preset]?.config ?? BASELINE;
+    setActivePresetConfig(cfg);
+    return cfg;
+  }, [preset]);
   const [isSimpleMode, setIsSimpleMode] = useState(true); // Default: simple mode
   const result = useMemo(() => calculateAll(inputs), [inputs]);
   const exportRef = useRef<HTMLDivElement>(null);
@@ -49,6 +69,25 @@ export default function Home() {
             Vergelijk netto inkomen per maand met reële aannames (2026). Alle berekeningen gaan uit van 12 maanden (jaar).
           </p>
         </header>
+
+        {/* Preset selector */}
+        <section className="mb-4">
+          <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
+            <label className="text-sm text-gray-600 mb-2 block font-medium">CAO/preset</label>
+            <div className="flex items-center gap-3">
+              <select
+                value={preset}
+                onChange={(e) => setPreset(e.target.value)}
+                className="rounded-lg border border-gray-200 px-3 py-2 text-sm"
+              >
+                {Object.entries(presets).map(([key, v]) => (
+                  <option key={key} value={key}>{v.label}</option>
+                ))}
+              </select>
+              <span className="text-xs text-gray-500">Keuze bepaalt percentages (vakantiegeld, Zvw, WKR, pensioen e.d.).</span>
+            </div>
+          </div>
+        </section>
 
         {/* Hours Input, Rate Input and Toggle Switch - Unified design for both mobile and desktop */}
         <section className="mb-6 space-y-4">
