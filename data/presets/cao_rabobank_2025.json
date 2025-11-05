@@ -1,0 +1,57 @@
+{
+  "id": "cao_rabobank_2025",
+  "label": "Rabobank cao 2024-2025",
+  "version": "2025.11",
+  "peildatum": "2025-11-05",
+  "sources": [
+    "Cao Rabobank 2024-2025, versie 01-10-2024",
+    "Rabobank Pensioenfonds – Pensioenreglement 2023",
+    "Employee Benefit Budget (EBB) regeling"
+  ],
+  "notes": [
+    "Vakantietoeslag 8%, 13e maand 1/12 = 8,33% (artikel 2.4).",
+    "Employee Benefit Budget (EBB): 10% per maand over het maandsalaris (artikel 2.6).",
+    "Pensioen: vlakke premie 27% van de pensioengrondslag, waarvan 21,5% werkgever en 5,5% werknemer (artikel 2.7).",
+    "Wettelijk verlofrecht: 172,8 uur (36u-week) plus 1 diversiteitsdag en 1 coöperatiedag (artikel 3.7).",
+    "Bovenwettelijk verlof blijft 5 jaar geldig, gekochte verlofuren onbeperkt (artikel 3.7).",
+    "Thuiswerkvergoeding €40 netto per maand, internetvergoeding €40 netto (artikel 3.7).",
+    "Feestdagen inclusief 2e dagen, diversiteitsdag vrij in te vullen (artikel 3.8).",
+    "Toeslagen: avond 50%, zaterdag 25–100%, zondag 100%, feestdagen 200% (artikel 3.3).",
+    "80-90-100 regeling: 80% werken, 90% salaris, 100% pensioenopbouw (artikel 3.11)."
+  ],
+  "emp": {
+    "employer": {
+      "socialPct": 11.0,
+      "zvwPct": 6.75,
+      "vacationPct": 8.0,
+      "pensionEmployerPct": 21.5,
+      "insuranceOtherPct": 1.0,
+      "employerTotalPct": 48.25
+    },
+    "extraOnSalary": {
+      "eindejaarsuitkeringPct": 8.33,
+      "employeeBenefitBudgetPct": 10.0,
+      "bovenwettelijkeVacationPct": 2.18,
+      "pawwEmployerPct": 0.10
+    },
+    "employee": {
+      "pensionEmployeePct": 5.5,
+      "pensionBasePct": 100.0
+    },
+    "wkrOnkostenPctOfEmployerCosts": 2.62
+  },
+  "vacation": {
+    "basisUren": 172.8,
+    "extraUrenOudereLeeftijdsgroepen": true,
+    "vervaltermijnJaren": 5,
+    "verkoopbaarViaEBB": true
+  },
+  "otherBenefits": {
+    "thuiswerkvergoedingNetto": 40,
+    "internetvergoedingNetto": 40,
+    "cooperatiedag": 1,
+    "diversiteitsdag": 1
+  }
+}
+
+

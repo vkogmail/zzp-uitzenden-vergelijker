@@ -12,6 +12,7 @@ import STIPP_PLUS_2026 from "@/data/presets/stipp_plus_2026_draft.json";
 import GEMEENTEN_2026 from "@/data/presets/gemeenten_2026_draft.json";
 import GENERIEK_2026 from "@/data/presets/generiek_2026_draft.json";
 import BANKEN_2026 from "@/data/presets/banken_2026_draft.json";
+import RABOBANK_2025 from "@/data/presets/cao_rabobank_2025.json";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 
@@ -26,6 +27,7 @@ export default function Home() {
     gemeenten_2026: { label: "Gemeenten 2026 (draft)", config: GEMEENTEN_2026 },
     banken_2026: { label: "Banken 2026 (draft)", config: BANKEN_2026 },
     generiek_2026: { label: "Generiek 2026 (draft)", config: GENERIEK_2026 },
+    rabobank_2025: { label: "Rabobank cao 2024–2025", config: RABOBANK_2025 },
   } as const;
 
   // Initialize active preset (and update when preset changes)
