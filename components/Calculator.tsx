@@ -489,7 +489,7 @@ export default function Calculator({ values, onChange }: CalculatorProps) {
           <p className="text-sm text-gray-600 mb-1">Netto uurloon (ZZP)</p>
           <div className="flex items-end justify-between mb-2">
             <span className="text-2xl font-semibold">{formatCurrencyWithDecimals(nettoUurloonZzp)}</span>
-            <span className="text-xs text-gray-500">= {formatCurrencyWithDecimals(nettoJaarBerekend)} ÷ {zzpPaidHours.toLocaleString("nl-NL")} uur</span>
+            <span className="text-xs text-gray-500">= {formatCurrencyWithDecimals(nettoJaarBerekend)} ÷ {workableAnnualHours.toLocaleString("nl-NL")} uur</span>
           </div>
           <div className="space-y-1 mt-2 pt-2 border-t border-gray-100">
             <p className="text-xs text-gray-500">Na belasting, AOV (6.5%), WW buffer (3%), pensioen en vakantiegeld</p>
