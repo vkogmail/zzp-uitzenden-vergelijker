@@ -233,6 +233,20 @@ export default function DetailedResults({ data, inputs }: DetailedResultsProps) 
                 }}
               />
             </div>
+        <button
+          onClick={() => setShowEmpBreakdown(!showEmpBreakdown)}
+          className="mt-3 w-full flex items-center justify-between px-3 py-2 text-sm font-medium text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-lg border border-gray-200 transition-colors"
+        >
+          <span>{showEmpBreakdown ? "Verberg detail" : "Meer detail"}</span>
+          <svg
+            className={`w-4 h-4 text-gray-500 transition-transform ${showEmpBreakdown ? "rotate-180" : ""}`}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
             
             {showEmpBreakdown && (
               <div className="mt-4 pt-4 border-t border-gray-200">
