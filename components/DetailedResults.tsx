@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { CalculatorInputs, ComparisonResult, calculateZzp, calculateEmployee, formatCurrency, formatCurrencyWithDecimals, getWorkableAnnualHours, getActivePresetConfig } from "@/lib/calculations";
+import { CalculatorInputs, ComparisonResult, calculateZzp, calculateEmployee, calculateIncomeTax, formatCurrency, formatCurrencyWithDecimals, getWorkableAnnualHours, getActivePresetConfig } from "@/lib/calculations";
 
 interface DetailedResultsProps {
   data: ComparisonResult;
@@ -245,10 +245,47 @@ export default function DetailedResults({ data, inputs }: DetailedResultsProps) 
                         <span className="text-gray-600">• Pensioen werknemer ({inputs.pensionEmployee ?? 7.5}%):</span>
                         <span className="text-gray-700">{formatCurrency(pensioenWerknemer)}</span>
                       </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">• Loonbelasting:</span>
-                        <span className="text-gray-700">{formatCurrency(loonbelasting)}</span>
-                      </div>
+                      {(() => {
+                        const belastbaarBedragEmp = (empCalc.brutoJaarloon - pensioenWerknemer);
+                        const brutoBelastingEmp = calculateIncomeTax(belastbaarBedragEmp);
+                        let algemeneHeffingskortingEmp = 0;
+                        if (belastbaarBedragEmp <= 23000) {
+                          algemeneHeffingskortingEmp = 3100;
+                        } else if (belastbaarBedragEmp <= 73031) {
+                          algemeneHeffingskortingEmp = 3100 * (1 - (belastbaarBedragEmp - 23000) / 50000);
+                        }
+                        let arbeidskortingEmp = 0;
+                        if (belastbaarBedragEmp <= 40000) {
+                          arbeidskortingEmp = 4000;
+                        } else if (belastbaarBedragEmp < 130000) {
+                          arbeidskortingEmp = 4000 * (1 - (belastbaarBedragEmp - 40000) / 90000);
+                        }
+                        const loonbelastingEmp = Math.max(0, brutoBelastingEmp - algemeneHeffingskortingEmp - arbeidskortingEmp);
+                        return (
+                          <>
+                            <div className="flex justify-between pt-1 border-t border-gray-100">
+                              <span className="text-gray-600">Belastbaar inkomen</span>
+                              <span className="text-gray-700">{formatCurrency(belastbaarBedragEmp)}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-gray-600">Bruto belasting</span>
+                              <span className="text-gray-700">{formatCurrency(brutoBelastingEmp)}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-gray-600">− Algemene heffingskorting</span>
+                              <span className="text-gray-700">{formatCurrency(algemeneHeffingskortingEmp)}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-gray-600">− Arbeidskorting</span>
+                              <span className="text-gray-700">{formatCurrency(arbeidskortingEmp)}</span>
+                            </div>
+                            <div className="flex justify-between pt-1 border-t border-gray-100">
+                              <span className="font-medium text-gray-700">Inkomstenbelasting</span>
+                              <span className="font-semibold">{formatCurrency(loonbelastingEmp)}</span>
+                            </div>
+                          </>
+                        );
+                      })()}
                       <div className="flex justify-between pt-1 border-t border-gray-100">
                         <span className="font-medium text-gray-700">Netto per jaar:</span>
                         <span className="font-semibold">{formatCurrency(data.emp.nettoJaar)}</span>
