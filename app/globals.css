@@ -101,9 +101,14 @@
 
   /* Fonts */
   --font-fallback-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", "Inter", "Roboto", "Helvetica", Arial, "Apple Color Emoji", "Segoe UI Emoji";
-  --font-rebond-stack: var(--font-rebond), var(--font-fallback-sans);
+  /* Actual font name from font files: "Rebond Grotesque" */
+  --font-rebond-stack: "Rebond Grotesque", rebondGrotesque, var(--font-rebond), var(--font-fallback-sans);
   --font-sans: var(--font-rebond-stack);
   --font-mono: var(--font-geist-mono);
+
+  /* Background and foreground */
+  --background: var(--grey-cool-5);
+  --foreground: var(--grey-cool-400);
 }
 
 /* 2) Tailwind theme bridge */
@@ -214,10 +219,13 @@ html:where(:not(.no-smooth)) { scroll-behavior: smooth; }
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-rebond-stack);
+  /* Use Geist as default font for body text */
+  font-family: var(--font-geist-sans), "Geist Variable", "Geist", var(--font-fallback-sans);
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  margin: 0;
+  padding: 0;
 }
 
 /* 4) Variants */
@@ -225,12 +233,15 @@ body {
 
 /* 5) Typography utilities (full remap of your .ty-* rules) */
 @utility ty-h1 {
-  font-family: var(--font-rebond-stack);
-  font-weight: 600;
+  /* Use actual font name from font files: "Rebond Grotesque" */
+  font-family: "Rebond Grotesque", rebondGrotesque, var(--font-rebond), var(--font-fallback-sans) !important;
+  font-weight: 600 !important;
   letter-spacing: -0.02em;
   line-height: 1;
   color: var(--color-foreground);
-  font-size: clamp(40px, 6vw, 64px);
+  font-size: clamp(32px, 5vw, 48px);
+  font-synthesis: none;
+  -webkit-font-smoothing: antialiased;
 }
 @utility ty-h2 {
   font-family: var(--font-rebond-stack);
@@ -275,7 +286,33 @@ body {
   text-decoration-thickness: 1px;
 }
 
-/* 6) Helpers */
+/* 6) Force Rebond Grotesque on large currency numbers */
+.text-4xl.font-bold {
+  font-family: "Rebond Grotesque", rebondGrotesque, var(--font-rebond), var(--font-fallback-sans) !important;
+}
+
+/* Medium currency numbers - need to handle responsive classes */
+/* Exclude h2 elements from Rebond Grotesque */
+.text-lg.font-bold:not(h2),
+.text-xl.font-bold:not(h2) {
+  font-family: "Rebond Grotesque", rebondGrotesque, var(--font-rebond), var(--font-fallback-sans) !important;
+}
+
+@media (min-width: 768px) {
+  .text-lg.md\:text-xl.font-bold:not(h2),
+  .md\:text-xl.font-bold:not(h2) {
+    font-family: "Rebond Grotesque", rebondGrotesque, var(--font-rebond), var(--font-fallback-sans) !important;
+  }
+}
+
+/* Force Geist on h2 elements - must be after the Rebond rules */
+h2,
+h2.text-xl.font-bold,
+h2.text-lg.font-bold {
+  font-family: var(--font-geist-sans), "Geist Variable", "Geist", var(--font-fallback-sans) !important;
+}
+
+/* 7) Helpers */
 @utility safe-area-bottom { padding-bottom: env(safe-area-inset-bottom); }
 @utility touch-manipulation { touch-action: manipulation; }
 

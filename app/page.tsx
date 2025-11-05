@@ -71,13 +71,18 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] text-gray-900 scroll-smooth">
+    <div className="min-h-screen text-gray-900 scroll-smooth" style={{ paddingTop: '16px' }}>
+      {/* Navigation */}
+      <nav className="bg-white rounded-[20px] mx-auto mb-6 max-w-4xl" style={{ boxShadow: 'rgba(13, 13, 18, 0.05) 0px 2px 4px 0px', paddingTop: '12px', paddingBottom: '12px', paddingLeft: '12px', paddingRight: '12px', height: '56px', display: 'flex', alignItems: 'center' }}>
+        <img src="/logo.svg" alt="Logo" className="h-8 w-auto" />
+      </nav>
+      
       <div className={`mx-auto max-w-4xl px-4 py-10 ${isSimpleMode ? 'pb-10' : 'pb-72'}`}>
-        <header className="mb-6">
+        <header className="mb-4">
           <h1 className="ty-h1 text-center mb-3">
             ZZP vs Uitzenden Vergelijker
           </h1>
-          <p className="ty-body-lg text-center mb-6">
+          <p className="ty-body-lg text-center mb-4">
             Vergelijk netto inkomen per maand met reële aannames (2026). Alle berekeningen gaan uit van 12 maanden (jaar).
           </p>
         </header>
@@ -129,13 +134,13 @@ export default function Home() {
         </section>
         {/* Actieve CAO banner (altijd zichtbaar, ook als dropdown straks verdwijnt) */}
         <div className="mb-4 rounded-lg bg-blue-50 border border-blue-200 px-3 py-2 text-xs md:text-sm text-blue-900">
-          We vergelijken op basis van de cao “{(presets as any)[preset]?.label ?? '—'}”
+          We vergelijken op basis van de cao "{(presets as any)[preset]?.label ?? '—'}"
           {(() => { const cfg = (presets as any)[preset]?.config as any; return cfg?.peildatum ? ` (peildatum ${cfg.peildatum})` : ''; })()}
           .
         </div>
 
         {/* Hours Input, Rate Input and Toggle Switch - Unified design for both mobile and desktop */}
-        <section className="mb-6 space-y-4">
+        <section className="mb-4 space-y-4">
           {/* Hours per week and Rate inputs - side by side on desktop */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Hourly rate input - what you want to get per hour */}
@@ -272,22 +277,20 @@ export default function Home() {
         </section>
 
         {isSimpleMode ? (
-          <section className="mb-6">
-            <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
-              <SimpleMode inputs={inputs} onInputChange={setValue as any} />
-            </div>
+          <section className="mb-4 mt-0">
+            <SimpleMode inputs={inputs} onInputChange={setValue as any} />
           </section>
         ) : (
           <>
             {/* Calculator Section - Visible on both Mobile and Desktop */}
-            <section className="mb-6">
+            <section className="mb-4">
               <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
                 <Calculator values={inputs as any} onChange={setValue as any} />
               </div>
             </section>
 
             {/* Detailed Results with Tabs */}
-            <section ref={exportRef} className="space-y-6">
+            <section ref={exportRef} className="space-y-4">
               <DetailedResults data={result} inputs={inputs} />
             </section>
           </>

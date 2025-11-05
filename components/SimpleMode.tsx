@@ -22,9 +22,9 @@ export default function SimpleMode({ inputs }: SimpleModeProps) {
   const empBarColor = zzpIsLower ? '#10b981' : '#fdba74'; // groen als ZZP lager is, orange-300 als uitzenden lager is
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-0">
       {/* Resultaat vergelijking - groot en duidelijk */}
-      <div className="rounded-2xl border-2 border-gray-200 bg-gradient-to-br from-white to-gray-50 p-8 shadow-lg">
+      <div className="rounded-2xl border-2 border-gray-200 bg-gradient-to-br from-white to-gray-50 p-8" style={{ boxShadow: '0 2px 4px 0 rgba(13, 13, 18, 0.05)' }}>
         <h2 className="text-xl font-bold text-gray-800 mb-6 text-center">
           Wat krijg je netto per maand?
         </h2>

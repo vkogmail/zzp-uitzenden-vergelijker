@@ -105,7 +105,7 @@ export default function DetailedResults({ data, inputs }: DetailedResultsProps) 
   return (
     <div className="w-full">
       {/* Resultaat vergelijking - groot en duidelijk */}
-      <div className="rounded-2xl border-2 border-gray-200 bg-gradient-to-br from-white to-gray-50 p-8 shadow-lg mb-6">
+      <div className="rounded-2xl border-2 border-gray-200 bg-gradient-to-br from-white to-gray-50 p-8 mb-6" style={{ boxShadow: '0 2px 4px 0 rgba(13, 13, 18, 0.05)' }}>
         <h2 className="text-xl font-bold text-gray-800 mb-6 text-center">
           Wat krijg je netto per maand?
         </h2>
