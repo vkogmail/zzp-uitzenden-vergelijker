@@ -7,11 +7,18 @@
     "Cao Gemeenten (officiële publicatie, 2026 — TBD)",
     "Rijksoverheid/Belastingdienst — Zvw 2026 (5,75% cap ~€75.860): https://www.belastingdienst.nl/"
   ],
+  "notes": [
+    "Gemeenten 2026 (draft): IKB 17,05% opgenomen; ADV-compensatie staat op 0% totdat cao dit specificeert.",
+    "Vakantiegeld 8,0% conform veelgebruikte publieke sector-richtlijn; verifieer bij definitieve cao.",
+    "Pensioen (ABP) 2026: premies TBD. Wanneer beschikbaar, employerPct/employeePct invullen en berekening past automatisch mee.",
+    "Zvw 2026: 5,75% met cap ~€75.860 volgens Belastingdienst."
+  ],
   "vacationDays": 25,
   "holidaysPaid": 7,
   "advDays": 0,
   "vakantiegeldPct": 8.0,
   "ikbPct": 17.05,
+  "advCompPct": 0,
   "pension": {
     "fund": "ABP",
     "phase": "Regulier",

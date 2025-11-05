@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { CalculatorInputs, ComparisonResult, calculateZzp, calculateEmployee, formatCurrency, formatCurrencyWithDecimals, getWorkableAnnualHours } from "@/lib/calculations";
+import { CalculatorInputs, ComparisonResult, calculateZzp, calculateEmployee, formatCurrency, formatCurrencyWithDecimals, getWorkableAnnualHours, getActivePresetConfig } from "@/lib/calculations";
 
 interface DetailedResultsProps {
   data: ComparisonResult;
@@ -9,6 +9,7 @@ interface DetailedResultsProps {
 }
 
 export default function DetailedResults({ data, inputs }: DetailedResultsProps) {
+  const preset = getActivePresetConfig() as any;
   // const [activeTab, setActiveTab] = useState<"zzp" | "uitzenden">("zzp");
   const [showZzpBreakdown, setShowZzpBreakdown] = useState(false);
   const [showEmpBreakdown, setShowEmpBreakdown] = useState(false);
@@ -392,6 +393,49 @@ export default function DetailedResults({ data, inputs }: DetailedResultsProps) 
           </div>
         </div>
       </div> */}
+      {/* Preset & CAO parameters overzicht */}
+      <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm mt-4">
+        <h3 className="text-sm font-semibold text-gray-700 mb-3">CAO/preset parameters (bron: JSON)</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+          <div>
+            <div className="text-xs text-gray-500 mb-1">Werkgeverslasten (componenten)</div>
+            <ul className="text-gray-700 space-y-1">
+              <li className="flex justify-between"><span>• Sociale premies</span><span>{(preset?.emp?.employer?.socialPct ?? 0).toFixed?.(2) ?? "0.00"}%</span></li>
+              <li className="flex justify-between"><span>• Zvw-heffing (WG)</span><span>{(preset?.emp?.employer?.zvwPct ?? 0).toFixed?.(2) ?? "0.00"}%</span></li>
+              <li className="flex justify-between"><span>• Vakantiegeld (WG basis)</span><span>{(preset?.emp?.employer?.vacationPct ?? preset?.vakantiegeldPct ?? 0).toFixed?.(2) ?? "0.00"}%</span></li>
+              <li className="flex justify-between"><span>• Pensioen werkgever</span><span>{(preset?.emp?.employer?.pensionEmployerPct ?? 0).toFixed?.(2) ?? "0.00"}%</span></li>
+              <li className="flex justify-between"><span>• Overige verzekeringen</span><span>{(preset?.emp?.employer?.insuranceOtherPct ?? 0).toFixed?.(2) ?? "0.00"}%</span></li>
+              <li className="flex justify-between font-medium"><span>Totaal (basis WG)</span><span>{(() => {
+                const s = Number(preset?.emp?.employer?.socialPct || 0);
+                const zvw = Number(preset?.emp?.employer?.zvwPct || 0);
+                const vac = Number((preset?.emp?.employer?.vacationPct ?? preset?.vakantiegeldPct) || 0);
+                const pen = Number(preset?.emp?.employer?.pensionEmployerPct || 0);
+                const ins = Number(preset?.emp?.employer?.insuranceOtherPct || 0);
+                const sum = s + zvw + vac + pen + ins;
+                const total = (preset?.emp?.employer?.employerTotalPct != null) ? Number(preset?.emp?.employer?.employerTotalPct) : sum;
+                return total.toFixed(2);
+              })()}%</span></li>
+            </ul>
+          </div>
+          <div>
+            <div className="text-xs text-gray-500 mb-1">Toeslagen en overige</div>
+            <ul className="text-gray-700 space-y-1">
+              <li className="flex justify-between"><span>• Bovenwettelijke vakantiedagen</span><span>{(preset?.emp?.extraOnSalary?.bovenwettelijkeVacationPct ?? 0).toFixed?.(2) ?? "0.00"}%</span></li>
+              <li className="flex justify-between"><span>• PAWW (werkgever)</span><span>{(preset?.emp?.extraOnSalary?.pawwEmployerPct ?? 0).toFixed?.(2) ?? "0.00"}%</span></li>
+              <li className="flex justify-between"><span>• IKB</span><span>{(preset?.emp?.ikbPct ?? preset?.ikbPct ?? 0).toFixed?.(2) ?? "0.00"}%</span></li>
+              <li className="flex justify-between"><span>• ADV-compensatie</span><span>{(preset?.emp?.advCompPct ?? preset?.advCompPct ?? 0).toFixed?.(2) ?? "0.00"}%</span></li>
+              <li className="flex justify-between"><span>• Pensioen werknemer</span><span>{(preset?.emp?.employee?.pensionEmployeePct ?? (inputs as any).pensionEmployee ?? 0).toFixed?.(2) ?? "0.00"}%</span></li>
+              <li className="flex justify-between"><span>• Zvw-bijdrage (ZZP label)</span><span>{(preset?.zvw?.pct ?? 0).toFixed?.(2) ?? "0.00"}% (cap {preset?.zvw?.cap ? preset.zvw.cap.toLocaleString("nl-NL") : "–"})</span></li>
+              <li className="flex justify-between"><span>• Vakantiedagen</span><span>{preset?.vacationDays ?? "–"}</span></li>
+              <li className="flex justify-between"><span>• Feestdagen (betaald)</span><span>{preset?.holidaysPaid ?? "–"}</span></li>
+              <li className="flex justify-between"><span>• ADV-dagen</span><span>{preset?.advDays ?? "–"}</span></li>
+            </ul>
+            <div className="text-[11px] text-gray-500 mt-2">
+              Peildatum: {preset?.peildatum ?? "–"}
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

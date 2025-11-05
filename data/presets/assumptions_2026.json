@@ -1,0 +1,45 @@
+{
+  "id": "assumptions_2026",
+  "label": "Assumptions — 2026 (fallback only)",
+  "version": "2026.01",
+  "peildatum": "2025-11-05",
+  "sources": [
+    "Lib defaults (see lib/calculations.ts, commit d7a8666)",
+    "Belastingdienst — Zvw 2026 (5,75% cap ~€75.860): https://www.belastingdienst.nl/"
+  ],
+  "notes": [
+    "Assumpties die alléén als fallback gelden wanneer een presetveld ontbreekt of null is.",
+    "Gebruik generiek_2026_draft / StiPP / Gemeenten als expliciete preset (settings).",
+    "Zvw 2026: 5,75% cap ~€75.860 (Belastingdienst). Werkgeverslastenbasis 41,60% (huidige default) zolang er geen nieuwe componentcijfers zijn."
+  ],
+  "zzp": {
+    "effectiveRateFactor": 0.8913,
+    "vacationUnpaidPct": 10.87,
+    "pensionTotalPct": 20.0,
+    "pensionBasePct": 90.0,
+    "vacationReservePctBase": 8.33,
+    "wwBufferPct": 3.0,
+    "zvwPct": 5.75,
+    "zvwCap": 75860
+  },
+  "emp": {
+    "employer": {
+      "socialPct": 11.0,
+      "zvwPct": 6.75,
+      "vacationPct": 8.33,
+      "pensionEmployerPct": 14.31,
+      "insuranceOtherPct": 1.21,
+      "employerTotalPct": 41.6
+    },
+    "extraOnSalary": {
+      "bovenwettelijkeVacationPct": 2.18,
+      "pawwEmployerPct": 0.10
+    },
+    "employee": {
+      "pensionEmployeePct": 7.5
+    },
+    "wkrOnkostenPctOfEmployerCosts": 2.62
+  }
+}
+
+

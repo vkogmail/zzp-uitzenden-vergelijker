@@ -6,6 +6,11 @@
   "sources": [
     "Rijksoverheid/Belastingdienst — Zvw 2026 (5,75% cap ~€75.860): https://www.belastingdienst.nl/"
   ],
+  "notes": [
+    "Generiek 2026 (draft): bedoeld als fallback preset wanneer geen specifieke cao van toepassing is.",
+    "Vakantiegeld 8,0% en geen IKB/pensioenregeling; pas aan wanneer sectorale afspraken gelden.",
+    "Zvw 2026: 5,75% met cap ~€75.860 volgens Belastingdienst."
+  ],
   "vacationDays": 25,
   "holidaysPaid": 7,
   "advDays": 0,

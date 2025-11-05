@@ -1,9 +1,43 @@
 import BASE_CONFIG from "@/data/presets/current_2025_baseline.json";
+import ASSUMPTIONS from "@/data/presets/assumptions_2026.json";
 
 // Active preset configuration (can be updated at runtime from the UI)
-let ACTIVE_CONFIG: any = BASE_CONFIG;
+let ACTIVE_PRESET: any = BASE_CONFIG;
 export function setActivePresetConfig(config: any) {
-  ACTIVE_CONFIG = config ?? BASE_CONFIG;
+  ACTIVE_PRESET = config ?? BASE_CONFIG;
+}
+
+export function getActivePresetConfig(): any {
+  return ACTIVE_PRESET;
+}
+
+// Deep merge where override only wins if value is not null/undefined
+function mergeWithAssumptions(base: any, override: any): any {
+  if (override === null || override === undefined) return base;
+  if (Array.isArray(base) && Array.isArray(override)) return override;
+  if (typeof base === "object" && base && typeof override === "object" && override) {
+    const out: any = Array.isArray(base) ? [] : {};
+    const keys = new Set([...Object.keys(base), ...Object.keys(override)]);
+    for (const key of keys) {
+      const bv = base[key];
+      const ov = override[key];
+      if (ov === null || ov === undefined) {
+        out[key] = bv;
+      } else if (typeof bv === "object" && bv && typeof ov === "object") {
+        out[key] = mergeWithAssumptions(bv, ov);
+      } else {
+        out[key] = ov;
+      }
+    }
+    return out;
+  }
+  return override;
+}
+
+function getResolvedConfig(): any {
+  // assumptions -> active preset -> baseline (for safety)
+  const merged = mergeWithAssumptions(ASSUMPTIONS as any, ACTIVE_PRESET as any);
+  return mergeWithAssumptions(merged, BASE_CONFIG as any);
 }
 
 export type CalculatorInputs = {
@@ -81,8 +115,9 @@ export function calculateZzp(inputs: CalculatorInputs): ZzpResult {
   const hoursPerWeekActual = hoursPerWeek && hoursPerWeek > 0 ? hoursPerWeek : 36;
   const theoreticalAnnualHours = hoursPerWeekActual * 52; // Theoretische uren (volledig)
   
-  // Voor ZZP: rekening houden met onbetaalde vakantie-uren (baseline-config)
-  const paidHoursRatio = (ACTIVE_CONFIG as any)?.zzp?.effectiveRateFactor ?? (1 - 0.1087);
+  // Voor ZZP: rekening houden met onbetaalde vakantie-uren (resolved-config)
+  const CFG = getResolvedConfig();
+  const paidHoursRatio = CFG?.zzp?.effectiveRateFactor ?? (1 - 0.1087);
   const effectivePaidHours = theoreticalAnnualHours * paidHoursRatio; // Betaalde uren
   
   const omzet = effectiveRateZzp * effectivePaidHours; // revenue (alleen voor gewerkte uren)
@@ -146,17 +181,17 @@ export function calculateZzp(inputs: CalculatorInputs): ZzpResult {
 
   // === Stap 8: POST-TAX kosten (niet fiscaal aftrekbaar) ===
   // WW-buffer wordt na belasting afgetrokken (al correct)
-  const wwBufferPct = ((ACTIVE_CONFIG as any)?.zzp?.wwBufferPct ?? 3) / 100;
+  const wwBufferPct = (CFG?.zzp?.wwBufferPct ?? 3) / 100;
   const wwBuffer = omzet * wwBufferPct; // WW buffer/sparen (niet fiscaal)
   
   // Zvw-premie (Zorgverzekeringswet): gebruik baseline/preset waarden waar beschikbaar
-  const zvwMaxBasis = (ACTIVE_CONFIG as any)?.zzp?.zvwCap ?? 75860;
-  const zvwPercentage = (((ACTIVE_CONFIG as any)?.zzp?.zvwPct ?? 5.75) as number) / 100;
+  const zvwMaxBasis = CFG?.zzp?.zvwCap ?? 75860;
+  const zvwPercentage = ((CFG?.zzp?.zvwPct ?? 5.75) as number) / 100;
   const zvwBasis = Math.min(belastbaarInkomen, zvwMaxBasis);
   const zvwPremie = zvwBasis * zvwPercentage;
   
   // Vakantiegeld basis uit baseline/preset (bijv. 8.33% of 8.0%)
-  const vakantiegeldBasePct = (ACTIVE_CONFIG as any)?.zzp?.vacationReservePctBase ?? 8.33; // %
+  const vakantiegeldBasePct = CFG?.zzp?.vacationReservePctBase ?? 8.33; // %
   const vakantiegeldEffectiefPct = vakantiegeldBasePct * (1 - effectieveBelastingdruk);
   const vakantiegeld = (omzet - businessCosts - (heeftEchteAovVerzekering ? aov : 0)) * (vakantiegeldEffectiefPct / 100); // vakantiereserve (niet fiscaal)
 
@@ -218,8 +253,14 @@ export function calculateEmployee(inputs: CalculatorInputs): EmployeeResult {
   const totaalBeschikbaar = factuurwaarde - fee; // Beschikbaar voor werkgeverskosten en loon
   
   // Stap 3: Werkgeverskosten berekenen
-  // Gebruik bestaande employerTotalPct of baseline-config
-  const baselineWgPct = (ACTIVE_CONFIG as any)?.emp?.employer?.employerTotalPct ?? 41.6;
+  // Gebruik bestaande employerTotalPct of leid af uit componenten uit preset
+  const CFG = getResolvedConfig();
+  const cfgEmp = (CFG as any)?.emp ?? {};
+  const cfgEmployer = cfgEmp?.employer ?? {};
+  const derivedWgPct = [cfgEmployer?.socialPct, cfgEmployer?.zvwPct, cfgEmployer?.vacationPct, cfgEmployer?.pensionEmployerPct, cfgEmployer?.insuranceOtherPct]
+    .filter((v) => typeof v === "number")
+    .reduce((a: number, b: number) => a + b, 0);
+  const baselineWgPct = (cfgEmployer?.employerTotalPct as number | undefined) ?? (derivedWgPct > 0 ? derivedWgPct : 41.6);
   const wgPct = employerTotalPct != null ? employerTotalPct : baselineWgPct;
   const werkgeverskosten = totaalBeschikbaar * toPct(wgPct); // Werkgeverskosten
   
@@ -227,19 +268,24 @@ export function calculateEmployee(inputs: CalculatorInputs): EmployeeResult {
   const brutoSalaris = totaalBeschikbaar - werkgeverskosten; // Basis bruto salaris
   
   // Stap 5: Toeslagen bovenop bruto salaris (uit baseline/preset waar beschikbaar)
-  const vakantiegeldPct = (ACTIVE_CONFIG as any)?.emp?.employer?.vacationPct ?? 8.33;
-  const bovenwettelijkeVakantiePct = (ACTIVE_CONFIG as any)?.emp?.extraOnSalary?.bovenwettelijkeVacationPct ?? 2.18;
-  const pawwPct = (ACTIVE_CONFIG as any)?.emp?.extraOnSalary?.pawwEmployerPct ?? 0.10;
+  const vakantiegeldPct = cfgEmployer?.vacationPct ?? (CFG as any)?.vakantiegeldPct ?? 8.33;
+  const bovenwettelijkeVakantiePct = (cfgEmp?.extraOnSalary?.bovenwettelijkeVacationPct ?? 2.18);
+  const pawwPct = (cfgEmp?.extraOnSalary?.pawwEmployerPct ?? 0.10);
   
   const vakantiegeldEmp = brutoSalaris * toPct(vakantiegeldPct);
   const bovenwettelijkeVakantie = brutoSalaris * toPct(bovenwettelijkeVakantiePct);
   const pawwWerkgever = brutoSalaris * toPct(pawwPct);
+  const ikbPct = (cfgEmp?.ikbPct as number | undefined) ?? ((CFG as any)?.ikbPct as number | undefined) ?? 0;
+  const advCompPct = (cfgEmp?.advCompPct as number | undefined) ?? ((CFG as any)?.advCompPct as number | undefined) ?? 0;
+  const ikbToeslag = brutoSalaris * toPct(ikbPct);
+  const advToeslag = brutoSalaris * toPct(advCompPct);
   
   // Stap 6: Bruto loon (voor belasting) - inclusief alle toeslagen
-  const brutoLoon = brutoSalaris + vakantiegeldEmp + bovenwettelijkeVakantie + pawwWerkgever;
+  const brutoLoon = brutoSalaris + vakantiegeldEmp + bovenwettelijkeVakantie + pawwWerkgever + ikbToeslag + advToeslag;
   
   // Stap 7: Pensioen werknemer berekenen (op bruto salaris, niet op bruto loon)
-  const pensionEmployeeActual = pensionEmployee ?? 7.5;
+  const presetPensionEmployeePct = (cfgEmp?.employee?.pensionEmployeePct as number | undefined);
+  const pensionEmployeeActual = pensionEmployee ?? (presetPensionEmployeePct != null ? presetPensionEmployeePct : 7.5);
   const pensionBaseActual = pensionBase ?? 90;
   const pensioenWerknemer = brutoSalaris * toPct(pensionBaseActual) * toPct(pensionEmployeeActual);
   
@@ -274,7 +320,7 @@ export function calculateEmployee(inputs: CalculatorInputs): EmployeeResult {
   // Stap 12: WKR onkostenvergoeding (optioneel, kan worden toegevoegd)
   // In de Publieke Partner breakdown: ~2.62% van werkgeverskosten
   // Dit wordt als vergoeding toegevoegd aan het netto loon
-  const wkrOnkostenPct = (((ACTIVE_CONFIG as any)?.emp?.wkrOnkostenPctOfEmployerCosts ?? 2.62) as number) / 100;
+  const wkrOnkostenPct = ((((CFG as any)?.emp?.wkrOnkostenPctOfEmployerCosts ?? 2.62) as number)) / 100;
   const wkrOnkosten = werkgeverskosten * wkrOnkostenPct;
   const teOntvangen = nettoLoon + wkrOnkosten; // Netto + WKR vergoeding
   

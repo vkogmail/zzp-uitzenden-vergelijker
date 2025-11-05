@@ -1,38 +1,48 @@
 "use client";
 
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Calculator from "@/components/Calculator";
 import SimpleMode from "@/components/SimpleMode";
 import DetailedResults from "@/components/DetailedResults";
 import StickyComparisonFooter from "@/components/StickyComparisonFooter";
-import { CalculatorInputs, calculateAll, defaultInputs, formatCurrency, formatCurrencyWithDecimals, formatPercent, getWorkableAnnualHours, setActivePresetConfig } from "@/lib/calculations";
+import { CalculatorInputs, calculateAll, defaultInputs, formatCurrency, formatCurrencyWithDecimals, formatPercent, getWorkableAnnualHours, setActivePresetConfig, getActivePresetConfig } from "@/lib/calculations";
 import BASELINE from "@/data/presets/current_2025_baseline.json";
 import STIPP_BASIS_2026 from "@/data/presets/stipp_basis_2026_draft.json";
 import STIPP_PLUS_2026 from "@/data/presets/stipp_plus_2026_draft.json";
 import GEMEENTEN_2026 from "@/data/presets/gemeenten_2026_draft.json";
 import GENERIEK_2026 from "@/data/presets/generiek_2026_draft.json";
+import BANKEN_2026 from "@/data/presets/banken_2026_draft.json";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 
 export default function Home() {
   const [inputs, setInputs] = useState<CalculatorInputs>(defaultInputs);
   const [preset, setPreset] = useState<string>("baseline");
+  const [showPresetOverlay, setShowPresetOverlay] = useState<boolean>(false);
   const presets = {
     baseline: { label: "Baseline (huidig)", config: BASELINE },
     stipp_basis_2026: { label: "ABU/NBBU • StiPP Basis 2026 (draft)", config: STIPP_BASIS_2026 },
     stipp_plus_2026: { label: "ABU/NBBU • StiPP Plus 2026 (draft)", config: STIPP_PLUS_2026 },
     gemeenten_2026: { label: "Gemeenten 2026 (draft)", config: GEMEENTEN_2026 },
+    banken_2026: { label: "Banken 2026 (draft)", config: BANKEN_2026 },
     generiek_2026: { label: "Generiek 2026 (draft)", config: GENERIEK_2026 },
   } as const;
 
   // Initialize active preset (and update when preset changes)
-  useMemo(() => {
+  useEffect(() => {
     const cfg = (presets as any)[preset]?.config ?? BASELINE;
     setActivePresetConfig(cfg);
-    return cfg;
+    // Sync visible inputs for labels that depend on config (vakantiegeld%, wg%)
+    const vg = ((cfg as any)?.emp?.employer?.vacationPct as number | undefined) ?? ((cfg as any)?.vakantiegeldPct as number | undefined);
+    const wg = (cfg as any)?.emp?.employer?.employerTotalPct as number | undefined;
+    setInputs((prev) => ({
+      ...prev,
+      ...(vg != null ? { vacation: vg } : {}),
+      ...(wg != null ? { employerTotalPct: wg } : {}),
+    }));
   }, [preset]);
   const [isSimpleMode, setIsSimpleMode] = useState(true); // Default: simple mode
-  const result = useMemo(() => calculateAll(inputs), [inputs]);
+  const result = useMemo(() => calculateAll(inputs), [inputs, preset]);
   const exportRef = useRef<HTMLDivElement>(null);
 
   const setValue = useCallback((key: keyof CalculatorInputs, value: number) => {
@@ -85,6 +95,14 @@ export default function Home() {
                 ))}
               </select>
               <span className="text-xs text-gray-500">Keuze bepaalt percentages (vakantiegeld, Zvw, WKR, pensioen e.d.).</span>
+              <button
+                type="button"
+                onClick={() => setShowPresetOverlay(true)}
+                className="ml-auto rounded-md border border-gray-200 px-2.5 py-1.5 text-xs text-gray-700 hover:bg-gray-50"
+                aria-label="Toon preset JSON"
+              >
+                Toon preset JSON
+              </button>
             </div>
           </div>
         </section>
@@ -253,7 +271,7 @@ export default function Home() {
             {/* <div className="mt-6 flex flex-wrap items-center gap-3">
               <button 
                 onClick={exportPdf} 
-                className="flex-1 md:flex-none rounded-lg bg-[#00B37E] px-6 py-3 text-white shadow-md hover:opacity-95 active:opacity-90 font-medium touch-manipulation transition-opacity"
+                className="flex-1 md:flex-none rounded-lg bg-[#00B37E] px-6 py-3 text:white shadow-md hover:opacity-95 active:opacity-90 font-medium touch-manipulation transition-opacity"
               >
                 Export as PDF
               </button>
@@ -303,6 +321,44 @@ export default function Home() {
       
       {/* Sticky Comparison Footer - Only in Expert Mode */}
       {!isSimpleMode && <StickyComparisonFooter data={result} inputs={inputs} />}
+
+      {showPresetOverlay && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/40" onClick={() => setShowPresetOverlay(false)} />
+          <div className="relative z-[101] w-[min(92vw,900px)] max-h-[80vh] bg-white border border-gray-200 rounded-xl shadow-xl overflow-hidden">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+              <div className="text-sm font-semibold text-gray-800">Geselecteerde preset (JSON)</div>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={async () => {
+                    try {
+                      const cfg = (presets as any)[preset]?.config ?? BASELINE;
+                      await navigator.clipboard.writeText(JSON.stringify(cfg, null, 2));
+                    } catch {}
+                  }}
+                  className="rounded-md border border-gray-200 px-2 py-1 text-xs text-gray-700 hover:bg-gray-50"
+                >
+                  Kopieer
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowPresetOverlay(false)}
+                  className="rounded-md border border-gray-200 px-2 py-1 text-xs text-gray-700 hover:bg-gray-50"
+                  aria-label="Sluiten"
+                >
+                  Sluiten
+                </button>
+              </div>
+            </div>
+            <div className="p-0 overflow-auto" style={{ maxHeight: 'calc(80vh - 44px)' }}>
+              <pre className="text-xs m-0 p-4 whitespace-pre-wrap break-words leading-relaxed">
+{JSON.stringify(((presets as any)[preset]?.config ?? BASELINE), null, 2)}
+              </pre>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

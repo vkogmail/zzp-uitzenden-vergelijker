@@ -8,6 +8,12 @@
     "Schemahouder normering arbeid (ABU/NBBU): https://normeringarbeid.nl",
     "StiPP — pensioenpercentages 2026 (TBD): https://www.stipp.nl/"
   ],
+  "notes": [
+    "StiPP Plus 2026 (draft): percentages kunnen afwijken van Basis; vul employerPct/employeePct in zodra gepubliceerd.",
+    "Vakantiegeld 8,33% conform uitzendpraktijk; verifieer met cao/regeling inlener.",
+    "Werkgeverslasten-totaal wordt afgeleid uit componenten zodra beschikbaar; anders fallback.",
+    "Zvw 2026: 5,75% met cap ~€75.860 volgens Belastingdienst."
+  ],
   "vacationDays": 25,
   "holidaysPaid": 7,
   "advDays": 0,

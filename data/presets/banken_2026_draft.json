@@ -1,0 +1,42 @@
+{
+  "id": "banken_2026_draft",
+  "label": "Banken — 2026 (draft)",
+  "version": "2026.01",
+  "peildatum": "2025-11-05",
+  "sources": [
+    "Sector-cao banken (2026 publicatie: TBD)",
+    "Belastingdienst — Zvw 2026 (5,75% cap ~€75.860): https://www.belastingdienst.nl/"
+  ],
+  "notes": [
+    "Draft voor sector Banken 2026. Cijfers die ontbreken (null) moeten nog worden ingevuld op basis van officiële cao-publicatie. Vakantiegeld 8,0% en PAWW 0,10% zijn opgenomen als aannames.",
+    "Zvw 2026: 5,75% met cap ~€75.860 volgens Belastingdienst; aanpassen zodra definitieve publicatie afwijkt.",
+    "Werkgeverslasten-totaal wordt afgeleid uit componenten zodra componenten zijn gevuld; als alles null blijft, valt de berekening terug op defaults."
+  ],
+  "vacationDays": 25,
+  "holidaysPaid": 7,
+  "advDays": 0,
+  "vakantiegeldPct": 8.0,
+  "ikbPct": 0,
+  "advCompPct": 0,
+  "emp": {
+    "employer": {
+      "socialPct": null,
+      "zvwPct": null,
+      "vacationPct": 8.0,
+      "pensionEmployerPct": null,
+      "insuranceOtherPct": null,
+      "employerTotalPct": null
+    },
+    "extraOnSalary": {
+      "bovenwettelijkeVacationPct": null,
+      "pawwEmployerPct": 0.10
+    },
+    "employee": {
+      "pensionEmployeePct": null
+    }
+  },
+  "zvw": { "pct": 5.75, "cap": 75860, "basis": "belastbaar" },
+  "employerOther": []
+}
+
+

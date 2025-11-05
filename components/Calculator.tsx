@@ -1,7 +1,7 @@
 "use client";
 
 import { ChangeEvent, useState } from "react";
-import { formatCurrency, formatCurrencyWithDecimals, getWorkableAnnualHours, calculateIncomeTax, calculateZzp, calculateEmployee } from "@/lib/calculations";
+import { formatCurrency, formatCurrencyWithDecimals, getWorkableAnnualHours, calculateIncomeTax, calculateZzp, calculateEmployee, getActivePresetConfig } from "@/lib/calculations";
 
 type TabType = "zzp" | "uitzenden";
 
@@ -67,6 +67,7 @@ function NumberField({
 }
 
 export default function Calculator({ values, onChange }: CalculatorProps) {
+  const preset = getActivePresetConfig() as any;
   const clientRateZzp = (values as any).clientRateZzp ?? values.rate;
   const clientRateEmp = (values as any).clientRateEmp ?? values.rate;
   const marginZzp = (values as any).marginZzp ?? 0;
@@ -75,15 +76,17 @@ export default function Calculator({ values, onChange }: CalculatorProps) {
   const effectiveRateEmp = clientRateEmp * (1 - marginEmp / 100);
   // Werkgeverslasten (vaste componenten volgens specificatie)
   // Basis werkgeverslasten (41.6%):
-  const wgSocial = 11.0; // Sociale premies (WW, WIA, ZW)
-  const wgZvw = 6.75; // Zorgverzekeringswet heffing (werkgeversheffing Zvw)
-  const wgVacation = 8.33; // Vakantiegeld (wettelijk)
-  const wgPensionEmployer = 14.31; // Pensioen werkgeversdeel
-  const wgInsurance = 1.21; // Overige verzekeringen (aangepast voor Zvw)
+  const wgSocial = preset?.emp?.employer?.socialPct ?? 11.0; // Sociale premies (WW, WIA, ZW)
+  const wgZvw = preset?.emp?.employer?.zvwPct ?? 6.75; // Zorgverzekeringswet heffing (werkgeversheffing Zvw)
+  const wgVacation = preset?.emp?.employer?.vacationPct ?? preset?.vakantiegeldPct ?? 8.33; // Vakantiegeld (wettelijk)
+  const wgPensionEmployer = preset?.emp?.employer?.pensionEmployerPct ?? 14.31; // Pensioen werkgeversdeel
+  const wgInsurance = preset?.emp?.employer?.insuranceOtherPct ?? 1.21; // Overige verzekeringen (aangepast voor Zvw)
   
   // Toeslagen bovenop bruto salaris (deze komen bovenop de basis werkgeverslasten):
-  const wgBovenwettelijkeVakantie = 2.18; // Bovenwettelijke vakantiedagen
-  const wgPaww = 0.10; // PAWW (Premie Arbeidsongeschiktheidsverzekering Werknemers)
+  const wgBovenwettelijkeVakantie = preset?.emp?.extraOnSalary?.bovenwettelijkeVacationPct ?? 2.18; // Bovenwettelijke vakantiedagen
+  const wgPaww = preset?.emp?.extraOnSalary?.pawwEmployerPct ?? 0.10; // PAWW (werkgever)
+  const ikbPctDisplay = preset?.emp?.ikbPct ?? preset?.ikbPct ?? 0;
+  const advCompPctDisplay = preset?.emp?.advCompPct ?? preset?.advCompPct ?? 0;
   
   // Basis werkgeverslasten som - berekend dynamisch voor accurate weergave
   const werkgeverslastenBasisSom = wgSocial + wgZvw + wgVacation + wgPensionEmployer + wgInsurance; // Dynamisch berekend
@@ -93,7 +96,7 @@ export default function Calculator({ values, onChange }: CalculatorProps) {
   // maar moeten meegenomen worden in de totale kosten. De effectieve percentage 
   // op totaal beschikbaar is ongeveer: basis + (toeslagen × (1 - basis%))
   // Voor nauwkeurigheid gebruiken we de berekening uit calculateEmployee
-  const employerTotal = 41.6; // Basis percentage (wordt gebruikt in berekening)
+  const employerTotal = (values as any).employerTotalPct ?? (preset?.emp?.employer?.employerTotalPct ?? 41.6); // Basis percentage
   const employerTotalFraction = employerTotal / 100;
   
   // Calculate annual hours based on hours per week
@@ -570,6 +573,18 @@ export default function Calculator({ values, onChange }: CalculatorProps) {
                 <span>• PAWW (werkgever)</span>
                 <span className="font-medium">{pawwPct.toFixed(2)}%</span>
               </div>
+              {ikbPctDisplay > 0 && (
+                <div className="flex justify-between items-center text-sm text-gray-700">
+                  <span>• IKB</span>
+                  <span className="font-medium">{ikbPctDisplay.toFixed(2)}%</span>
+                </div>
+              )}
+              {advCompPctDisplay > 0 && (
+                <div className="flex justify-between items-center text-sm text-gray-700">
+                  <span>• ADV-compensatie</span>
+                  <span className="font-medium">{advCompPctDisplay.toFixed(2)}%</span>
+                </div>
+              )}
             </div>
           </div>
           <div className="mt-3 pt-2 border-t border-gray-200">

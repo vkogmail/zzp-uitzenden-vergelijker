@@ -8,6 +8,10 @@
     "Belastingdienst — Zorgverzekeringswet 2026 (bijdrage 5,75%, max. bijdrage-inkomen ~€75.860): https://www.belastingdienst.nl/",
     "Algemene cao-praktijk: vakantiegeld 8,33% (BW), bovenwettelijke dagen 2,18% (Publieke sector), PAWW 0,10% (stelselbreed)."
   ],
+  "notes": [
+    "Deze JSON legt de huidige (nov 2025) vaste waarden uit lib/calculations.ts vast, zodat we ze kunnen vergelijken zodra we overstappen op CAO‑presets. Werkgeverskosten‑optelsom (basis): 11.0 + 6.75 + 8.33 + 14.31 + 1.21 = 41.60%. Extra op bruto salaris: bovenwettelijke 2,18% + PAWW 0,10% (effectief ~1,33% van totaal beschikbaar bij 41,6% basis).",
+    "Zvw‑parameters zijn voor 2026 al bekend (5,75%, cap ±€75.860). Pas aan zodra officiële publicatie wijzigt. Pensioenpercentages voor 2026 (StiPP/ABP) zijn nog te bevestigen."
+  ],
   "zzp": {
     "effectiveRateFactor": 0.8913,
     "vacationUnpaidPct": 10.87,
@@ -37,14 +41,7 @@
       "pensionBasePct": 90.0
     },
     "wkrOnkostenPctOfEmployerCosts": 2.62
-  },
-  "notes": [
-    "Deze JSON legt de huidige (nov 2025) vaste waarden uit lib/calculations.ts vast, zodat we ze kunnen vergelijken zodra we overstappen op CAO‑presets.
-    Werkgeverskosten‑optelsom (basis): 11.0 + 6.75 + 8.33 + 14.31 + 1.21 = 41.60%.
-    Extra op bruto salaris: bovenwettelijke 2,18% + PAWW 0,10% (effectief ~1,33% van totaal beschikbaar bij 41,6% basis).",
-    "Zvw‑parameters zijn voor 2026 al bekend (5,75%, cap ±€75.860). Pas aan zodra officiële publicatie wijzigt.
-    Pensioenpercentages voor 2026 (StiPP/ABP) zijn nog te bevestigen."
-  ]
+  }
 }
 
 
