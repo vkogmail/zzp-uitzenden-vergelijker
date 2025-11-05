@@ -113,12 +113,13 @@ export function calculateZzp(inputs: CalculatorInputs): ZzpResult {
     ? clientRateZzp * (1 - toPct(marginZzp))
     : rate;
   const hoursPerWeekActual = hoursPerWeek && hoursPerWeek > 0 ? hoursPerWeek : 36;
-  const theoreticalAnnualHours = hoursPerWeekActual * 52; // Theoretische uren (volledig)
+  // Gebruik dezelfde jaaruren als de UI (werkbaar): 52 weken minus 6 dagen
+  const theoreticalAnnualHours = getWorkableAnnualHours(hoursPerWeekActual);
   
   // Voor ZZP: rekening houden met onbetaalde vakantie-uren (resolved-config)
   const CFG = getResolvedConfig();
   const paidHoursRatio = CFG?.zzp?.effectiveRateFactor ?? (1 - 0.1087);
-  const effectivePaidHours = theoreticalAnnualHours * paidHoursRatio; // Betaalde uren
+  const effectivePaidHours = theoreticalAnnualHours * paidHoursRatio; // Betaalde uren (werkbaar × factor)
   
   const omzet = effectiveRateZzp * effectivePaidHours; // revenue (alleen voor gewerkte uren)
   const businessCosts = omzet * toPct(costs); // bedrijfskosten

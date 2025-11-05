@@ -101,12 +101,13 @@ export default function Calculator({ values, onChange }: CalculatorProps) {
   
   // Calculate annual hours based on hours per week
   const hoursPerWeekInput = (values as any).hoursPerWeek ?? 36;
-  const theoreticalAnnualHours = hoursPerWeekInput * 52; // Theoretische uren (volledig)
+  const theoreticalAnnualHours = hoursPerWeekInput * 52; // Theoretische uren (Uitzenden: inclusief betaalde vakantie)
   
-  // Voor ZZP: betaalde uren (10.87% onbetaalde vakantie)
+  // Voor ZZP: werkbare jaaruren (zelfde als UI-teller) en betaalde uren (10.87% onbetaalde vakantie)
+  const workableAnnualHours = getWorkableAnnualHours(hoursPerWeekInput);
   const unpaidVacationPercentage = 0.1087;
   const paidHoursRatio = 1 - unpaidVacationPercentage; // 89.13%
-  const zzpPaidHours = theoreticalAnnualHours * paidHoursRatio; // Betaalde uren voor ZZP
+  const zzpPaidHours = workableAnnualHours * paidHoursRatio; // Betaalde uren voor ZZP
   
   // Voor Uitzenden: theoretische uren (inclusief betaalde vakantiedagen)
   const empAnnualHours = theoreticalAnnualHours; // Volledige theoretische uren
@@ -299,14 +300,7 @@ export default function Calculator({ values, onChange }: CalculatorProps) {
           </div>
         </div>
         
-        {/* Klanttarief ZZP */}
-        <div className="md:col-start-1 md:row-start-3 rounded-xl bg-white border border-gray-100 shadow-sm p-4">
-          <p className="text-sm text-gray-600 mb-1">Klanttarief ZZP</p>
-          <div className="flex items-end justify-between">
-            <span className="text-2xl font-semibold">{formatCurrencyWithDecimals(clientRateZzp)}</span>
-            <span className="text-xs text-gray-500">→ Jij krijgt: {formatCurrencyWithDecimals(effectiveRateZzp)} (na {marginZzp.toFixed(1)}% marge)</span>
-          </div>
-        </div>
+        {/* Klanttarief ZZP — verwijderd op verzoek */}
         
         {/* ZZP opbouw */}
         <div className="md:col-start-1 md:row-start-4 rounded-xl bg-white border border-gray-100 shadow-sm p-4">
@@ -388,7 +382,7 @@ export default function Calculator({ values, onChange }: CalculatorProps) {
               <span className="font-semibold">{formatCurrencyWithDecimals(effectiveRateZzp)}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600">× Betaalde uren ({zzpPaidHours.toLocaleString("nl-NL")} uur, 89.13% van {theoreticalAnnualHours.toLocaleString("nl-NL")})</span>
+              <span className="text-gray-600">× Betaalde uren ({zzpPaidHours.toLocaleString("nl-NL")} uur, 89.13% van {workableAnnualHours.toLocaleString("nl-NL")})</span>
               <span className="text-gray-500">= {formatCurrency(omzet)}</span>
             </div>
             <div className="flex justify-between text-gray-700 pl-4">
@@ -528,14 +522,7 @@ export default function Calculator({ values, onChange }: CalculatorProps) {
           </div>
         </div>
         
-        {/* Klanttarief Uitzenden */}
-        <div className="md:col-start-2 md:row-start-3 md:self-start rounded-xl bg-white border border-gray-100 shadow-sm p-4">
-          <p className="text-sm text-gray-600 mb-1">Klanttarief Uitzenden</p>
-          <div className="flex items-end justify-between">
-            <span className="text-2xl font-semibold">{formatCurrencyWithDecimals(clientRateEmp)}</span>
-            <span className="text-xs text-gray-500">→ Jij krijgt: {formatCurrencyWithDecimals(effectiveRateEmp)} (na {marginEmp.toFixed(1)}% marge)</span>
-          </div>
-        </div>
+        {/* Klanttarief Uitzenden — verwijderd op verzoek */}
         
         {/* Totaal werkgeverslasten */}
         <div className="md:col-start-2 md:row-start-4 md:self-start rounded-xl bg-white border border-gray-100 shadow-sm p-4">
@@ -563,7 +550,7 @@ export default function Calculator({ values, onChange }: CalculatorProps) {
             </div>
           </div>
           <div className="mt-3 pt-2 border-t border-gray-200">
-            <p className="text-xs text-gray-500 mb-2 font-medium">Toeslagen (van bruto salaris):</p>
+            <p className="text-xs text-gray-500 mb-2 font-medium">Toeslagen (% van bruto salaris):</p>
             <div className="space-y-2">
               <div className="flex justify-between items-center text-sm text-gray-700">
                 <span>• Bovenwettelijke vakantiedagen</span>
