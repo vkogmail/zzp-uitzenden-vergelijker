@@ -102,7 +102,14 @@ export default function Home() {
               <select
                 value={preset}
                 onChange={(e) => setPreset(e.target.value)}
-                className="rounded-lg border border-gray-200 px-3 py-2 text-sm"
+                className="rounded-lg border border-gray-200 bg-white text-gray-900 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none cursor-pointer"
+                style={{
+                  backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23374151' d='M6 9L1 4h10z'/%3E%3C/svg%3E")`,
+                  backgroundRepeat: 'no-repeat',
+                  backgroundPosition: 'right 0.75rem center',
+                  backgroundSize: '12px',
+                  paddingRight: '2.5rem'
+                }}
               >
                 {Object.entries(presets).map(([key, v]) => (
                   <option key={key} value={key}>{v.label}</option>

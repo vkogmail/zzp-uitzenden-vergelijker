@@ -1,8 +1,12 @@
 @import "tailwindcss";
 
-/* Geist is provided via next/font in app/layout.tsx */
+/* === CreateNew Tailwind v4 globals (full replacement) ===
+   - Keeps your original token block
+   - Maps tokens into Tailwind palette via @theme
+   - Rebuilds legacy classes as @utility
+*/
 
-/* Design tokens from public/styles.json → CSS variables */
+/* 0) Your original tokens */
 :root {
   /* Neutral */
   --neutral-white: rgb(255, 255, 255);
@@ -20,8 +24,8 @@
 
   /* Grey Warm */
   --grey-warm-5: rgb(251, 250, 249);
-  --grey-warm-25: rgb(247, 244, 241);
-  --grey-warm-50: rgb(243, 239, 236);
+  --grey-warm-25: rgb(244, 241, 235);
+  --grey-warm-50: rgb(231, 221, 207);
 
   /* Blue */
   --blue-5: rgb(246, 251, 255);
@@ -37,27 +41,45 @@
   --cyan-25: rgb(225, 249, 253);
   --cyan-50: rgb(191, 240, 250);
   --cyan-100: rgb(51, 215, 242);
-  --cyan-200: rgb(0, 123, 144);
-  --cyan-300: rgb(11, 123, 142);
-  --cyan-400: rgb(10, 41, 46);
+  --cyan-200: rgb(10, 162, 191);
+  --cyan-300: rgb(2, 102, 131);
+  --cyan-400: rgb(1, 54, 72);
 
   /* Teal */
-  --teal-5: rgb(244, 253, 249);
-  --teal-25: rgb(216, 247, 235);
-  --teal-50: rgb(177, 236, 215);
-  --teal-100: rgb(0, 204, 116);
-  --teal-200: rgb(0, 125, 75);
-  --teal-300: rgb(0, 125, 75);
-  --teal-400: rgb(0, 41, 24);
+  --teal-5: rgb(242, 254, 250);
+  --teal-25: rgb(206, 252, 237);
+  --teal-50: rgb(151, 244, 217);
+  --teal-100: rgb(32, 232, 175);
+  --teal-200: rgb(14, 165, 133);
+  --teal-300: rgb(7, 89, 80);
+  --teal-400: rgb(0, 37, 34);
 
-  /* Green */
-  --green-5: rgb(252, 254, 243);
-  --green-25: rgb(244, 250, 220);
-  --green-50: rgb(233, 243, 184);
-  --green-100: rgb(145, 186, 0);
-  --green-200: rgb(96, 122, 5);
-  --green-300: rgb(59, 67, 9);
-  --green-400: rgb(40, 45, 6);
+  /* Pink */
+  --pink-5: rgb(255, 247, 253);
+  --pink-25: rgb(255, 228, 246);
+  --pink-50: rgb(251, 202, 236);
+  --pink-100: rgb(235, 70, 173);
+  --pink-200: rgb(190, 0, 127);
+  --pink-300: rgb(124, 0, 83);
+  --pink-400: rgb(50, 0, 29);
+
+  /* Violet */
+  --violet-5: rgb(247, 243, 255);
+  --violet-25: rgb(233, 224, 255);
+  --violet-50: rgb(209, 194, 255);
+  --violet-100: rgb(146, 97, 255);
+  --violet-200: rgb(107, 62, 220);
+  --violet-300: rgb(68, 34, 163);
+  --violet-400: rgb(29, 15, 69);
+
+  /* Orange */
+  --orange-5: rgb(255, 251, 247);
+  --orange-25: rgb(255, 236, 224);
+  --orange-50: rgb(255, 208, 178);
+  --orange-100: rgb(255, 148, 77);
+  --orange-200: rgb(220, 88, 22);
+  --orange-300: rgb(160, 50, 9);
+  --orange-400: rgb(71, 24, 5);
 
   /* Gold */
   --gold-5: rgb(255, 254, 245);
@@ -68,253 +90,198 @@
   --gold-300: rgb(102, 79, 0);
   --gold-400: rgb(46, 23, 0);
 
-  /* Orange */
-  --orange-5: rgb(255, 251, 247);
-  --orange-25: rgb(255, 236, 224);
-  --orange-50: rgb(255, 219, 184);
-  --orange-100: rgb(255, 98, 0);
-  --orange-200: rgb(187, 72, 0);
-  --orange-300: rgb(102, 49, 0);
-  --orange-400: rgb(51, 24, 0);
+  /* Green */
+  --green-5: rgb(247, 255, 245);
+  --green-25: rgb(233, 247, 228);
+  --green-50: rgb(206, 233, 194);
+  --green-100: rgb(111, 153, 91);
+  --green-200: rgb(62, 94, 52);
+  --green-300: rgb(48, 71, 40);
+  --green-400: rgb(40, 45, 6);
 
-  /* Pink */
-  --pink-5: rgb(252, 250, 254);
-  --pink-25: rgb(239, 231, 252);
-  --pink-50: rgb(234, 214, 247);
-  --pink-100: rgb(192, 131, 226);
-  --pink-200: rgb(100, 63, 164);
-  --pink-300: rgb(90, 54, 103);
-  --pink-400: rgb(56, 33, 64);
-
-  /* Violet */
-  --violet-5: rgb(250, 249, 254);
-  --violet-25: rgb(239, 231, 252);
-  --violet-50: rgb(221, 205, 248);
-  --violet-100: rgb(140, 93, 224);
-  --violet-200: rgb(100, 63, 164);
-  --violet-300: rgb(59, 39, 99);
-  --violet-400: rgb(20, 0, 51);
-  /* Primary font stacks */
-  --font-fallback-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  /* Fonts */
+  --font-fallback-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", "Inter", "Roboto", "Helvetica", Arial, "Apple Color Emoji", "Segoe UI Emoji";
   --font-rebond-stack: var(--font-rebond), var(--font-fallback-sans);
-}
-
-:root {
-  --background: #ffffff;
-  --foreground: #3e5e34;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  /* Make Rebond Grotesque the default sans stack */
   --font-sans: var(--font-rebond-stack);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #3e5e34;
-    --foreground: #ededed;
-  }
+/* 2) Tailwind theme bridge */
+@theme inline {
+  /* Surfaces */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  /* Fonts */
+  --font-sans: var(--font-rebond-stack);
+  --font-mono: var(--font-geist-mono);
+
+  /* Cool gray */
+  --color-gray-50:  var(--grey-cool-5);
+  --color-gray-100: var(--grey-cool-25);
+  --color-gray-200: var(--grey-cool-50);
+  --color-gray-600: var(--grey-cool-100-on-light);
+  --color-gray-700: var(--grey-cool-200);
+  --color-gray-800: var(--grey-cool-300);
+  --color-gray-900: var(--grey-cool-400);
+
+  /* Warm gray mapped to stone */
+  --color-stone-50:  var(--grey-warm-5);
+  --color-stone-100: var(--grey-warm-25);
+  --color-stone-200: var(--grey-warm-50);
+
+  /* Blue */
+  --color-blue-50:  var(--blue-25);
+  --color-blue-100: var(--blue-50);
+  --color-blue-200: var(--blue-50);
+  --color-blue-300: var(--blue-200);
+  --color-blue-400: var(--blue-300);
+  --color-blue-500: var(--blue-100);
+  --color-blue-600: var(--blue-100);
+  --color-blue-700: var(--blue-200);
+  --color-blue-800: var(--blue-300);
+  --color-blue-900: var(--blue-400);
+
+  /* Cyan */
+  --color-cyan-50:  var(--cyan-25);
+  --color-cyan-100: var(--cyan-50);
+  --color-cyan-400: var(--cyan-100);
+  --color-cyan-600: var(--cyan-200);
+  --color-cyan-700: var(--cyan-300);
+  --color-cyan-900: var(--cyan-400);
+
+  /* Teal */
+  --color-teal-50:  var(--teal-25);
+  --color-teal-100: var(--teal-50);
+  --color-teal-500: var(--teal-100);
+  --color-teal-700: var(--teal-200);
+  --color-teal-800: var(--teal-300);
+  --color-teal-900: var(--teal-400);
+
+  /* Green */
+  --color-green-50:  var(--green-25);
+  --color-green-100: var(--green-50);
+  --color-green-500: var(--green-100);
+  --color-green-700: var(--green-200);
+  --color-green-800: var(--green-300);
+  --color-green-900: var(--green-400);
+
+  /* Gold as amber */
+  --color-amber-50:  var(--gold-25);
+  --color-amber-100: var(--gold-50);
+  --color-amber-500: var(--gold-100);
+  --color-amber-700: var(--gold-200);
+  --color-amber-800: var(--gold-300);
+  --color-amber-900: var(--gold-400);
+
+  /* Orange */
+  --color-orange-50:  var(--orange-25);
+  --color-orange-100: var(--orange-50);
+  --color-orange-500: var(--orange-100);
+  --color-orange-700: var(--orange-200);
+  --color-orange-800: var(--orange-300);
+  --color-orange-900: var(--orange-400);
+
+  /* Pink */
+  --color-pink-50:  var(--pink-25);
+  --color-pink-100: var(--pink-50);
+  --color-pink-500: var(--pink-100);
+  --color-pink-700: var(--pink-200);
+  --color-pink-800: var(--pink-300);
+  --color-pink-900: var(--pink-400);
+
+  /* Violet */
+  --color-violet-50:  var(--violet-25);
+  --color-violet-100: var(--violet-50);
+  --color-violet-500: var(--violet-100);
+  --color-violet-700: var(--violet-200);
+  --color-violet-800: var(--violet-300);
+  --color-violet-900: var(--violet-400);
+
+  /* Radius & spacing */
+  --radius-xl: 1rem;
+  --radius-2xl: 1.25rem;
+  --radius-full: 9999px;
+
+  --spacing-18: 4.5rem;
+  --spacing-22: 5.5rem;
 }
 
+/* 3) Base */
+html:where(:not(.no-smooth)) { scroll-behavior: smooth; }
+:root { color-scheme: light dark; }
+* { -webkit-tap-highlight-color: transparent; }
 body {
   background: var(--background);
   color: var(--foreground);
-  /* Rebond Grotesque loaded via Next.js localFont - use CSS variable */
   font-family: var(--font-rebond-stack);
-}
-
-/* Safe area support for mobile devices */
-@supports (padding: max(0px)) {
-  .safe-area-bottom {
-    padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
-  }
-}
-
-/* Touch optimization */
-.touch-manipulation {
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent;
-}
-
-/* Smooth scrolling */
-html {
-  scroll-behavior: smooth;
-}
-
-/* Improve text rendering on mobile */
-body {
+  text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;
-  /* Avoid faux bold/italic which can cause mismatched weights across browsers */
-  font-synthesis: none;
 }
 
-/* Force Rebond on ALL headings - maximum specificity to override Tailwind/Framer/Safari */
-html body h1, html body h1.framer-text, html body h1[class], html body h1[class*="framer"], html body h1[class*="text-"], html body h1.ty-h1 { 
-  font-family: var(--font-rebond-stack) !important; 
-  font-weight: 700 !important; 
-  font-synthesis: none !important;
-  -webkit-font-smoothing: antialiased !important;
-}
-html body h2, html body h2.framer-text, html body h2[class], html body h2[class*="framer"], html body h2[class*="text-"], html body h2.ty-h2 { 
-  font-family: var(--font-rebond-stack) !important; 
-  font-weight: 600 !important; 
-  font-synthesis: none !important;
-  -webkit-font-smoothing: antialiased !important;
-}
-html body h3, html body h3.framer-text, html body h3[class], html body h3[class*="framer"], html body h3[class*="text-"], html body h3.ty-h3 { 
-  font-family: var(--font-rebond-stack) !important; 
-  font-weight: 600 !important; 
-  font-synthesis: none !important;
-  -webkit-font-smoothing: antialiased !important;
-}
-html body h4, html body h4.framer-text, html body h4[class], html body h4[class*="framer"], html body h4[class*="text-"], html body h4.ty-h4 { 
-  font-family: var(--font-rebond-stack) !important; 
-  font-weight: 600 !important; 
-  font-synthesis: none !important;
-  -webkit-font-smoothing: antialiased !important;
-}
+/* 4) Variants */
+@variant hocus (&:hover, &:focus-visible);
 
-/* Hide Next.js dev tools portal */
-nextjs-portal {
-  display: none !important;
-}
-
-/* Contrast + weight tweaks for common text utilities */
-.text-gray-600 { color: #1f2937 !important; font-weight: 500 !important; } /* gray-800 */
-.text-gray-500 { color: #374151 !important; font-weight: 500 !important; } /* gray-700 */
-.text-gray-900 { color: var(--grey-cool-400) !important; }
-
-/* Typography utilities (mirroring public/styles.json) */
-.ty-h1 {
+/* 5) Typography utilities (full remap of your .ty-* rules) */
+@utility ty-h1 {
   font-family: var(--font-rebond-stack);
   font-weight: 600;
-  color: var(--grey-cool-400);
-  font-size: 64px;
   letter-spacing: -0.02em;
-  line-height: 1em;
+  line-height: 1;
+  color: var(--color-foreground);
+  font-size: clamp(40px, 6vw, 64px);
 }
-@media (min-width: 810px) { .ty-h1 { font-size: 40px; } }
-@media (min-width: 1200px) { .ty-h1 { font-size: 48px; } }
-
-.ty-h2 {
+@utility ty-h2 {
   font-family: var(--font-rebond-stack);
   font-weight: 600;
-  color: var(--grey-cool-400);
-  font-size: 56px;
   letter-spacing: -0.02em;
-  line-height: 100%;
+  line-height: 1;
+  color: var(--color-foreground);
+  font-size: clamp(36px, 5vw, 56px);
 }
-@media (min-width: 810px) { .ty-h2 { font-size: 36px; } }
-@media (min-width: 1200px) { .ty-h2 { font-size: 48px; } }
-
-.ty-h3 {
-  font-family: "Geist Variable", "Geist", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+@utility ty-h3 {
+  font-family: "Geist Variable","Geist",var(--font-fallback-sans);
   font-weight: 500;
-  color: var(--grey-cool-400);
-  font-size: 32px;
   letter-spacing: -0.01em;
-  line-height: 120%;
+  line-height: 1.2;
+  color: var(--color-foreground);
+  font-size: clamp(22px, 3.2vw, 32px);
 }
-@media (min-width: 810px) { .ty-h3 { font-size: 22px; } }
-@media (min-width: 1200px) { .ty-h3 { font-size: 24px; } }
-
-.ty-h4 {
-  font-family: "Geist Variable", "Geist", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+@utility ty-h4 {
+  font-family: "Geist Variable","Geist",var(--font-fallback-sans);
   font-weight: 500;
-  color: var(--grey-cool-400);
-  font-size: 20px;
   letter-spacing: -0.01em;
-  line-height: 130%;
+  line-height: 1.3;
+  color: var(--color-foreground);
+  font-size: clamp(18px, 2.2vw, 20px);
 }
-@media (min-width: 810px) { .ty-h4 { font-size: 18px; } }
-@media (min-width: 1200px) { .ty-h4 { font-size: 18px; } }
+@utility ty-body    { @apply text-gray-600 text-base leading-7 tracking-[-0.02em]; }
+@utility ty-body-lg { @apply text-gray-600 text-lg leading-[1.4] font-medium; }
+@utility ty-body-sm { @apply text-gray-600 text-xs leading-[1.6]; }
 
-.ty-body {
-  font-family: "Geist Variable", "Geist", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-  font-weight: 400;
-  color: var(--grey-cool-100-on-light);
-  font-size: 16px;
-  letter-spacing: -0.02em;
-  line-height: 1.6em;
-}
+@utility ty-nav   { @apply text-gray-900 text-[15px] leading-4 font-medium; }
+@utility ty-label { @apply text-gray-900 text-sm  leading-4 font-medium; }
 
-.ty-body-lg {
-  font-family: "Geist Variable", "Geist", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-  font-weight: 500;
-  color: var(--grey-cool-100-on-light);
-  font-size: 18px;
-  line-height: 140%;
-}
-@media (min-width: 810px) { .ty-body-lg { font-size: 16px; } }
-@media (min-width: 1200px) { .ty-body-lg { font-size: 16px; } }
-
-.ty-body-sm {
-  font-family: "Geist Variable", "Geist", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-  font-weight: 400;
-  color: var(--grey-cool-100-on-dark);
-  font-size: 12px;
-  line-height: 160%;
-}
-
-.ty-nav {
-  font-family: "Geist Variable", "Geist", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-  font-weight: 500;
-  color: var(--grey-cool-400);
-  font-size: 15px;
-  line-height: 16px;
-}
-
-.ty-label {
-  font-family: "Geist Variable", "Geist", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-  font-weight: 500;
-  color: var(--grey-cool-400);
-  font-size: 14px;
-  line-height: 16px;
-}
-
-.ty-label-special-sm {
-  font-family: "Geist Variable", "Geist", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-  font-weight: 400;
-  color: var(--grey-cool-100-on-dark);
-  font-size: 14px;
+/* Special label (keeps your tighter tracking) */
+@utility ty-label-special-sm {
+  @apply text-gray-900 text-[13px] leading-4 font-medium;
   letter-spacing: -0.01em;
-  line-height: 16px;
 }
 
-.ty-eyebrow {
-  font-family: "Geist Variable", "Geist", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-  font-weight: 600;
-  color: var(--grey-cool-100-on-light);
-  text-transform: uppercase;
-  font-size: 12px;
-  letter-spacing: 0.08em;
-  line-height: 150%;
+/* Link style (replaces .ty-link) */
+@utility ty-link {
+  @apply inline-block text-blue-700 underline underline-offset-4 decoration-1 hocus:text-blue-800;
+  text-decoration-thickness: 1px;
 }
-@media (min-width: 810px) { .ty-eyebrow { font-size: 11px; } }
 
-.ty-link {
-  font-family: "Geist Variable", "Geist", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-  font-weight: 400;
-  color: var(--grey-cool-100-on-dark);
-  font-size: 18px;
-  letter-spacing: -0.02em;
-  line-height: 150%;
-  text-decoration: none;
-}
-@media (min-width: 810px) { .ty-link { font-size: 16px; } }
-@media (min-width: 1200px) { .ty-link { font-size: 16px; } }
+/* 6) Helpers */
+@utility safe-area-bottom { padding-bottom: env(safe-area-inset-bottom); }
+@utility touch-manipulation { touch-action: manipulation; }
 
-/* Brand color mapping (closest matches from public/styles.json) */
-/* Blue scale → map Tailwind-like utilities to design tokens */
-.bg-blue-50 { background-color: rgb(228, 242, 255) !important; } /* Blue/25 */
-.border-blue-200 { border-color: rgb(193, 224, 255) !important; } /* Blue/50 */
-.text-blue-900 { color: rgb(0, 29, 56) !important; } /* Blue/400 */
-.text-blue-800 { color: rgb(0, 53, 102) !important; } /* Blue/300 */
-.text-blue-700 { color: rgb(0, 92, 179) !important; } /* Blue/200 */
-.text-blue-600 { color: rgb(0, 133, 255) !important; } /* Blue/100-ish */
-.text-blue-500 { color: rgb(0, 133, 255) !important; } /* Blue/100 */
+/* 7) Notes:
+   - You can now use native Tailwind utilities instead of custom color classes:
+     bg-blue-50, border-blue-200, text-blue-900/800/700/600/500,
+     text-gray-900/600/500, text-cyan-600, bg-amber-50, text-violet-700, etc.
+   - Those map to your tokens via @theme above.
+*/
