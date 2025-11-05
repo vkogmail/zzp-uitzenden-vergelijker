@@ -1,10 +1,34 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import localFont from "next/font/local";
+import { Geist_Mono } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+const rebondGrotesque = localFont({
+  src: [
+    {
+      path: "../public/fonts/Rebond-Woff2/RebondGrotesque-Regular.woff2",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "../public/fonts/Rebond-Woff2/RebondGrotesque-Medium.woff2",
+      weight: "500",
+      style: "normal",
+    },
+    {
+      path: "../public/fonts/Rebond-Woff2/RebondGrotesque-Semibold.woff2",
+      weight: "600",
+      style: "normal",
+    },
+    {
+      path: "../public/fonts/Rebond-Woff2/RebondGrotesque-Bold.woff2",
+      weight: "700",
+      style: "normal",
+    },
+  ],
+  display: "swap",
+  adjustFontFallback: false,
+  variable: "--font-rebond",
 });
 
 const geistMono = Geist_Mono({
@@ -23,10 +47,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+    <html lang="en" className={rebondGrotesque.variable}>
+      <body className={`${geistMono.variable} antialiased`}>
         {children}
       </body>
     </html>

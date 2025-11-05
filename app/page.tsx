@@ -74,10 +74,10 @@ export default function Home() {
     <div className="min-h-screen bg-[#f8fafc] text-gray-900 scroll-smooth">
       <div className={`mx-auto max-w-4xl px-4 py-10 ${isSimpleMode ? 'pb-10' : 'pb-72'}`}>
         <header className="mb-6">
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-3">
+          <h1 className="ty-h1 text-center mb-3">
             ZZP vs Uitzenden Vergelijker
           </h1>
-          <p className="text-base md:text-lg text-gray-600 mb-6">
+          <p className="ty-body-lg text-center mb-6">
             Vergelijk netto inkomen per maand met reële aannames (2026). Alle berekeningen gaan uit van 12 maanden (jaar).
           </p>
         </header>
@@ -85,7 +85,19 @@ export default function Home() {
         {/* Preset selector */}
         <section className="mb-4">
           <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
-            <label className="text-sm text-gray-600 mb-2 block font-medium">CAO/preset</label>
+            <label className="text-sm text-gray-600 mb-2 block font-medium">
+              <span className="inline-flex items-center gap-1">
+                Kies je CAO
+                <span className="group relative inline-flex align-middle">
+                  <svg className="w-4 h-4 cursor-help text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                  </svg>
+                  <span className="opacity-0 group-hover:opacity-100 transition-opacity absolute z-10 -top-9 left-1/2 -translate-x-1/2 whitespace-nowrap bg-gray-800 text-white text-[10px] px-2 py-1 rounded">
+                    Keuze bepaalt percentages (vakantiegeld, Zvw, WKR, pensioen e.d.).
+                  </span>
+                </span>
+              </span>
+            </label>
             <div className="flex items-center gap-3">
               <select
                 value={preset}
@@ -96,7 +108,7 @@ export default function Home() {
                   <option key={key} value={key}>{v.label}</option>
                 ))}
               </select>
-              <span className="text-xs text-gray-500">Keuze bepaalt percentages (vakantiegeld, Zvw, WKR, pensioen e.d.).</span>
+              {/* uitleg verplaatst naar tooltip bij label */}
               <button
                 type="button"
                 onClick={() => setShowPresetOverlay(true)}
@@ -108,6 +120,12 @@ export default function Home() {
             </div>
           </div>
         </section>
+        {/* Actieve CAO banner (altijd zichtbaar, ook als dropdown straks verdwijnt) */}
+        <div className="mb-4 rounded-lg bg-blue-50 border border-blue-200 px-3 py-2 text-xs md:text-sm text-blue-900">
+          We vergelijken op basis van de cao “{(presets as any)[preset]?.label ?? '—'}”
+          {(() => { const cfg = (presets as any)[preset]?.config as any; return cfg?.peildatum ? ` (peildatum ${cfg.peildatum})` : ''; })()}
+          .
+        </div>
 
         {/* Hours Input, Rate Input and Toggle Switch - Unified design for both mobile and desktop */}
         <section className="mb-6 space-y-4">
@@ -294,8 +312,8 @@ export default function Home() {
         {/* Informatie blok - Altijd zichtbaar */}
         <section className="mb-6">
           <div className="rounded-xl bg-blue-50 border border-blue-200 p-5">
-            <h3 className="text-sm font-semibold text-blue-900 mb-2">💡 Hoe werkt dit?</h3>
-            <ul className="text-xs text-blue-800 space-y-1">
+            <h3 className="ty-h3 text-blue-900 mb-2">💡 Hoe werkt dit?</h3>
+            <ul className="text-xs md:text-sm font-normal text-blue-900 leading-relaxed">
               <li>• Bij ZZP moet je zelf pensioen regelen, verzekeringen betalen en reserves aanleggen</li>
               <li>• Bij uitzenden regelt het uitzendbureau dit allemaal voor je</li>
               <li>• Daarom kan je als uitzendkracht soms netto meer overhouden, ondanks een lager tarief</li>

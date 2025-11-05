@@ -108,6 +108,7 @@ export default function Calculator({ values, onChange }: CalculatorProps) {
   const unpaidVacationPercentage = 0.1087;
   const paidHoursRatio = 1 - unpaidVacationPercentage; // 89.13%
   const zzpPaidHours = workableAnnualHours * paidHoursRatio; // Betaalde uren voor ZZP
+  const vacationHours = workableAnnualHours * unpaidVacationPercentage;
   
   // Voor Uitzenden: gebruik ook werkbare jaaruren voor eerlijke vergelijking
   const empAnnualHours = getWorkableAnnualHours(hoursPerWeekInput);
@@ -382,7 +383,7 @@ export default function Calculator({ values, onChange }: CalculatorProps) {
               <span className="font-semibold">{formatCurrencyWithDecimals(effectiveRateZzp)}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600">× Betaalde uren ({zzpPaidHours.toLocaleString("nl-NL")} uur, 89.13% van {workableAnnualHours.toLocaleString("nl-NL")})</span>
+              <span className="text-gray-600">× Betaalde uren ({zzpPaidHours.toLocaleString("nl-NL")} uur = werkbare jaaruren − vakantie‑uren [{workableAnnualHours.toLocaleString("nl-NL")} − {Math.round(vacationHours).toLocaleString("nl-NL")}])</span>
               <span className="text-gray-500">= {formatCurrency(omzet)}</span>
             </div>
             <div className="flex justify-between text-gray-700 pl-4">
@@ -492,7 +493,7 @@ export default function Calculator({ values, onChange }: CalculatorProps) {
             <span className="text-xs text-gray-500">= {formatCurrencyWithDecimals(nettoJaarBerekend)} ÷ {workableAnnualHours.toLocaleString("nl-NL")} uur</span>
           </div>
           <div className="space-y-1 mt-2 pt-2 border-t border-gray-100">
-            <p className="text-xs text-gray-500">Na belasting, AOV (6.5%), WW buffer (3%), pensioen en vakantiegeld</p>
+            <p className="text-xs text-gray-500">Na belasting, WW-buffer (3%), pensioen en vakantiegeld</p>
           </div>
         </div>
       </div>

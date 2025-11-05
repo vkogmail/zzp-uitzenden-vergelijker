@@ -90,9 +90,27 @@ export type ComparisonResult = {
 const toPct = (value: number) => value / 100;
 
 export function getWorkableAnnualHours(hoursPerWeek: number): number {
-  // Formula: (hoursPerWeek * 52) - (6 * (hoursPerWeek / 5))
-  // This accounts for 6 holiday days at average hours per day (hoursPerWeek / 5)
-  return Math.round((hoursPerWeek * 52) - (6 * (hoursPerWeek / 5)));
+  const currentYear = new Date().getFullYear();
+  
+  // Workable days per year (excluding weekends and Dutch holidays)
+  // 2026: 255 days, 2027: 256 days, 2028: 254 days
+  let workableDays: number;
+  if (currentYear === 2026) {
+    workableDays = 255;
+  } else if (currentYear === 2027) {
+    workableDays = 256;
+  } else if (currentYear === 2028) {
+    workableDays = 254;
+  } else {
+    // Default to 2026 values if year is outside range
+    workableDays = 255;
+  }
+  
+  // Calculate hours per day assuming 5-day work week
+  const hoursPerDay = hoursPerWeek / 5;
+  
+  // Total workable hours = workable days × hours per day
+  return Math.round(workableDays * hoursPerDay);
 }
 
 export function calculateZzp(inputs: CalculatorInputs): ZzpResult {
