@@ -184,14 +184,18 @@ export function calculateZzp(inputs: CalculatorInputs): ZzpResult {
   const wwBufferPct = (CFG?.zzp?.wwBufferPct ?? 3) / 100;
   const wwBuffer = omzet * wwBufferPct; // WW buffer/sparen (niet fiscaal)
   
-  // Zvw-premie (Zorgverzekeringswet): gebruik baseline/preset waarden waar beschikbaar
-  const zvwMaxBasis = CFG?.zzp?.zvwCap ?? 75860;
-  const zvwPercentage = ((CFG?.zzp?.zvwPct ?? 5.75) as number) / 100;
+  // Zvw-premie (Zorgverzekeringswet): gebruik preset waarden; val terug op top-level preset.zvw wanneer zzp.zvw* ontbreekt
+  const zvwMaxBasis = (CFG?.zzp?.zvwCap ?? (CFG as any)?.zvw?.cap ?? 75860) as number;
+  const zvwPercentage = (((CFG?.zzp?.zvwPct ?? (CFG as any)?.zvw?.pct) ?? 5.75) as number) / 100;
   const zvwBasis = Math.min(belastbaarInkomen, zvwMaxBasis);
   const zvwPremie = zvwBasis * zvwPercentage;
   
-  // Vakantiegeld basis uit baseline/preset (bijv. 8.33% of 8.0%)
-  const vakantiegeldBasePct = CFG?.zzp?.vacationReservePctBase ?? 8.33; // %
+  // Vakantiegeld basis voor ZZP: top-level vakantiegeldPct → of CAO WG-basis (emp.employer.vacationPct) → anders zzp.vacationReservePctBase
+  const vakantiegeldBasePct = (
+    ((CFG as any)?.vakantiegeldPct as number | undefined) ??
+    ((CFG as any)?.emp?.employer?.vacationPct as number | undefined) ??
+    (CFG?.zzp?.vacationReservePctBase ?? 8.33)
+  ); // %
   const vakantiegeldEffectiefPct = vakantiegeldBasePct * (1 - effectieveBelastingdruk);
   const vakantiegeld = (omzet - businessCosts - (heeftEchteAovVerzekering ? aov : 0)) * (vakantiegeldEffectiefPct / 100); // vakantiereserve (niet fiscaal)
 
