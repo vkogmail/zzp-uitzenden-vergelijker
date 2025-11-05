@@ -26,12 +26,10 @@ const rebondGrotesque = localFont({
       style: "normal",
     },
   ],
-  display: "swap",
-  adjustFontFallback: false,
-  variable: "--font-rebond",
-  // Force Next.js to use the actual font name from the font files
-  name: "Rebond Grotesque",
-});
+        display: "swap",
+        adjustFontFallback: false,
+        variable: "--font-rebond",
+      });
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
