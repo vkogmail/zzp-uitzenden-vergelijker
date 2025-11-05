@@ -109,8 +109,8 @@ export default function Calculator({ values, onChange }: CalculatorProps) {
   const paidHoursRatio = 1 - unpaidVacationPercentage; // 89.13%
   const zzpPaidHours = workableAnnualHours * paidHoursRatio; // Betaalde uren voor ZZP
   
-  // Voor Uitzenden: theoretische uren (inclusief betaalde vakantiedagen)
-  const empAnnualHours = theoreticalAnnualHours; // Volledige theoretische uren
+  // Voor Uitzenden: gebruik ook werkbare jaaruren voor eerlijke vergelijking
+  const empAnnualHours = getWorkableAnnualHours(hoursPerWeekInput);
   
   // Use calculateEmployee for consistent calculations (includes fix for vacation pay double-counting)
   const empCalc = calculateEmployee(values as any);

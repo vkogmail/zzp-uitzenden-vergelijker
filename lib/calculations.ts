@@ -247,7 +247,8 @@ export function calculateEmployee(inputs: CalculatorInputs): EmployeeResult {
   
   // Stap 1: Factuurwaarde berekenen (theoretische uren, inclusief vakantiedagen)
   const hoursPerWeekActual = hoursPerWeek && hoursPerWeek > 0 ? hoursPerWeek : 36;
-  const theoreticalAnnualHours = hoursPerWeekActual * 52; // Theoretische uren (volledig, inclusief vakantie)
+  // Gebruik dezelfde werkbare jaaruren als in de UI voor eerlijke vergelijking
+  const theoreticalAnnualHours = getWorkableAnnualHours(hoursPerWeekActual);
   
   const uurtarief = clientRateEmp != null ? clientRateEmp : rate;
   const factuurwaarde = uurtarief * theoreticalAnnualHours; // Totale factuurwaarde
