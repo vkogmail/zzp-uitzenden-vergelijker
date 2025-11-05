@@ -48,7 +48,8 @@ function simpleMarkdownToHtml(md: string): string {
 }
 
 export default function Page() {
-  const mdPath = path.join(process.cwd(), "Docs", "PLAN_CAO_PRESETS.md");
+  // Render the consolidated calculations document to avoid build errors when the old plan file is absent
+  const mdPath = path.join(process.cwd(), "Docs", "CALCULATIES.md");
   const md = fs.readFileSync(mdPath, "utf8");
   const html = simpleMarkdownToHtml(md);
 
