@@ -345,7 +345,6 @@ export default function Calculator({ values, onChange }: CalculatorProps) {
           <ul className="text-sm text-gray-700 space-y-1">
             <li className="flex justify-between"><span>• Zvw-premie (verplicht)</span><span>5.75%</span></li>
             <li className="flex justify-between"><span>• WW-buffer (reserve, niet verplicht)</span><span>3.0%</span></li>
-            <li className="flex justify-between"><span>• Vakantiegeld (in netto inbegrepen)</span><span>{vakantiegeldEffectiefPct.toFixed(2)}%</span></li>
           </ul>
         </div>
         <div className="mt-3 pt-2 border-t border-gray-100 space-y-1">
@@ -466,10 +465,6 @@ export default function Calculator({ values, onChange }: CalculatorProps) {
                 <div className="flex justify-between">
                   <span className="text-gray-600">− WW-buffer (reserve, niet verplicht: 3% van omzet)</span>
                   <span className="text-gray-500">{formatCurrency(wwBuffer)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Vakantiegeld (in netto inbegrepen)</span>
-                  <span className="text-gray-500">{formatCurrency(vakantiegeld)}</span>
                 </div>
                 <div className="flex justify-between pt-2 border-t border-gray-200">
                   <span className="text-gray-700 font-semibold">Netto per jaar</span>

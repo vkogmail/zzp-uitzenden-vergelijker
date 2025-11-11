@@ -192,10 +192,6 @@ export default function DetailedResults({ data, inputs }: DetailedResultsProps) 
                         <span className="text-gray-600">• WW-buffer (reserve, niet verplicht):</span>
                         <span className="text-gray-700">{formatCurrency(wwBuffer)}</span>
                       </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">• Vakantiegeld (in netto inbegrepen):</span>
-                        <span className="text-gray-700">{formatCurrency(vakantiegeld)}</span>
-                      </div>
                       <div className="flex justify-between pt-1 border-t border-gray-100">
                         <span className="font-medium text-gray-700">Netto per jaar:</span>
                         <span className="font-semibold">{formatCurrency(nettoJaarBerekend)}</span>
