@@ -233,10 +233,10 @@ export default function Calculator({ values, onChange }: CalculatorProps) {
   // Vakantiegeld: 8.33% met effectieve belastingdruk toegepast
   const vakantiegeldBasePct = 8.33; // Basis percentage
   const vakantiegeldEffectiefPct = vakantiegeldBasePct * (1 - effectieveBelastingdruk);
-  const vakantiegeld = (omzet - bedrijfskosten - (heeftEchteAovVerzekering ? aov : 0)) * (vakantiegeldEffectiefPct / 100); // vakantiereserve
+  const vakantiegeld = (omzet - bedrijfskosten - (heeftEchteAovVerzekering ? aov : 0)) * (vakantiegeldEffectiefPct / 100); // vakantiereserve (informatief)
   
-  // Netto = winst voor belasting - belasting - WW buffer - Zvw-premie - vakantiegeld
-  const nettoJaarBerekend = winstVoorBelasting - inkomstenbelasting - wwBuffer - zvwPremie - vakantiegeld;
+  // Netto = winst voor belasting - belasting - WW buffer - Zvw-premie
+  const nettoJaarBerekend = winstVoorBelasting - inkomstenbelasting - wwBuffer - zvwPremie;
   const nettoUurloonZzp = nettoJaarBerekend / zzpPaidHours;
   
   const [showZzpBreakdown, setShowZzpBreakdown] = useState(false);
@@ -457,7 +457,7 @@ export default function Calculator({ values, onChange }: CalculatorProps) {
             </div>
 
             <div className="pt-2 border-t border-gray-100">
-              <p className="text-gray-500 font-medium mb-2">Na belasting (reserves, aanbevolen):</p>
+              <p className="text-gray-500 font-medium mb-2">Na belasting (verplicht & aanbevolen reserveringen):</p>
               <div className="space-y-2">
                 <div className="flex justify-between">
                   <span className="text-gray-600">− Zvw-premie (verplicht: 5.75% van belastbaar inkomen, max €75.860)</span>
@@ -468,7 +468,7 @@ export default function Calculator({ values, onChange }: CalculatorProps) {
                   <span className="text-gray-500">{formatCurrency(wwBuffer)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">− Vakantiegeld reserve (niet verplicht: {vakantiegeldEffectiefPct.toFixed(2)}% = 8.33% × {((1 - effectieveBelastingdruk) * 100).toFixed(1)}%)</span>
+                  <span className="text-gray-600">Vakantiegeld (aanbevolen eigen reserve: {vakantiegeldEffectiefPct.toFixed(2)}% = 8.33% × {((1 - effectieveBelastingdruk) * 100).toFixed(1)}%)</span>
                   <span className="text-gray-500">{formatCurrency(vakantiegeld)}</span>
                 </div>
                 <div className="flex justify-between pt-2 border-t border-gray-200">
@@ -493,7 +493,7 @@ export default function Calculator({ values, onChange }: CalculatorProps) {
             <span className="text-xs text-gray-500">= {formatCurrencyWithDecimals(nettoJaarBerekend)} ÷ {workableAnnualHours.toLocaleString("nl-NL")} uur</span>
           </div>
           <div className="space-y-1 mt-2 pt-2 border-t border-gray-100">
-            <p className="text-xs text-gray-500">Na belasting, WW-buffer (3%), pensioen en vakantiegeld</p>
+            <p className="text-xs text-gray-500">Na belasting, WW-buffer (3%) en Zvw-premie. Inclusief zelf toegekend vakantiegeld.</p>
           </div>
         </div>
       </div>

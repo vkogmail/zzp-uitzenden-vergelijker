@@ -88,7 +88,7 @@ export default function DetailedResults({ data, inputs }: DetailedResultsProps) 
   const vakantiegeldEffectiefPct = vakantiegeldBasePct * (1 - effectieveBelastingdruk);
   const wwBuffer = omzet * 0.03;
   const vakantiegeld = (omzet - bedrijfskosten - (heeftEchteAovVerzekering ? aov : 0)) * (vakantiegeldEffectiefPct / 100);
-  const nettoJaarBerekend = winstVoorBelasting - inkomstenbelasting - wwBuffer - zzpCalc.zvwPremie - vakantiegeld;
+  const nettoJaarBerekend = winstVoorBelasting - inkomstenbelasting - wwBuffer - zzpCalc.zvwPremie;
   
   // Employee calculations for comparison
   const pensionEmployee = (inputs as any).pensionEmployee ?? 7.5;
@@ -124,6 +124,9 @@ export default function DetailedResults({ data, inputs }: DetailedResultsProps) 
             <div className="text-xs text-gray-500 mb-3">
               per maand • {formatCurrency(data.zzp.nettoJaar)} per jaar
             </div>
+            <div className="text-xs text-gray-500 mb-4">
+              Inclusief zelf toegekend vakantiegeld van {formatCurrency(vakantiegeld)} per jaar.
+            </div>
             {/* Bar */}
             <div className="w-full h-4 rounded-full overflow-hidden mt-2" style={{ backgroundColor: zzpIsLower ? '#e5e7eb' : 'transparent' }}>
               <div 
@@ -142,7 +145,7 @@ export default function DetailedResults({ data, inputs }: DetailedResultsProps) 
                 <h3 className="text-sm font-semibold text-gray-700 mb-3">ZZP opbouw van netto</h3>
                 <div className="space-y-3 text-sm">
                   <div>
-                    <p className="text-xs text-gray-500 mb-2 font-medium">Af te trekken:</p>
+                    <p className="text-xs text-gray-500 mb-2 font-medium">Verplicht & aanbevolen reserveringen:</p>
                     <div className="space-y-1.5">
                       <div className="flex justify-between">
                         <span className="text-gray-600">• Bedrijfskosten ({costsPct.toFixed(1)}%):</span>
@@ -190,7 +193,7 @@ export default function DetailedResults({ data, inputs }: DetailedResultsProps) 
                         <span className="text-gray-700">{formatCurrency(wwBuffer)}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-600">• Vakantiegeld reserve (niet verplicht):</span>
+                        <span className="text-gray-600">• Vakantiegeld (aanbevolen eigen reserve, inbegrepen in netto):</span>
                         <span className="text-gray-700">{formatCurrency(vakantiegeld)}</span>
                       </div>
                       <div className="flex justify-between pt-1 border-t border-gray-100">

@@ -26,7 +26,7 @@ export default function ResultTable({ data }: { data: ComparisonResult }) {
             <td className="px-4 py-3">{formatCurrencyWithDecimals(emp.nettoJaar)}</td>
           </tr>
           <tr>
-            <td className="px-4 py-3 text-sm text-gray-600">Vakantiegeld</td>
+            <td className="px-4 py-3 text-sm text-gray-600">Vakantiegeld (in netto inbegrepen)</td>
             <td className="px-4 py-3">{formatCurrencyWithDecimals(zzp.vakantiegeld)}</td>
             <td className="px-4 py-3">{formatCurrencyWithDecimals(emp.vakantiegeldEmp)}</td>
           </tr>

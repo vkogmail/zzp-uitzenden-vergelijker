@@ -216,13 +216,13 @@ export function calculateZzp(inputs: CalculatorInputs): ZzpResult {
     (CFG?.zzp?.vacationReservePctBase ?? 8.33)
   ); // %
   const vakantiegeldEffectiefPct = vakantiegeldBasePct * (1 - effectieveBelastingdruk);
-  const vakantiegeld = (omzet - businessCosts - (heeftEchteAovVerzekering ? aov : 0)) * (vakantiegeldEffectiefPct / 100); // vakantiereserve (niet fiscaal)
+  const vakantiegeld = (omzet - businessCosts - (heeftEchteAovVerzekering ? aov : 0)) * (vakantiegeldEffectiefPct / 100); // vakantiereserve (informatief, niet fiscaal)
 
   // === Stap 9: Netto resultaat ===
   const winstNaBelasting = winstVoorBelasting - inkomstenbelasting; // for reporting parity
-  // Netto = winst voor belasting - belasting - WW buffer - Zvw-premie - vakantiegeld
-  // WW buffer, Zvw-premie en vakantiegeld worden na belasting afgetrokken
-  const nettoJaar = winstVoorBelasting - inkomstenbelasting - wwBuffer - zvwPremie - vakantiegeld;
+  // Netto = winst voor belasting - belasting - WW buffer - Zvw-premie
+  // Vakantiegeld blijft beschikbaar voor eigen toekenning en wordt niet apart afgetrokken
+  const nettoJaar = winstVoorBelasting - inkomstenbelasting - wwBuffer - zvwPremie;
   const nettoMaand = nettoJaar / 12;
 
   return {

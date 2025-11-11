@@ -43,6 +43,9 @@ export default function SimpleMode({ inputs }: SimpleModeProps) {
             <div className="text-xs text-gray-500 mb-3">
               per maand • {formatCurrency(result.zzp.nettoJaar)} per jaar
             </div>
+            <div className="text-xs text-gray-500 mb-4">
+              Inclusief zelf toegekend vakantiegeld van {formatCurrency(result.zzp.vakantiegeld)} per jaar.
+            </div>
             {/* Bar */}
             <div className="w-full h-4 rounded-full overflow-hidden mt-2" style={{ backgroundColor: zzpIsLower ? '#e5e7eb' : 'transparent' }}>
               <div 

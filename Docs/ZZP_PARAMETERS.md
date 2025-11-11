@@ -4,6 +4,8 @@
 
 Voor een eerlijke vergelijking tussen ZZP en uitzenden worden aan de ZZP-kant de volgende parameters gebruikt die **per CAO kunnen variëren**:
 
+De netto-uitkomst voor ZZP is **inclusief** het zelf toegekende vakantiegeld; we tonen het bedrag apart als informatieve reserve.
+
 ## Parameters uit preset config (`zzp.*`)
 
 ### 1. **effectiveRateFactor** (standaard: 0.8913)
@@ -19,8 +21,8 @@ Voor een eerlijke vergelijking tussen ZZP en uitzenden worden aan de ZZP-kant de
 - **Fallback**: 10.87%
 
 ### 3. **vacationReservePctBase** (standaard: 8.33%)
-- **Wat**: Basis percentage voor vakantiegeld reserve (vóór belastingcorrectie)
-- **Berekening**: `vakantiegeld = (omzet - bedrijfskosten) × vacationReservePctBase × (1 - effectieve_belastingdruk)`
+- **Wat**: Basis percentage voor vakantiegeld-reserve (vóór belastingcorrectie)
+- **Berekening**: `vakantiegeld = (omzet - bedrijfskosten) × vacationReservePctBase × (1 - effectieve_belastingdruk)` (informative reserve; blijft onderdeel van netto)
 - **Waarom CAO-afhankelijk**: Kan overgenomen worden van `vakantiegeldPct` of `emp.employer.vacationPct` uit CAO
 - **Fallback prioriteit**:
   1. `vakantiegeldPct` (top-level)
