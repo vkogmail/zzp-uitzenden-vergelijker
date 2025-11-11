@@ -345,7 +345,7 @@ export default function Calculator({ values, onChange }: CalculatorProps) {
           <ul className="text-sm text-gray-700 space-y-1">
             <li className="flex justify-between"><span>• Zvw-premie (verplicht)</span><span>5.75%</span></li>
             <li className="flex justify-between"><span>• WW-buffer (reserve, niet verplicht)</span><span>3.0%</span></li>
-            <li className="flex justify-between"><span>• Vakantiegeld reserve (8.33% × {((1 - effectieveBelastingdruk) * 100).toFixed(1)}%), niet verplicht</span><span>{vakantiegeldEffectiefPct.toFixed(2)}%</span></li>
+            <li className="flex justify-between"><span>• Vakantiegeld (in netto inbegrepen)</span><span>{vakantiegeldEffectiefPct.toFixed(2)}%</span></li>
           </ul>
         </div>
         <div className="mt-3 pt-2 border-t border-gray-100 space-y-1">
