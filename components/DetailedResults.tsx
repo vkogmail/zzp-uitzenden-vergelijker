@@ -193,7 +193,7 @@ export default function DetailedResults({ data, inputs }: DetailedResultsProps) 
                         <span className="text-gray-700">{formatCurrency(wwBuffer)}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-600">• Vakantiegeld (aanbevolen eigen reserve, inbegrepen in netto):</span>
+                        <span className="text-gray-600">• Vakantiegeld (in netto inbegrepen):</span>
                         <span className="text-gray-700">{formatCurrency(vakantiegeld)}</span>
                       </div>
                       <div className="flex justify-between pt-1 border-t border-gray-100">

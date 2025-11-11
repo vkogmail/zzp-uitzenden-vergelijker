@@ -468,7 +468,7 @@ export default function Calculator({ values, onChange }: CalculatorProps) {
                   <span className="text-gray-500">{formatCurrency(wwBuffer)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Vakantiegeld (aanbevolen eigen reserve: {vakantiegeldEffectiefPct.toFixed(2)}% = 8.33% × {((1 - effectieveBelastingdruk) * 100).toFixed(1)}%)</span>
+                  <span className="text-gray-600">Vakantiegeld (in netto inbegrepen)</span>
                   <span className="text-gray-500">{formatCurrency(vakantiegeld)}</span>
                 </div>
                 <div className="flex justify-between pt-2 border-t border-gray-200">
