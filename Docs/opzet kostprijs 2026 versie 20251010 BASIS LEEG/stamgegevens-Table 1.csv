@@ -1,0 +1,78 @@
+Stamgegevens;;;;;;;;;;;
+Administratiecode;0000;;;;;;;;;;
+Naam bedrijf;CREATENEW  WORK;;;;;;;;;;
+CAO;VUL IN;;;;;;;;;;
+Loonjaar;2026;;;;;;;;;;
+Grote/kleine werkgever;Klein;;;;;;;;;;
+Sector;52;;;;;;;;;;
+WGA grote werkgever;1,97;;;;;;;;;;
+ZW-Flex grote werkgever;3,91;;;;;;;;;;
+WGA kleine werkgever;2,68;;;;;;;;;;
+ZW-Flex kleine werkgever;3,71;;;;;;;;;;
+WAO/WIA basispremie (Aof) grote werkgever;7,61;;;;;;;;;;
+WAO/WIA basispremie (Aof) kleine werkgever;6,26;;;;;;;;;;
+Eigen risicodrager ZW-Flex;nee;;;;;;;;;;
+;;;;;;;;;;;
+;;;;;;;;;;;
+Standaard reserveringen;met beding A;zonder beding B+C;zonder beding A;;Voorzieningen (opslagen);administratief;administratief;administratief;techn./industrieel;techn./industrieel;techn./industrieel
+Feestdagen;2,61;0,00;0,00;;;met beding A;zonder beding B+C;zonder beding A;met beding A;zonder beding B+C;zonder beding A
+Vakantiedagen regulier;10,87;10,87;10,87;;Duurzame inzetbaarheid;0,00;0,00;0,00;0,00;0,00;0,00
+Vakantiedagen vakantiewerk;8,33;8,33;8,33;;Sociaal Fonds;0,20;0,00;0,20;0,20;0,00;0,20
+Vakantiegeld;8,33;8,33;8,33;;Arbeidsongeschiktheid;0,00;0,00;0,00;0,00;0,00;0,00
+;;;;;Contractverplichting/leegloop;0,00;0,00;0,00;0,00;0,00;0,00
+;;;;;Reservering KV/FD contracten;0,60;0,60;0,60;0,60;0,60;0,60
+Sociale verzekeringen;werknemer;werkgever;totaal;;Transitievergoeding;0,00;0,00;0,00;0,00;0,00;0,00
+Aanvullende ziektewet (AZV) administratief;0,300;1,900;2,200;;Organisatiekosten;0,00;0,00;0,00;0,00;0,00;0,00
+Aanvullende ziektewet (AZV) technisch;0,700;3,260;3,960;;Overige opslagen 1;0,00;0,00;0,00;0,00;0,00;0,00
+Zorgverzekeringswet (ZVW);0,000;6,100;6,100;;Overige opslagen 2;0,00;0,00;0,00;0,00;0,00;0,00
+Gedifferentieerde premie WhK (WGA) ;1,340;1,340;2,680;;Overige opslagen 3;0,00;0,00;0,00;0,00;0,00;0,00
+Gedifferentieerde premie WhK (ZW-Flex);0,000;3,710;3,710;;Overige opslagen 4;0,00;0,00;0,00;0,00;0,00;0,00
+WW (Awf) ;0,000;7,740;7,740;;Totaal;0,80;0,60;0,80;0,80;0,60;0,80
+WAO/WIA basispremie (Aof) ;0,000;6,260;6,260;;;;;;;;
+Wko (wet kinderopvang);0,000;0,500;0,500;;;;;;;;
+PAWW;0,000;0,100;0,100;;Standaard werkbare dagen;;;;;;
+;;;;;Bruto werkbare dagen;;;;261;;
+;;;;;Vakantiedagen;;;;25;;
+Pensioenen;werknemer;werkgever;totaal;;Feestdagen ;;;;6;;
+Stipp-pensioen *;7,95;15,90;23,85;;Netto werkbare dagen;;;;230;;
+Gemiddeld uurloon voor berekening kostprijs;;;25,00;;;;;;;;
+Franchise;;;8,90;;;;;;;;
+Compensatiefactor pensioen;;;0,853;;;;;;;;
+;;;;;;;;;;;
+;;;;;;;;;;;
+Opslag sociale lasten ;;;;;;;;;;;
+Administratief met beding;37,89;;;;;;;;;;
+Technisch/industrieel met beding;39,25;;;;;;;;;;
+Zonder beding alle fasen;35,99;;;;;;;;;;
+;;;;;;;;;;;
+;;;;;;;;;;;
+Ondertekening voor akkoord loonvariabelen en kostprijsopbouw;;;;;;;;;;;
+;;;;;;;;;;;
+;;;;;;;;;;;
+Naam contactpersoon:;;;;;;;;;;;
+;;;;;;;;;;;
+Datum: ;;;;;;;;;;;
+;;;;;;;;;;;
+Handtekening:;;;;;;;;;;;
+;;;;;;;;;;;
+;;;;;;;;;;;
+;;;;;;;;;;;
+;;;;;;;;;;;
+;;;;;;;;;;;
+;;;;;;;;;;;
+* 2026: Premiepercentages: 15,90 WG / 7,50 WN;;;;;;;;;;;
+;;;;;;;;;;;
+Feestdagen;6;2,61%;;;;;;;;;
+;;;;;;;;;;;
+Nieuwjaarsdag;1/1/26;;;;;;;;;;
+2e Paasdag;4/6/26;;;;;;;;;;
+Koningsdag;4/27/26;;;;;;;;;;
+Hemelvaartsdag;5/14/26;;;;;;;;;;
+2e Pinksterdag;5/25/26;;;;;;;;;;
+1e Kerstdag;12/25/26;;;;;;;;;;
+;;;;;;;;;;;
+Werkbare dagen ;261;;;;;;;;;;
+;;;;;;;;;;;
+Vrije dagen;25;10,87%;;;;;;;;;
+;;;;;;;;;;;
+Netto werkbare dagen;230;;;;;;;;;;
