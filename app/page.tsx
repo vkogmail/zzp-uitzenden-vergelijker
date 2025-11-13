@@ -5,7 +5,7 @@ import Calculator from "@/components/Calculator";
 import SimpleMode from "@/components/SimpleMode";
 import DetailedResults from "@/components/DetailedResults";
 import StickyComparisonFooter from "@/components/StickyComparisonFooter";
-import { CalculatorInputs, calculateAll, defaultInputs, formatCurrency, formatCurrencyWithDecimals, formatPercent, getWorkableAnnualHours, setActivePresetConfig, getActivePresetConfig } from "@/lib/calculations";
+import { CalculatorInputs, calculateAll, defaultInputs, formatCurrency, formatCurrencyWithDecimals, formatPercent, getWorkableAnnualHours, setActivePresetConfig, getActivePresetConfig, getDerivedEmployerCostsPct } from "@/lib/calculations";
 import BASELINE from "@/data/presets/current_2025_baseline.json";
 import STIPP_BASIS_2026 from "@/data/presets/stipp_basis_2026_draft.json";
 import STIPP_PLUS_2026 from "@/data/presets/stipp_plus_2026_draft.json";
@@ -33,7 +33,10 @@ export default function Home() {
     setActivePresetConfig(cfg);
     // Sync visible inputs for labels that depend on config (vakantiegeld%, wg%)
     const vg = ((cfg as any)?.emp?.employer?.vacationPct as number | undefined) ?? ((cfg as any)?.vakantiegeldPct as number | undefined);
-    const wg = (cfg as any)?.emp?.employer?.employerTotalPct as number | undefined;
+    // Use derived employer costs percentage if available, otherwise use explicit employerTotalPct
+    const derivedWg = getDerivedEmployerCostsPct(cfg);
+    const explicitWg = (cfg as any)?.emp?.employer?.employerTotalPct as number | undefined;
+    const wg = derivedWg ?? explicitWg;
     setInputs((prev) => ({
       ...prev,
       ...(vg != null ? { vacation: vg } : {}),

@@ -40,6 +40,61 @@ function getResolvedConfig(): any {
   return mergeWithAssumptions(merged, BASE_CONFIG as any);
 }
 
+// Helper function to calculate derived employer costs percentage from preset
+export function getDerivedEmployerCostsPct(preset: any): number | null {
+  const cfgEmp = preset?.emp ?? {};
+  const cfgEmployer = cfgEmp?.employer ?? {};
+  
+  // If employerTotalPct is explicitly set, use it
+  if (typeof cfgEmployer?.employerTotalPct === "number") {
+    return cfgEmployer.employerTotalPct;
+  }
+  
+  // Check if detailed components are available
+  const hasDetailedComponents = cfgEmployer?.azvPct != null || cfgEmployer?.zvwPct != null || 
+                                 cfgEmployer?.whkWgaPct != null || cfgEmployer?.whkZwFlexPct != null ||
+                                 cfgEmployer?.wwPct != null || cfgEmployer?.aofPct != null || cfgEmployer?.wkoPct != null;
+  
+  if (hasDetailedComponents) {
+    // Calculate from detailed components
+    let derivedWgPct = [
+      cfgEmployer?.azvPct ?? 0,
+      cfgEmployer?.zvwPct ?? 0,
+      cfgEmployer?.whkWgaPct ?? 0,
+      cfgEmployer?.whkZwFlexPct ?? 0,
+      cfgEmployer?.wwPct ?? 0,
+      cfgEmployer?.aofPct ?? 0,
+      cfgEmployer?.wkoPct ?? 0,
+      cfgEmployer?.vacationPct ?? 0,
+      cfgEmployer?.pensionEmployerPct ?? 0,
+      cfgEmployer?.insuranceOtherPct ?? 0
+    ].reduce((a: number, b: number) => a + (typeof b === "number" ? b : 0), 0);
+    
+    // Add employerOther (sociaal fonds, KV/FD)
+    const cfgEmployerOther = cfgEmp?.employerOther ?? {};
+    const employerOtherPct = [
+      cfgEmployerOther?.sociaalFondsPct ?? 0,
+      cfgEmployerOther?.kvFdReserveringPct ?? 0
+    ].reduce((a: number, b: number) => a + (typeof b === "number" ? b : 0), 0);
+    derivedWgPct += employerOtherPct;
+    
+    return derivedWgPct > 0 ? derivedWgPct : null;
+  } else {
+    // Fallback to aggregated values
+    const derivedWgPct = [
+      cfgEmployer?.socialPct,
+      cfgEmployer?.zvwPct,
+      cfgEmployer?.vacationPct,
+      cfgEmployer?.pensionEmployerPct,
+      cfgEmployer?.insuranceOtherPct
+    ]
+      .filter((v) => typeof v === "number")
+      .reduce((a: number, b: number) => a + b, 0);
+    
+    return derivedWgPct > 0 ? derivedWgPct : null;
+  }
+}
+
 export type CalculatorInputs = {
   // Contract and pricing
   clientRateZzp?: number; // rate charged to client for ZZP

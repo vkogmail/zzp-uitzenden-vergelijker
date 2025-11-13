@@ -43,9 +43,14 @@ RESOLVED CFG  : { emp: { employer: {
 Belangrijke velden (bron JSON): `zzp.effectiveRateFactor`, `zzp.zvwPct`, `zzp.zvwCap`, `zzp.vacationReservePctBase`, `zzp.wwBufferPct`.
 
 ### 4) Uitzenden-berekening (korte keten)
-1. Factuurwaarde: `clientRateEmp × (hoursPerWeek × 52)`.
+1. Factuurwaarde: `clientRateEmp × werkbare_jaaruren` (gebruikt `getWorkableAnnualHours()`).
 2. Fee (marge): `factuurwaarde × marginEmp%`. Totaal beschikbaar = factuurwaarde − fee.
-3. Werkgeverskosten: percentage `emp.employer.employerTotalPct` of afgeleid uit som componenten: `socialPct + zvwPct + vacationPct + pensionEmployerPct + insuranceOtherPct`.
+3. Werkgeverskosten: 
+   - **Prioriteit 1**: Expliciete `emp.employer.employerTotalPct` (indien aanwezig)
+   - **Prioriteit 2**: Afgeleid uit gedetailleerde componenten via `getDerivedEmployerCostsPct()`:
+     - Indien gedetailleerde componenten beschikbaar: `azvPct + zvwPct + whkWgaPct + whkZwFlexPct + wwPct + aofPct + wkoPct + vacationPct + pensionEmployerPct + insuranceOtherPct + sociaalFondsPct + kvFdReserveringPct`
+     - Anders: `socialPct + zvwPct + vacationPct + pensionEmployerPct + insuranceOtherPct`
+   - **Prioriteit 3**: Default 41,6% (alleen als fallback)
 4. Bruto salaris (basis) = totaal beschikbaar − werkgeverskosten.
 5. Toeslagen op bruto salaris: vakantiegeld (top‑level `vakantiegeldPct` of `emp.employer.vacationPct`), bovenwettelijke vakantiedagen (`emp.extraOnSalary.bovenwettelijkeVacationPct`), PAWW (`emp.extraOnSalary.pawwEmployerPct`), optioneel IKB (`emp.ikbPct` of top‑level `ikbPct`) en ADV‑compensatie (`emp.advCompPct` of top‑level `advCompPct`). Totaal “bruto loon” = bruto salaris + alle toeslagen.
 6. Pensioen werknemer (aftrekbaar): `bruto salaris × pensionBase% × emp.employee.pensionEmployeePct`.
@@ -60,6 +65,7 @@ Belangrijke velden (bron JSON): `emp.employer.*`, `emp.extraOnSalary.*`, `emp.em
 - `zzp.effectiveRateFactor` → bepaalt betaalde uren in `calculateZzp` (default 0,8913).
 - `zzp.vacationReservePctBase`, `zzp.wwBufferPct` → post‑tax reserveringen in `calculateZzp`.
 - `emp.employer.[socialPct,zvwPct,vacationPct,pensionEmployerPct,insuranceOtherPct,employerTotalPct]` → werkgeverskosten in `calculateEmployee` (som of expliciet totaal).
+- `getDerivedEmployerCostsPct(preset)` → helper functie die werkgeverskosten afleidt uit componenten (gebruikt in `app/page.tsx` om `employerTotalPct` input te synchroniseren).
 - `emp.extraOnSalary.[bovenwettelijkeVacationPct,pawwEmployerPct]` → toeslagen op bruto salaris in `calculateEmployee`.
 - `emp.employee.pensionEmployeePct` → werknemerspensioen in `calculateEmployee`.
 - `emp.wkrOnkostenPctOfEmployerCosts` → WKR‑vergoeding in `calculateEmployee` (~2,62%).

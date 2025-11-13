@@ -86,6 +86,23 @@ Deze release bevat belangrijke updates om de calculator te aligneren met de Shee
 - ✅ Banken 2026
 - ✅ Generiek 2026 (default)
 
+### 5. Bugfix: Werkgeverskosten berekening
+
+**Probleem**:
+- Presets zonder expliciete `pensionEmployerPct` vielen terug op `assumptions_2026` (14,31% pensioen)
+- Default `employerTotalPct: 41.6%` werd gebruikt in plaats van afgeleide waarde uit componenten
+- Dit resulteerde in te hoge werkgeverskosten (50,76% i.p.v. 36,45% voor generiek/gemeenten)
+
+**Oplossing**:
+- ✅ `pensionEmployerPct: 0` expliciet toegevoegd aan `generiek_2026_draft` en `gemeenten_2026_draft`
+- ✅ Helper functie `getDerivedEmployerCostsPct()` toegevoegd om werkgeverskosten af te leiden uit componenten
+- ✅ Logica aangepast: afgeleide waarde heeft nu prioriteit boven default `employerTotalPct`
+
+**Resultaat**:
+- Generiek/Gemeenten: 36,45% werkgeverskosten (was 50,76%)
+- StiPP presets: 52,35% werkgeverskosten (met 15,90% pensioen)
+- Verschil tussen ZZP en uitzenden is nu correct zichtbaar
+
 ---
 
 ## Berekeningen
@@ -164,6 +181,7 @@ Deze release bevat belangrijke updates om de calculator te aligneren met de Shee
 - ✅ Feestdagen: 6 (was 7)
 - ✅ ZVW: 6,10%
 - ✅ Gedetailleerde componenten toegevoegd
+- ✅ `pensionEmployerPct: 0` expliciet toegevoegd (geen pensioen)
 
 ### stipp_basis_2026_draft.json
 - ✅ Feestdagen: 6 (was 7)
@@ -181,6 +199,7 @@ Deze release bevat belangrijke updates om de calculator te aligneren met de Shee
 - ✅ Feestdagen: 6 (was 7)
 - ✅ ZVW: 6,10%
 - ✅ Gedetailleerde componenten toegevoegd
+- ✅ `pensionEmployerPct: 0` expliciet toegevoegd (geen pensioen)
 
 ### banken_2026_draft.json
 - ✅ Feestdagen: 6 (was 7)
@@ -261,9 +280,9 @@ Deze release bevat belangrijke updates om de calculator te aligneren met de Shee
 
 ### Bestanden gewijzigd
 - `data/presets/*.json` — alle presets bijgewerkt
-- `lib/calculations.ts` — berekeningslogica uitgebreid voor gedetailleerde componenten
+- `lib/calculations.ts` — berekeningslogica uitgebreid voor gedetailleerde componenten, helper functie `getDerivedEmployerCostsPct()` toegevoegd
 - `components/Calculator.tsx` — UI aangepast voor gedetailleerde weergave
-- `app/page.tsx` — dropdown gefilterd, labels aangepast
+- `app/page.tsx` — dropdown gefilterd, labels aangepast, logica voor afgeleide werkgeverskosten toegevoegd
 
 ### Nieuwe velden in JSON-structuur
 ```json
