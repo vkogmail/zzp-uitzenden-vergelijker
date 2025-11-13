@@ -1,17 +1,17 @@
-# Release Notes: CSV Alignment & Gedetailleerde Werkgeverslasten
+# Release Notes: Sheet Arsenaal Alignment & Gedetailleerde Werkgeverslasten
 **Datum**: 2025-11-XX  
 **Versie**: 2026.01  
 **Status**: Ter verificatie
 
 ## Overzicht
 
-Deze release bevat belangrijke updates om de calculator te aligneren met de CSV-kostprijsgegevens en om gedetailleerde werkgeverslasten te ondersteunen. Alle presets zijn bijgewerkt met exacte waarden uit de CSV-bestanden en de berekeningen zijn uitgebreid om componenten opgesplitst te tonen.
+Deze release bevat belangrijke updates om de calculator te aligneren met de Sheet Arsenaal-kostprijsgegevens en om gedetailleerde werkgeverslasten te ondersteunen. Alle presets zijn bijgewerkt met exacte waarden uit de Sheet Arsenaal-bestanden en de berekeningen zijn uitgebreid om componenten opgesplitst te tonen.
 
 ---
 
 ## Belangrijkste wijzigingen
 
-### 1. Presets gealigneerd met CSV-kostprijsgegevens
+### 1. Presets gealigneerd met Sheet Arsenaal-kostprijsgegevens
 
 **Bronbestanden**:
 - `Docs/opzet kostprijs 2026 versie 20251010 BASIS LEEG/stamgegevens-Table 1.csv`
@@ -203,14 +203,14 @@ Deze release bevat belangrijke updates om de calculator te aligneren met de CSV-
 ## Verificatie-checklist
 
 ### ✅ Berekeningen
-- [ ] **ZZP-berekening**: Controleer of netto resultaat overeenkomt met verwachting
+- [ ] **ZZP-berekening**: Netto resultaat overeenkomstig verwachting
   - Omzet = effectieve rate × betaalde uren (89.13% van werkbare uren)
   - Winst voor belasting = omzet − bedrijfskosten − pensioen
   - Belastbaar inkomen = winst − €3.360 − 14% MKB-vrijstelling
   - Inkomstenbelasting = Box-1 schijven minus heffingskortingen
   - Netto = winst − belasting − WW-buffer (3%) − Zvw-premie
 
-- [ ] **Uitzenden-berekening**: Controleer of netto resultaat overeenkomt met verwachting
+- [ ] **Uitzenden-berekening**: Netto resultaat overeenkomstig verwachting
   - Factuurwaarde = clientRate × werkbare jaaruren
   - Totaal beschikbaar = factuurwaarde − fee (marge%)
   - Werkgeverskosten = totaal beschikbaar × (som componenten)
@@ -225,13 +225,13 @@ Deze release bevat belangrijke updates om de calculator te aligneren met de CSV-
 - [ ] **Sociale premies**: Totaal = 25,75% (AZV 1,90% + ZVW 6,10% + WhK WGA 1,34% + WhK ZW-Flex 3,71% + WW 7,74% + Aof 6,26% + Wko 0,50% + PAWW 0,10%)
 - [ ] **Opslagen**: Sociaal fonds 0,20% + KV/FD 0,60% = 0,80%
 
-### ✅ CSV-vergelijking
-- [ ] **Vakantiedagen**: 25 dagen (10,87%) — matcht CSV
-- [ ] **Feestdagen**: 6 dagen (2,61%) — matcht CSV
-- [ ] **Werkbare dagen**: 255 dagen (2026) = 2040 uur — matcht CSV
-- [ ] **Vakantiegeld**: 8,33% (StiPP) / 8,0% (Generiek) — matcht CSV
-- [ ] **Sociale premies**: Componenten komen overeen met CSV
-- [ ] **Pensioen StiPP**: 15,90% WG / 7,95% WN — matcht CSV
+### ✅ Sheet Arsenaal-vergelijking
+- [ ] **Vakantiedagen**: 25 dagen (10,87%) — matcht Sheet Arsenaal
+- [ ] **Feestdagen**: 6 dagen (2,61%) — matcht Sheet Arsenaal
+- [ ] **Werkbare dagen**: 255 dagen (2026) = 2040 uur — matcht Sheet Arsenaal
+- [ ] **Vakantiegeld**: 8,33% (StiPP) / 8,0% (Generiek) — matcht Sheet Arsenaal
+- [ ] **Sociale premies**: Componenten komen overeen met Sheet Arsenaal
+- [ ] **Pensioen StiPP**: 15,90% WG / 7,95% WN — matcht Sheet Arsenaal
 
 ### ✅ UI-weergave
 - [ ] **Detailview**: Toont alle gedetailleerde componenten correct
@@ -247,18 +247,18 @@ Deze release bevat belangrijke updates om de calculator te aligneren met de CSV-
 
 ---
 
-## Bekende verschillen met CSV
+## Bekende verschillen met Sheet Arsenaal
 
 ### Vakantiegeld
-- **CSV stamgegevens**: 8,33%
-- **CSV kostprijzen**: 8,00%
+- **Sheet Arsenaal stamgegevens**: 8,33%
+- **Sheet Arsenaal kostprijzen**: 8,00%
 - **Presets**: StiPP gebruikt 8,33%, Generiek/Banken/Gemeenten gebruiken 8,0%
 - **Beslissing**: Beide waarden zijn correct afhankelijk van context
 
 ### Pensioen kostprijsfactor
-- **CSV**: Gebruikt 10,24% op pensioengrondslag (16,10)
+- **Sheet Arsenaal**: Gebruikt 10,24% op pensioengrondslag (16,10)
 - **Presets**: Gebruikt 15,90% WG + 7,95% WN = 23,85% totaal
-- **Verschil**: CSV berekent kostprijsfactor, presets gebruiken premiepercentages
+- **Verschil**: Sheet Arsenaal berekent kostprijsfactor, presets gebruiken premiepercentages
 - **Impact**: Geen impact op netto-uitkomst (beide methoden zijn correct)
 
 ---
@@ -301,7 +301,7 @@ Deze release bevat belangrijke updates om de calculator te aligneren met de CSV-
 ## Vragen voor verificatie
 
 1. **Zijn de sociale premie-percentages correct?**
-   - Controleer tegen officiële bronnen (Belastingdienst, UWV, etc.)
+   - Verifieer tegen officiële bronnen (Belastingdienst, UWV, etc.)
 
 2. **Klopt de StiPP pensioen-premie?**
    - 15,90% WG / 7,95% WN voor 2026 — is dit definitief?
@@ -325,5 +325,4 @@ Voor vragen of opmerkingen over deze release, neem contact op met het developmen
 **Documentatie**:
 - `Docs/CALCULATIES.md` — volledige berekeningsdocumentatie
 - `Docs/ZZP_PARAMETERS.md` — ZZP-parameters per CAO
-- `Docs/CSV_vs_Presets.md` — CSV-vergelijking (verouderd na deze release)
-
+- `Docs/CSV_vs_Presets.md` — Sheet Arsenaal-vergelijking (verouderd na deze release)
