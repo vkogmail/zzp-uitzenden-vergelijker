@@ -14,7 +14,7 @@
     "Zvw 2026: 5,75% met cap ~€75.860 volgens Belastingdienst."
   ],
   "vacationDays": 25,
-  "holidaysPaid": 7,
+  "holidaysPaid": 6,
   "advDays": 0,
   "vakantiegeldPct": 8.0,
   "ikbPct": 17.05,
@@ -28,6 +28,23 @@
     "note": "ABP premie 2026 TBD; vul bij publicatie aan"
   },
   "zvw": { "pct": 5.75, "cap": 75860, "basis": "belastbaar" },
+  "emp": {
+    "employer": {
+      "azvPct": 1.90,
+      "zvwPct": 6.10,
+      "whkWgaPct": 1.34,
+      "whkZwFlexPct": 3.71,
+      "wwPct": 7.74,
+      "aofPct": 6.26,
+      "wkoPct": 0.50,
+      "vacationPct": 8.0,
+      "insuranceOtherPct": 0.10
+    },
+    "employerOther": {
+      "sociaalFondsPct": 0.20,
+      "kvFdReserveringPct": 0.60
+    }
+  },
   "employerOther": []
 }
 

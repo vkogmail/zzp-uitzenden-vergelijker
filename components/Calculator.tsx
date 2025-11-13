@@ -75,12 +75,27 @@ export default function Calculator({ values, onChange }: CalculatorProps) {
   const effectiveRateZzp = clientRateZzp * (1 - marginZzp / 100);
   const effectiveRateEmp = clientRateEmp * (1 - marginEmp / 100);
   // Werkgeverslasten (vaste componenten volgens specificatie)
-  // Basis werkgeverslasten (41.6%):
-  const wgSocial = preset?.emp?.employer?.socialPct ?? 11.0; // Sociale premies (WW, WIA, ZW)
-  const wgZvw = preset?.emp?.employer?.zvwPct ?? 6.75; // Zorgverzekeringswet heffing (werkgeversheffing Zvw)
-  const wgVacation = preset?.emp?.employer?.vacationPct ?? preset?.vakantiegeldPct ?? 8.33; // Vakantiegeld (wettelijk)
-  const wgPensionEmployer = preset?.emp?.employer?.pensionEmployerPct ?? 14.31; // Pensioen werkgeversdeel
-  const wgInsurance = preset?.emp?.employer?.insuranceOtherPct ?? 1.21; // Overige verzekeringen (aangepast voor Zvw)
+  // Check of gedetailleerde componenten beschikbaar zijn
+  const hasDetailedComponents = preset?.emp?.employer?.azvPct != null || preset?.emp?.employer?.zvwPct != null || 
+                                 preset?.emp?.employer?.whkWgaPct != null || preset?.emp?.employer?.whkZwFlexPct != null ||
+                                 preset?.emp?.employer?.wwPct != null || preset?.emp?.employer?.aofPct != null || preset?.emp?.employer?.wkoPct != null;
+  
+  // Gedetailleerde componenten (indien beschikbaar)
+  const wgAzv = preset?.emp?.employer?.azvPct ?? 0;
+  const wgZvw = preset?.emp?.employer?.zvwPct ?? 6.10;
+  const wgWhkWga = preset?.emp?.employer?.whkWgaPct ?? 0;
+  const wgWhkZwFlex = preset?.emp?.employer?.whkZwFlexPct ?? 0;
+  const wgWw = preset?.emp?.employer?.wwPct ?? 0;
+  const wgAof = preset?.emp?.employer?.aofPct ?? 0;
+  const wgWko = preset?.emp?.employer?.wkoPct ?? 0;
+  const wgVacation = preset?.emp?.employer?.vacationPct ?? preset?.vakantiegeldPct ?? 8.33;
+  const wgPensionEmployer = preset?.emp?.employer?.pensionEmployerPct ?? 14.31;
+  const wgInsurance = preset?.emp?.employer?.insuranceOtherPct ?? 0.10; // PAWW
+  const wgSociaalFonds = preset?.emp?.employerOther?.sociaalFondsPct ?? 0;
+  const wgKvFd = preset?.emp?.employerOther?.kvFdReserveringPct ?? 0;
+  
+  // Geaggregeerde waarden (fallback)
+  const wgSocial = preset?.emp?.employer?.socialPct ?? 11.0; // Sociale premies (WW, WIA, ZW) - alleen gebruikt als fallback
   
   // Toeslagen bovenop bruto salaris (deze komen bovenop de basis werkgeverslasten):
   const wgBovenwettelijkeVakantie = preset?.emp?.extraOnSalary?.bovenwettelijkeVacationPct ?? 2.18; // Bovenwettelijke vakantiedagen
@@ -89,7 +104,9 @@ export default function Calculator({ values, onChange }: CalculatorProps) {
   const advCompPctDisplay = preset?.emp?.advCompPct ?? preset?.advCompPct ?? 0;
   
   // Basis werkgeverslasten som - berekend dynamisch voor accurate weergave
-  const werkgeverslastenBasisSom = wgSocial + wgZvw + wgVacation + wgPensionEmployer + wgInsurance; // Dynamisch berekend
+  const werkgeverslastenBasisSom = hasDetailedComponents
+    ? (wgAzv + wgZvw + wgWhkWga + wgWhkZwFlex + wgWw + wgAof + wgWko + wgVacation + wgPensionEmployer + wgInsurance + wgSociaalFonds + wgKvFd)
+    : (wgSocial + wgZvw + wgVacation + wgPensionEmployer + wgInsurance); // Fallback naar geaggregeerde waarden
   
   // Totaal werkgeverslasten inclusief toeslagen
   // Let op: bovenwettelijke vakantie en PAWW zijn percentages van bruto salaris,
@@ -524,26 +541,111 @@ export default function Calculator({ values, onChange }: CalculatorProps) {
         <div className="md:col-start-2 md:row-start-4 md:self-start rounded-xl bg-white border border-gray-100 shadow-sm p-4">
           <p className="text-xs text-gray-500 mb-2 font-medium">Werkgeverskosten (van totaal beschikbaar):</p>
           <div className="space-y-2">
-            <div className="flex justify-between items-center text-sm text-gray-700">
-              <span>• Sociale premies</span>
-              <span className="font-medium">{wgSocial.toFixed(2)}%</span>
-            </div>
-            <div className="flex justify-between items-center text-sm text-gray-700">
-              <span>• Zvw-heffing</span>
-              <span className="font-medium">{wgZvw.toFixed(2)}%</span>
-            </div>
-            <div className="flex justify-between items-center text-sm text-gray-700">
-              <span>• Vakantiegeld (wettelijk)</span>
-              <span className="font-medium">{wgVacation.toFixed(2)}%</span>
-            </div>
-            <div className="flex justify-between items-center text-sm text-gray-700">
-              <span>• Pensioen werkgever</span>
-              <span className="font-medium">{wgPensionEmployer.toFixed(2)}%</span>
-            </div>
-            <div className="flex justify-between items-center text-sm text-gray-700">
-              <span>• Overige verzekeringen</span>
-              <span className="font-medium">{wgInsurance.toFixed(2)}%</span>
-            </div>
+            {hasDetailedComponents ? (
+              <>
+                {/* Gedetailleerde weergave */}
+                <div className="text-xs text-gray-500 font-medium mb-1">Sociale verzekeringen:</div>
+                {wgAzv > 0 && (
+                  <div className="flex justify-between items-center text-sm text-gray-700 pl-2">
+                    <span>• AZV (Aanvullende ziektewet)</span>
+                    <span className="font-medium">{wgAzv.toFixed(2)}%</span>
+                  </div>
+                )}
+                <div className="flex justify-between items-center text-sm text-gray-700 pl-2">
+                  <span>• ZVW (Zorgverzekeringswet)</span>
+                  <span className="font-medium">{wgZvw.toFixed(2)}%</span>
+                </div>
+                {wgWhkWga > 0 && (
+                  <div className="flex justify-between items-center text-sm text-gray-700 pl-2">
+                    <span>• WhK WGA (Werkhervatting gedeeltelijk arbeidsgeschikten)</span>
+                    <span className="font-medium">{wgWhkWga.toFixed(2)}%</span>
+                  </div>
+                )}
+                {wgWhkZwFlex > 0 && (
+                  <div className="flex justify-between items-center text-sm text-gray-700 pl-2">
+                    <span>• WhK ZW-Flex (Ziektewet flexibel)</span>
+                    <span className="font-medium">{wgWhkZwFlex.toFixed(2)}%</span>
+                  </div>
+                )}
+                {wgWw > 0 && (
+                  <div className="flex justify-between items-center text-sm text-gray-700 pl-2">
+                    <span>• WW (Werkloosheidswet)</span>
+                    <span className="font-medium">{wgWw.toFixed(2)}%</span>
+                  </div>
+                )}
+                {wgAof > 0 && (
+                  <div className="flex justify-between items-center text-sm text-gray-700 pl-2">
+                    <span>• Aof (WAO/WIA basispremie)</span>
+                    <span className="font-medium">{wgAof.toFixed(2)}%</span>
+                  </div>
+                )}
+                {wgWko > 0 && (
+                  <div className="flex justify-between items-center text-sm text-gray-700 pl-2">
+                    <span>• Wko (Wet kinderopvang)</span>
+                    <span className="font-medium">{wgWko.toFixed(2)}%</span>
+                  </div>
+                )}
+                {wgInsurance > 0 && (
+                  <div className="flex justify-between items-center text-sm text-gray-700 pl-2">
+                    <span>• PAWW</span>
+                    <span className="font-medium">{wgInsurance.toFixed(2)}%</span>
+                  </div>
+                )}
+                <div className="flex justify-between items-center text-sm text-gray-700 pt-1 border-t border-gray-100">
+                  <span className="font-medium">Totaal sociale verzekeringen</span>
+                  <span className="font-semibold">{(wgAzv + wgZvw + wgWhkWga + wgWhkZwFlex + wgWw + wgAof + wgWko + wgInsurance).toFixed(2)}%</span>
+                </div>
+                <div className="flex justify-between items-center text-sm text-gray-700 pt-2">
+                  <span>• Vakantiegeld (wettelijk)</span>
+                  <span className="font-medium">{wgVacation.toFixed(2)}%</span>
+                </div>
+                <div className="flex justify-between items-center text-sm text-gray-700">
+                  <span>• Pensioen werkgever</span>
+                  <span className="font-medium">{wgPensionEmployer.toFixed(2)}%</span>
+                </div>
+                {(wgSociaalFonds > 0 || wgKvFd > 0) && (
+                  <>
+                    <div className="text-xs text-gray-500 font-medium mb-1 pt-1 border-t border-gray-100">Opslagen:</div>
+                    {wgSociaalFonds > 0 && (
+                      <div className="flex justify-between items-center text-sm text-gray-700 pl-2">
+                        <span>• Sociaal fonds</span>
+                        <span className="font-medium">{wgSociaalFonds.toFixed(2)}%</span>
+                      </div>
+                    )}
+                    {wgKvFd > 0 && (
+                      <div className="flex justify-between items-center text-sm text-gray-700 pl-2">
+                        <span>• KV/FD-reservering</span>
+                        <span className="font-medium">{wgKvFd.toFixed(2)}%</span>
+                      </div>
+                    )}
+                  </>
+                )}
+              </>
+            ) : (
+              <>
+                {/* Geaggregeerde weergave (fallback) */}
+                <div className="flex justify-between items-center text-sm text-gray-700">
+                  <span>• Sociale premies</span>
+                  <span className="font-medium">{wgSocial.toFixed(2)}%</span>
+                </div>
+                <div className="flex justify-between items-center text-sm text-gray-700">
+                  <span>• Zvw-heffing</span>
+                  <span className="font-medium">{wgZvw.toFixed(2)}%</span>
+                </div>
+                <div className="flex justify-between items-center text-sm text-gray-700">
+                  <span>• Vakantiegeld (wettelijk)</span>
+                  <span className="font-medium">{wgVacation.toFixed(2)}%</span>
+                </div>
+                <div className="flex justify-between items-center text-sm text-gray-700">
+                  <span>• Pensioen werkgever</span>
+                  <span className="font-medium">{wgPensionEmployer.toFixed(2)}%</span>
+                </div>
+                <div className="flex justify-between items-center text-sm text-gray-700">
+                  <span>• Overige verzekeringen</span>
+                  <span className="font-medium">{wgInsurance.toFixed(2)}%</span>
+                </div>
+              </>
+            )}
           </div>
           <div className="mt-3 pt-2 border-t border-gray-200">
             <p className="text-xs text-gray-500 mb-2 font-medium">Toeslagen (% van bruto salaris):</p>
@@ -597,7 +699,12 @@ export default function Calculator({ values, onChange }: CalculatorProps) {
               <span className="text-sm font-semibold text-gray-900">{werkgeverslastenBasisSom.toFixed(2)}%</span>
             </div>
             <div className="text-xs text-gray-400 italic pl-2">
-              ({wgSocial.toFixed(2)}% + {wgZvw.toFixed(2)}% + {wgVacation.toFixed(2)}% + {wgPensionEmployer.toFixed(2)}% + {wgInsurance.toFixed(2)}% = {werkgeverslastenBasisSom.toFixed(2)}%)
+              {hasDetailedComponents ? (
+                <>Sociale verzekeringen: {wgAzv.toFixed(2)}% + {wgZvw.toFixed(2)}% + {wgWhkWga.toFixed(2)}% + {wgWhkZwFlex.toFixed(2)}% + {wgWw.toFixed(2)}% + {wgAof.toFixed(2)}% + {wgWko.toFixed(2)}% + {wgInsurance.toFixed(2)}% = {(wgAzv + wgZvw + wgWhkWga + wgWhkZwFlex + wgWw + wgAof + wgWko + wgInsurance).toFixed(2)}%<br />
+                + Vakantiegeld {wgVacation.toFixed(2)}% + Pensioen {wgPensionEmployer.toFixed(2)}% + Opslagen {(wgSociaalFonds + wgKvFd).toFixed(2)}% = {werkgeverslastenBasisSom.toFixed(2)}%</>
+              ) : (
+                <>({wgSocial.toFixed(2)}% + {wgZvw.toFixed(2)}% + {wgVacation.toFixed(2)}% + {wgPensionEmployer.toFixed(2)}% + {wgInsurance.toFixed(2)}% = {werkgeverslastenBasisSom.toFixed(2)}%)</>
+              )}
             </div>
             <div className="flex items-end justify-between pb-0 mb-0 text-xs text-gray-600">
               <span>+ Toeslagen (effectief van totaal beschikbaar):</span>

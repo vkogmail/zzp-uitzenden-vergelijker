@@ -25,16 +25,26 @@
   },
   "emp": {
     "employer": {
-      "socialPct": 11.0,
-      "zvwPct": 6.75,
+      "socialPct": 25.75,
+      "azvPct": 1.90,
+      "zvwPct": 6.10,
+      "whkWgaPct": 1.34,
+      "whkZwFlexPct": 3.71,
+      "wwPct": 7.74,
+      "aofPct": 6.26,
+      "wkoPct": 0.50,
       "vacationPct": 8.33,
       "pensionEmployerPct": 14.31,
-      "insuranceOtherPct": 1.21,
+      "insuranceOtherPct": 0.10,
       "employerTotalPct": 41.6
     },
     "extraOnSalary": {
       "bovenwettelijkeVacationPct": 2.18,
       "pawwEmployerPct": 0.10
+    },
+    "employerOther": {
+      "sociaalFondsPct": 0.20,
+      "kvFdReserveringPct": 0.60
     },
     "employee": {
       "pensionEmployeePct": 7.5,

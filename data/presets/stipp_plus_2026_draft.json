@@ -15,19 +15,40 @@
     "Zvw 2026: 5,75% met cap ~€75.860 volgens Belastingdienst."
   ],
   "vacationDays": 25,
-  "holidaysPaid": 7,
+  "holidaysPaid": 6,
   "advDays": 0,
   "vakantiegeldPct": 8.33,
   "ikbPct": 0,
   "pension": {
     "fund": "StiPP",
     "phase": "Plus",
-    "employerPct": null,
-    "employeePct": null,
+    "employerPct": 15.90,
+    "employeePct": 7.95,
     "basePct": 90,
-    "note": "2026 percentages TBD; kan afwijken t.o.v. Basis"
+    "note": "2026 percentages: WG 15,90%, WN 7,95% (totaal 23,85%)"
   },
   "zvw": { "pct": 5.75, "cap": 75860, "basis": "belastbaar" },
+  "emp": {
+    "employer": {
+      "azvPct": 1.90,
+      "zvwPct": 6.10,
+      "whkWgaPct": 1.34,
+      "whkZwFlexPct": 3.71,
+      "wwPct": 7.74,
+      "aofPct": 6.26,
+      "wkoPct": 0.50,
+      "vacationPct": 8.33,
+      "pensionEmployerPct": 15.90,
+      "insuranceOtherPct": 0.10
+    },
+    "employerOther": {
+      "sociaalFondsPct": 0.20,
+      "kvFdReserveringPct": 0.60
+    },
+    "employee": {
+      "pensionEmployeePct": 7.95
+    }
+  },
   "employerOther": []
 }
 

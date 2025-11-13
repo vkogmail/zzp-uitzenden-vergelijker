@@ -12,27 +12,24 @@ import STIPP_PLUS_2026 from "@/data/presets/stipp_plus_2026_draft.json";
 import GEMEENTEN_2026 from "@/data/presets/gemeenten_2026_draft.json";
 import GENERIEK_2026 from "@/data/presets/generiek_2026_draft.json";
 import BANKEN_2026 from "@/data/presets/banken_2026_draft.json";
-import RABOBANK_2025 from "@/data/presets/cao_rabobank_2025.json";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 
 export default function Home() {
   const [inputs, setInputs] = useState<CalculatorInputs>(defaultInputs);
-  const [preset, setPreset] = useState<string>("baseline");
+  const [preset, setPreset] = useState<string>("generiek_2026");
   const [showPresetOverlay, setShowPresetOverlay] = useState<boolean>(false);
   const presets = {
-    baseline: { label: "Baseline (huidig)", config: BASELINE },
-    stipp_basis_2026: { label: "ABU/NBBU • StiPP Basis 2026 (draft)", config: STIPP_BASIS_2026 },
-    stipp_plus_2026: { label: "ABU/NBBU • StiPP Plus 2026 (draft)", config: STIPP_PLUS_2026 },
-    gemeenten_2026: { label: "Gemeenten 2026 (draft)", config: GEMEENTEN_2026 },
-    banken_2026: { label: "Banken 2026 (draft)", config: BANKEN_2026 },
-    generiek_2026: { label: "Generiek 2026 (draft)", config: GENERIEK_2026 },
-    rabobank_2025: { label: "Rabobank cao 2024–2025", config: RABOBANK_2025 },
+    stipp_basis_2026: { label: "ABU/NBBU • StiPP Basis 2026", config: STIPP_BASIS_2026 },
+    stipp_plus_2026: { label: "ABU/NBBU • StiPP Plus 2026", config: STIPP_PLUS_2026 },
+    gemeenten_2026: { label: "Gemeenten 2026", config: GEMEENTEN_2026 },
+    banken_2026: { label: "Banken 2026", config: BANKEN_2026 },
+    generiek_2026: { label: "Generiek 2026", config: GENERIEK_2026 },
   } as const;
 
   // Initialize active preset (and update when preset changes)
   useEffect(() => {
-    const cfg = (presets as any)[preset]?.config ?? BASELINE;
+    const cfg = (presets as any)[preset]?.config ?? GENERIEK_2026;
     setActivePresetConfig(cfg);
     // Sync visible inputs for labels that depend on config (vakantiegeld%, wg%)
     const vg = ((cfg as any)?.emp?.employer?.vacationPct as number | undefined) ?? ((cfg as any)?.vakantiegeldPct as number | undefined);
@@ -365,7 +362,7 @@ export default function Home() {
                   type="button"
                   onClick={async () => {
                     try {
-                      const cfg = (presets as any)[preset]?.config ?? BASELINE;
+                      const cfg = (presets as any)[preset]?.config ?? GENERIEK_2026;
                       await navigator.clipboard.writeText(JSON.stringify(cfg, null, 2));
                     } catch {}
                   }}
@@ -385,7 +382,7 @@ export default function Home() {
             </div>
             <div className="p-0 overflow-auto" style={{ maxHeight: 'calc(80vh - 44px)' }}>
               <pre className="text-xs m-0 p-4 whitespace-pre-wrap break-words leading-relaxed">
-{JSON.stringify(((presets as any)[preset]?.config ?? BASELINE), null, 2)}
+{JSON.stringify(((presets as any)[preset]?.config ?? GENERIEK_2026), null, 2)}
               </pre>
             </div>
           </div>

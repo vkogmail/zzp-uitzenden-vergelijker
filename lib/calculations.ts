@@ -281,9 +281,48 @@ export function calculateEmployee(inputs: CalculatorInputs): EmployeeResult {
   const CFG = getResolvedConfig();
   const cfgEmp = (CFG as any)?.emp ?? {};
   const cfgEmployer = cfgEmp?.employer ?? {};
-  const derivedWgPct = [cfgEmployer?.socialPct, cfgEmployer?.zvwPct, cfgEmployer?.vacationPct, cfgEmployer?.pensionEmployerPct, cfgEmployer?.insuranceOtherPct]
-    .filter((v) => typeof v === "number")
-    .reduce((a: number, b: number) => a + b, 0);
+  
+  // Bereken werkgeverskosten uit gedetailleerde componenten indien beschikbaar
+  const hasDetailedComponents = cfgEmployer?.azvPct != null || cfgEmployer?.zvwPct != null || 
+                                 cfgEmployer?.whkWgaPct != null || cfgEmployer?.whkZwFlexPct != null ||
+                                 cfgEmployer?.wwPct != null || cfgEmployer?.aofPct != null || cfgEmployer?.wkoPct != null;
+  
+  let derivedWgPct = 0;
+  if (hasDetailedComponents) {
+    // Gebruik gedetailleerde componenten
+    derivedWgPct = [
+      cfgEmployer?.azvPct ?? 0,
+      cfgEmployer?.zvwPct ?? 0,
+      cfgEmployer?.whkWgaPct ?? 0,
+      cfgEmployer?.whkZwFlexPct ?? 0,
+      cfgEmployer?.wwPct ?? 0,
+      cfgEmployer?.aofPct ?? 0,
+      cfgEmployer?.wkoPct ?? 0,
+      cfgEmployer?.vacationPct ?? 0,
+      cfgEmployer?.pensionEmployerPct ?? 0,
+      cfgEmployer?.insuranceOtherPct ?? 0
+    ].reduce((a: number, b: number) => a + (typeof b === "number" ? b : 0), 0);
+    
+    // Voeg employerOther toe (sociaal fonds, KV/FD)
+    const cfgEmployerOther = cfgEmp?.employerOther ?? {};
+    const employerOtherPct = [
+      cfgEmployerOther?.sociaalFondsPct ?? 0,
+      cfgEmployerOther?.kvFdReserveringPct ?? 0
+    ].reduce((a: number, b: number) => a + (typeof b === "number" ? b : 0), 0);
+    derivedWgPct += employerOtherPct;
+  } else {
+    // Fallback naar geaggregeerde waarden
+    derivedWgPct = [
+      cfgEmployer?.socialPct,
+      cfgEmployer?.zvwPct,
+      cfgEmployer?.vacationPct,
+      cfgEmployer?.pensionEmployerPct,
+      cfgEmployer?.insuranceOtherPct
+    ]
+      .filter((v) => typeof v === "number")
+      .reduce((a: number, b: number) => a + b, 0);
+  }
+  
   const baselineWgPct = (cfgEmployer?.employerTotalPct as number | undefined) ?? (derivedWgPct > 0 ? derivedWgPct : 41.6);
   const wgPct = employerTotalPct != null ? employerTotalPct : baselineWgPct;
   const werkgeverskosten = totaalBeschikbaar * toPct(wgPct); // Werkgeverskosten
