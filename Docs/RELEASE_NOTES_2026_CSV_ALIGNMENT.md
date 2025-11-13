@@ -13,10 +13,6 @@ Deze release bevat belangrijke updates om de calculator te aligneren met de Shee
 
 ### 1. Presets gealigneerd met Sheet Arsenaal-kostprijsgegevens
 
-**Bronbestanden**:
-- `Docs/opzet kostprijs 2026 versie 20251010 BASIS LEEG/stamgegevens-Table 1.csv`
-- `Docs/opzet kostprijs 2026 versie 20251010 BASIS LEEG/kostprijzen-Table 1.csv`
-
 **Wijzigingen**:
 - ✅ **Feestdagen**: aangepast van 7 naar **6 dagen** (2,61%) in alle 2026 presets
 - ✅ **ZVW percentage**: aangepast van 6,75% naar **6,10%** in alle presets
@@ -78,10 +74,10 @@ Deze release bevat belangrijke updates om de calculator te aligneren met de Shee
 
 ### 4. Preset dropdown gefilterd
 
-**Uitgesloten van dropdown**:
-- ❌ `baseline` (current_2025_baseline.json) — blijft beschikbaar als fallback
-- ❌ `rabobank_2025` (cao_rabobank_2025.json) — blijft beschikbaar als fallback
-- ❌ `assumptions_2026` — blijft beschikbaar als fallback
+**verwijderde cao's uit dropdown**:
+- ❌ `baseline` (current_2025_baseline.json)
+- ❌ `rabobank_2025` (cao_rabobank_2025.json)
+- ❌ `assumptions_2026` — blijft beschikbaar
 
 **Zichtbaar in dropdown**:
 - ✅ ABU/NBBU • StiPP Basis 2026
@@ -89,8 +85,6 @@ Deze release bevat belangrijke updates om de calculator te aligneren met de Shee
 - ✅ Gemeenten 2026
 - ✅ Banken 2026
 - ✅ Generiek 2026 (default)
-
-**Labels aangepast**: "(draft)" verwijderd uit alle labels
 
 ---
 
@@ -318,11 +312,6 @@ Deze release bevat belangrijke updates om de calculator te aligneren met de Shee
 
 ---
 
-## Contact & feedback
-
-Voor vragen of opmerkingen over deze release, neem contact op met het development team.
-
 **Documentatie**:
-- `Docs/CALCULATIES.md` — volledige berekeningsdocumentatie
-- `Docs/ZZP_PARAMETERS.md` — ZZP-parameters per CAO
-- `Docs/CSV_vs_Presets.md` — Sheet Arsenaal-vergelijking (verouderd na deze release)
+- [CALCULATIES.md](https://zzp-uitzenden-vergelijker.vercel.app/docs/calculaties) — volledige berekeningsdocumentatie
+- [ZZP_PARAMETERS.md](https://zzp-uitzenden-vergelijker.vercel.app/docs/zzp-parameters) — ZZP-parameters per CAO
