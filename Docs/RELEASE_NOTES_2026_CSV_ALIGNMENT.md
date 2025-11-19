@@ -101,7 +101,7 @@ Deze release bevat belangrijke updates om de calculator te aligneren met de Shee
 **Resultaat**:
 - Generiek/Gemeenten: 36,45% werkgeverskosten (was 50,76%)
 - StiPP presets: 52,35% werkgeverskosten (met 15,90% pensioen)
-- Verschil tussen ZZP en uitzenden is nu correct zichtbaar
+- Verschil tussen ZZP en detacheren is nu correct zichtbaar
 
 ---
 
@@ -127,7 +127,7 @@ Deze release bevat belangrijke updates om de calculator te aligneren met de Shee
 
 6. **Netto**: `winst_voor_belasting − inkomstenbelasting − WW_buffer − Zvw_premie`
 
-### Uitzenden-berekening (uitgebreid)
+### Detacheren-berekening (uitgebreid)
 
 1. **Factuurwaarde**: `clientRateEmp × werkbare_jaaruren`
 
@@ -223,7 +223,7 @@ Deze release bevat belangrijke updates om de calculator te aligneren met de Shee
   - Inkomstenbelasting = Box-1 schijven minus heffingskortingen
   - Netto = winst − belasting − WW-buffer (3%) − Zvw-premie
 
-- [ ] **Uitzenden-berekening**: Netto resultaat overeenkomstig verwachting
+- [ ] **Detacheren-berekening**: Netto resultaat overeenkomstig verwachting
   - Factuurwaarde = clientRate × werkbare jaaruren
   - Totaal beschikbaar = factuurwaarde − fee (marge%)
   - Werkgeverskosten = totaal beschikbaar × (som componenten)

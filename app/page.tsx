@@ -52,7 +52,7 @@ export default function Home() {
   }, []);
 
   const copyResults = async () => {
-    const text = `ZZP vs Uitzenden Vergelijker\n\nNetto per maand (ZZP): ${formatCurrency(result.zzp.nettoMaand)}\nNetto per maand (Uitzenden): ${formatCurrency(result.emp.nettoMaand)}\nVerschil: ${formatCurrency(result.diffMonthly)} (${formatPercent(result.diffPercent, 1)})`;
+    const text = `ZZP vs Detacheren Vergelijker\n\nNetto per maand (ZZP): ${formatCurrency(result.zzp.nettoMaand)}\nNetto per maand (Detacheren): ${formatCurrency(result.emp.nettoMaand)}\nVerschil: ${formatCurrency(result.diffMonthly)} (${formatPercent(result.diffPercent, 1)})`;
     await navigator.clipboard.writeText(text);
   };
 
@@ -67,7 +67,7 @@ export default function Home() {
     const imgWidth = pageWidth - 20;
     const imgHeight = (canvas.height * imgWidth) / canvas.width;
     pdf.addImage(imgData, "PNG", 10, 10, imgWidth, Math.min(imgHeight, pageHeight - 20));
-    pdf.save("zzp-vs-uitzenden.pdf");
+    pdf.save("zzp-vs-detacheren.pdf");
   };
 
   return (
@@ -82,7 +82,7 @@ export default function Home() {
       <div className={`mx-auto max-w-4xl px-4 py-10 ${isSimpleMode ? 'pb-10' : 'pb-72'}`}>
         <header className="mb-4">
           <h1 className="ty-h1 text-center mb-3">
-            ZZP vs Uitzenden Vergelijker
+            ZZP vs Detacheren Vergelijker
           </h1>
           <p className="ty-body-lg text-center mb-4">
             Vergelijk netto inkomen per maand met reële aannames (2026). Alle berekeningen gaan uit van 12 maanden (jaar).
@@ -211,7 +211,7 @@ export default function Home() {
                     const clientRateZzp = (inputs as any).clientRateZzp ?? inputs.rate;
                     return clientRateZzp;
                   })())} €/uur</div>
-                  <div>Klant betaalt Uitzenden: {formatCurrencyWithDecimals((() => {
+                  <div>Klant betaalt Detacheren: {formatCurrencyWithDecimals((() => {
                     const marginEmp = (inputs as any).marginEmp ?? 0;
                     const clientRateEmp = (inputs as any).clientRateEmp ?? inputs.rate;
                     return clientRateEmp;
@@ -316,7 +316,7 @@ export default function Home() {
             </div> */}
 
             {/* <footer className="mt-8 rounded-2xl border border-gray-100 bg-white p-4 md:p-5 text-xs md:text-sm text-gray-600 shadow-sm leading-relaxed">
-              {result.diffPercent >= 0 ? 'Verdient' : 'Krijgt'} een ZZP'er netto ongeveer {Math.abs(result.diffPercent * 100).toFixed(1)}% {result.diffPercent >= 0 ? 'meer' : 'minder'} dan bij uitzenden bij de huidige tarieven (ZZP: {formatCurrencyWithDecimals((inputs as any).clientRateZzp ?? inputs.rate)}/uur, Uitzenden: {formatCurrencyWithDecimals((inputs as any).clientRateEmp ?? inputs.rate)}/uur). Let op: pensioen percentages en marges kunnen verschillen. De echte verschillen zitten in zekerheid versus vrijheid.
+              {result.diffPercent >= 0 ? 'Verdient' : 'Krijgt'} een ZZP'er netto ongeveer {Math.abs(result.diffPercent * 100).toFixed(1)}% {result.diffPercent >= 0 ? 'meer' : 'minder'} dan bij detacheren bij de huidige tarieven (ZZP: {formatCurrencyWithDecimals((inputs as any).clientRateZzp ?? inputs.rate)}/uur, Detacheren: {formatCurrencyWithDecimals((inputs as any).clientRateEmp ?? inputs.rate)}/uur). Let op: pensioen percentages en marges kunnen verschillen. De echte verschillen zitten in zekerheid versus vrijheid.
             </footer> */}
           </>
         )}
@@ -327,9 +327,9 @@ export default function Home() {
             <h3 className="ty-h3 text-blue-900 mb-2">💡 Hoe werkt dit?</h3>
             <ul className="text-xs md:text-sm font-normal text-blue-900 leading-relaxed">
               <li>• Bij ZZP moet je zelf pensioen regelen, verzekeringen betalen en reserves aanleggen</li>
-              <li>• Bij uitzenden regelt het uitzendbureau dit allemaal voor je</li>
-              <li>• Daarom kan je als uitzendkracht soms netto meer overhouden, ondanks een lager tarief</li>
-              <li>• De keuze gaat vooral om zekerheid (uitzenden) versus vrijheid (ZZP)</li>
+              <li>• Bij detacheren regelt het detacheringsbureau dit allemaal voor je</li>
+              <li>• Daarom kan je als gedetacheerde soms netto meer overhouden, ondanks een lager tarief</li>
+              <li>• De keuze gaat vooral om zekerheid (detacheren) versus vrijheid (ZZP)</li>
             </ul>
           </div>
         </section>

@@ -98,7 +98,7 @@ export function getDerivedEmployerCostsPct(preset: any): number | null {
 export type CalculatorInputs = {
   // Contract and pricing
   clientRateZzp?: number; // rate charged to client for ZZP
-  clientRateEmp?: number; // rate charged to client for Detachering/Uitzenden
+  clientRateEmp?: number; // rate charged to client for Detacheren
   marginZzp?: number; // % margin withheld before reaching ZZP
   marginEmp?: number; // % margin withheld before reaching employer payroll
   employerTotalPct?: number; // total employer on-costs percentage to derive gross wage

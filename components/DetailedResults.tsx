@@ -10,7 +10,7 @@ interface DetailedResultsProps {
 
 export default function DetailedResults({ data, inputs }: DetailedResultsProps) {
   const preset = getActivePresetConfig() as any;
-  // const [activeTab, setActiveTab] = useState<"zzp" | "uitzenden">("zzp");
+  // const [activeTab, setActiveTab] = useState<"zzp" | "detacheren">("zzp");
   const [showZzpBreakdown, setShowZzpBreakdown] = useState(false);
   const [showEmpBreakdown, setShowEmpBreakdown] = useState(false);
   
@@ -20,7 +20,7 @@ export default function DetailedResults({ data, inputs }: DetailedResultsProps) 
   const empBarPercentage = maxValue > 0 ? (data.emp.nettoMaand / maxValue) * 100 : 50;
   const zzpIsLower = data.zzp.nettoMaand < data.emp.nettoMaand;
   const zzpBarColor = zzpIsLower ? '#fdba74' : '#10b981'; // orange-300 als lager, groen als hoger
-  const empBarColor = zzpIsLower ? '#10b981' : '#fdba74'; // groen als ZZP lager is, orange-300 als uitzenden lager is
+  const empBarColor = zzpIsLower ? '#10b981' : '#fdba74'; // groen als ZZP lager is, orange-300 als detacheren lager is
 
   // Calculate breakdown values
   const clientRateZzp = (inputs as any).clientRateZzp ?? inputs.rate;
@@ -38,7 +38,7 @@ export default function DetailedResults({ data, inputs }: DetailedResultsProps) 
   const paidHoursRatio = 1 - unpaidVacationPercentage; // 89.13%
   const zzpPaidHours = theoreticalAnnualHours * paidHoursRatio; // Betaalde uren voor ZZP
   
-  // Voor Uitzenden: ook werkbare jaaruren
+  // Voor Detacheren: ook werkbare jaaruren
   const empAnnualHours = theoreticalAnnualHours;
   
   // Detail cards variables (commented out - cards are hidden)
@@ -167,10 +167,10 @@ export default function DetailedResults({ data, inputs }: DetailedResultsProps) 
                             <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-72 p-2 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 whitespace-normal">
                               {Math.abs(pensionTotalPct - (pensionEmployee + wgPensionEmployer)) > 1 && (
                                 <div className="mb-2 pb-2 border-b border-gray-600">
-                                  ⚠️ Let op: ZZP pensioen = {pensionTotalPct.toFixed(1)}% vs Uitzenden = {(pensionEmployee + wgPensionEmployer).toFixed(2)}%. Dit beïnvloedt de vergelijking.
+                                  ⚠️ Let op: ZZP pensioen = {pensionTotalPct.toFixed(1)}% vs Detacheren = {(pensionEmployee + wgPensionEmployer).toFixed(2)}%. Dit beïnvloedt de vergelijking.
                                 </div>
                               )}
-                              Pensioenpremie voor ZZP'ers. Berekenen op grondslag van {pensionBasePct}% van de winst, met een maximum van 30% jaarruimte. Het totaal percentage ({pensionTotalPct.toFixed(1)}%) verschilt mogelijk van uitzenden omdat je als ZZP'er zelf kunt kiezen hoeveel je inlegt.
+                              Pensioenpremie voor ZZP'ers. Berekenen op grondslag van {pensionBasePct}% van de winst, met een maximum van 30% jaarruimte. Het totaal percentage ({pensionTotalPct.toFixed(1)}%) verschilt mogelijk van detacheren omdat je als ZZP'er zelf kunt kiezen hoeveel je inlegt.
                             </div>
                           </div>
                         </div>
@@ -207,13 +207,13 @@ export default function DetailedResults({ data, inputs }: DetailedResultsProps) 
             )}
           </div>
 
-          {/* Uitzenden Result */}
+          {/* Detacheren Result */}
           <div className={`rounded-xl p-6 border-2 ${
             data.emp.nettoMaand > data.zzp.nettoMaand 
               ? 'bg-green-50 border-green-400' 
               : 'bg-white border-gray-200'
           }`}>
-            <div className="text-sm text-gray-600 mb-1 font-medium">Als uitzendkracht:</div>
+            <div className="text-sm text-gray-600 mb-1 font-medium">Als gedetacheerde:</div>
             <div className="text-4xl font-bold text-gray-900 mb-2">
               {formatCurrencyWithDecimals(data.emp.nettoMaand)}
             </div>
@@ -235,7 +235,7 @@ export default function DetailedResults({ data, inputs }: DetailedResultsProps) 
             
             {showEmpBreakdown && (
               <div className="mt-4 pt-4 border-t border-gray-200">
-                <h3 className="text-sm font-semibold text-gray-700 mb-3">Uitzenden opbouw van netto</h3>
+                <h3 className="text-sm font-semibold text-gray-700 mb-3">Detacheren opbouw van netto</h3>
                 <div className="space-y-3 text-sm">
                   <div>
                     <p className="text-xs text-gray-500 mb-2 font-medium">Af te trekken:</p>
@@ -315,14 +315,14 @@ export default function DetailedResults({ data, inputs }: DetailedResultsProps) 
           ZZP Details
         </button>
         <button
-          onClick={() => setActiveTab("uitzenden")}
+          onClick={() => setActiveTab("detacheren")}
           className={`flex-1 px-4 py-3 text-sm font-semibold transition-all rounded-md ${
-            activeTab === "uitzenden"
+            activeTab === "detacheren"
               ? "bg-white text-gray-900 shadow-sm"
               : "text-gray-600 hover:text-gray-900"
           }`}
         >
-          Uitzenden Details
+          Detacheren Details
         </button>
       </div> */}
 
@@ -371,20 +371,20 @@ export default function DetailedResults({ data, inputs }: DetailedResultsProps) 
           </div>
         </div> */}
 
-        {/* Uitzenden Panel - Mobile: Show when active, Desktop: Always show */}
-        {/* <div className={`rounded-2xl border border-gray-100 bg-white p-5 shadow-sm ${activeTab !== "uitzenden" ? "hidden md:block" : ""}`}>
+        {/* Detacheren Panel - Mobile: Show when active, Desktop: Always show */}
+        {/* <div className={`rounded-2xl border border-gray-100 bg-white p-5 shadow-sm ${activeTab !== "detacheren" ? "hidden md:block" : ""}`}>
           <div className="space-y-6"> */}
             {/* Header */}
             {/* <div className="mb-4">
-              <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-2">Uitzenden</h2>
+              <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-2">Detacheren</h2>
               <div className="text-sm text-gray-600">
                 Netto per maand: <span className="font-semibold text-gray-900">{formatCurrencyWithDecimals(data.emp.nettoMaand)}</span>
               </div>
             </div> */}
 
-            {/* Uurtarief Uitzenden Section */}
+            {/* Uurtarief Detacheren Section */}
             {/* <div className="pt-4 border-t border-gray-200">
-              <h3 className="text-sm font-semibold text-gray-700 mb-3">Uurtarief Uitzenden</h3>
+              <h3 className="text-sm font-semibold text-gray-700 mb-3">Uurtarief Detacheren</h3>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span className="text-gray-600">Effectief tarief per uur:</span>

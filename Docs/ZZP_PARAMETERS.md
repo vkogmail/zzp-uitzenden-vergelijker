@@ -2,7 +2,7 @@
 
 ## Overzicht
 
-Voor een eerlijke vergelijking tussen ZZP en uitzenden worden aan de ZZP-kant de volgende parameters gebruikt die **per CAO kunnen variëren**:
+Voor een eerlijke vergelijking tussen ZZP en detacheren worden aan de ZZP-kant de volgende parameters gebruikt die **per CAO kunnen variëren**:
 
 De netto-uitkomst voor ZZP is **inclusief** het zelf toegekende vakantiegeld; we tonen het bedrag apart als informatieve reserve.
 

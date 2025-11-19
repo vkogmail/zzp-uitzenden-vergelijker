@@ -6,7 +6,7 @@ import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Berekeningen - Documentatie',
-  description: 'Volledige documentatie van de berekeningslogica voor ZZP vs Uitzenden vergelijker',
+  description: 'Volledige documentatie van de berekeningslogica voor ZZP vs Detacheren vergelijker',
 };
 
 export default function CalculatiesPage() {

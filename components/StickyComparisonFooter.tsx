@@ -19,7 +19,7 @@ export default function StickyComparisonFooter({ data, inputs }: StickyCompariso
   const paidHoursRatio = 1 - unpaidVacationPercentage; // 89.13%
   const zzpPaidHours = theoreticalAnnualHours * paidHoursRatio; // Betaalde uren voor ZZP
   
-  // Voor Uitzenden: theoretische uren (inclusief betaalde vakantiedagen)
+  // Voor Detacheren: theoretische uren (inclusief betaalde vakantiedagen)
   const empAnnualHours = theoreticalAnnualHours; // Volledige theoretische uren
   
   // Calculate netto per uur
@@ -74,13 +74,13 @@ export default function StickyComparisonFooter({ data, inputs }: StickyCompariso
             </div>
           </div>
           
-          {/* Uitzenden Card */}
+          {/* Detacheren Card */}
           <div className={`rounded-xl p-3 border-2 ${
             !zzpIsBetter 
               ? "bg-green-50 border-green-400" 
               : "bg-white border-gray-200"
           }`}>
-            <div className="text-xs text-gray-600 mb-1 font-medium">Als uitzendkracht:</div>
+            <div className="text-xs text-gray-600 mb-1 font-medium">Als gedetacheerde:</div>
             <div className="text-lg md:text-xl font-bold text-gray-900 mb-1">
               {formatCurrencyWithDecimals(emp.nettoMaand)}
             </div>

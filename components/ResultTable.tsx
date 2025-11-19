@@ -11,7 +11,7 @@ export default function ResultTable({ data }: { data: ComparisonResult }) {
           <tr>
             <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Post</th>
             <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">ZZP</th>
-            <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Uitzenden</th>
+            <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Detacheren</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-100">

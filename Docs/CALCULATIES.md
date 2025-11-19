@@ -1,10 +1,10 @@
-## CALCULATIES — Eén bron van waarheid
+## CALCULATIES
 
 Doel: in dit document staat beknopt en eenduidig hoe we rekenen, waar cijfers vandaan komen, en hoe JSON-velden doorwerken in de code. Dit document is leidend t.o.v. oudere losse documenten.
 
 ### 1) Overzicht en definities
 - ZZP: berekening in `lib/calculations.ts` functie `calculateZzp` (netto per jaar/maand uit omzet − kosten − pensioen − belasting − post‑tax reserveringen).
-- Uitzenden: berekening in `lib/calculations.ts` functie `calculateEmployee` (factuurwaarde → fee → totaal beschikbaar → werkgeverskosten → bruto salaris → toeslagen → pensioen werknemer → loonheffing → WKR → netto).
+- Detacheren: berekening in `lib/calculations.ts` functie `calculateEmployee` (factuurwaarde → fee → totaal beschikbaar → werkgeverskosten → bruto salaris → toeslagen → pensioen werknemer → loonheffing → WKR → netto).
 - UI gebruikt deze functies en toont tussenstappen in `components/Calculator.tsx` en `components/DetailedResults.tsx`.
 
 ### 2) Databronnen en configuratie-resolutie
@@ -42,7 +42,7 @@ RESOLVED CFG  : { emp: { employer: {
 
 Belangrijke velden (bron JSON): `zzp.effectiveRateFactor`, `zzp.zvwPct`, `zzp.zvwCap`, `zzp.vacationReservePctBase`, `zzp.wwBufferPct`.
 
-### 4) Uitzenden-berekening (korte keten)
+### 4) Detacheren-berekening (korte keten)
 1. Factuurwaarde: `clientRateEmp × werkbare_jaaruren` (gebruikt `getWorkableAnnualHours()`).
 2. Fee (marge): `factuurwaarde × marginEmp%`. Totaal beschikbaar = factuurwaarde − fee.
 3. Werkgeverskosten: 

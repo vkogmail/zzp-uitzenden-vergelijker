@@ -3,7 +3,7 @@
 import { ChangeEvent, useState } from "react";
 import { formatCurrency, formatCurrencyWithDecimals, getWorkableAnnualHours, calculateIncomeTax, calculateZzp, calculateEmployee, getActivePresetConfig } from "@/lib/calculations";
 
-type TabType = "zzp" | "uitzenden";
+type TabType = "zzp" | "detacheren";
 
 type NumericKey =
   | "rate"
@@ -118,7 +118,7 @@ export default function Calculator({ values, onChange }: CalculatorProps) {
   
   // Calculate annual hours based on hours per week
   const hoursPerWeekInput = (values as any).hoursPerWeek ?? 36;
-  const theoreticalAnnualHours = hoursPerWeekInput * 52; // Theoretische uren (Uitzenden: inclusief betaalde vakantie)
+  const theoreticalAnnualHours = hoursPerWeekInput * 52; // Theoretische uren (Detacheren: inclusief betaalde vakantie)
   
   // Voor ZZP: werkbare jaaruren (zelfde als UI-teller) en betaalde uren (10.87% onbetaalde vakantie)
   const workableAnnualHours = getWorkableAnnualHours(hoursPerWeekInput);
@@ -127,7 +127,7 @@ export default function Calculator({ values, onChange }: CalculatorProps) {
   const zzpPaidHours = workableAnnualHours * paidHoursRatio; // Betaalde uren voor ZZP
   const vacationHours = workableAnnualHours * unpaidVacationPercentage;
   
-  // Voor Uitzenden: gebruik ook werkbare jaaruren voor eerlijke vergelijking
+  // Voor Detacheren: gebruik ook werkbare jaaruren voor eerlijke vergelijking
   const empAnnualHours = getWorkableAnnualHours(hoursPerWeekInput);
   
   // Use calculateEmployee for consistent calculations (includes fix for vacation pay double-counting)
@@ -274,14 +274,14 @@ export default function Calculator({ values, onChange }: CalculatorProps) {
           ZZP
         </button>
         <button
-          onClick={() => setActiveTab("uitzenden")}
+          onClick={() => setActiveTab("detacheren")}
           className={`flex-1 px-4 py-3 text-sm font-semibold transition-all rounded-md ${
-            activeTab === "uitzenden"
+            activeTab === "detacheren"
               ? "bg-white text-gray-900 shadow-sm"
               : "text-gray-600 hover:text-gray-900"
           }`}
         >
-          Uitzenden
+          Detacheren
         </button>
       </div>
 
@@ -290,7 +290,7 @@ export default function Calculator({ values, onChange }: CalculatorProps) {
           <h2 className="text-sm font-semibold text-gray-700">ZZP</h2>
         </div>
         <div className="md:col-start-2 md:row-start-1 hidden md:block">
-          <h2 className="text-sm font-semibold text-gray-700">Uitzenden</h2>
+          <h2 className="text-sm font-semibold text-gray-700">Detacheren</h2>
         </div>
       
       {/* ZZP Cards Column */}
@@ -342,10 +342,10 @@ export default function Calculator({ values, onChange }: CalculatorProps) {
                   <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-72 p-2 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 whitespace-normal">
                     {Math.abs(pensionTotalPct - (pensionEmployee + wgPensionEmployer)) > 1 && (
                       <div className="mb-2 pb-2 border-b border-gray-600">
-                        ⚠️ Let op: ZZP pensioen = {pensionTotalPct.toFixed(1)}% vs Uitzenden = {(pensionEmployee + wgPensionEmployer).toFixed(2)}%. Dit beïnvloedt de vergelijking.
+                        ⚠️ Let op: ZZP pensioen = {pensionTotalPct.toFixed(1)}% vs Detacheren = {(pensionEmployee + wgPensionEmployer).toFixed(2)}%. Dit beïnvloedt de vergelijking.
                       </div>
                     )}
-                    Pensioenpremie voor ZZP'ers. Berekenen op grondslag van {pensionBasePct}% van de winst, met een maximum van 30% jaarruimte. Het totaal percentage ({pensionTotalPct.toFixed(1)}%) verschilt mogelijk van uitzenden omdat je als ZZP'er zelf kunt kiezen hoeveel je inlegt.
+                    Pensioenpremie voor ZZP'ers. Berekenen op grondslag van {pensionBasePct}% van de winst, met een maximum van 30% jaarruimte. Het totaal percentage ({pensionTotalPct.toFixed(1)}%) verschilt mogelijk van detacheren omdat je als ZZP'er zelf kunt kiezen hoeveel je inlegt.
                   </div>
                 </div>
               </div>
@@ -353,7 +353,7 @@ export default function Calculator({ values, onChange }: CalculatorProps) {
             </li>
             <li className="flex justify-between text-xs text-gray-500 pl-4">
               <span>→ Effectief: {((pensionBasePct * pensionTotalPct) / 100).toFixed(1)}% van winst</span>
-              <span>vs Uitzenden: {(pensionEmployee + wgPensionEmployer).toFixed(2)}% totaal</span>
+              <span>vs Detacheren: {(pensionEmployee + wgPensionEmployer).toFixed(2)}% totaal</span>
             </li>
           </ul>
         </div>
@@ -510,12 +510,12 @@ export default function Calculator({ values, onChange }: CalculatorProps) {
         </div>
       </div>
 
-      {/* Uitzenden Cards Column */}
-      <div className={`md:contents ${activeTab !== "uitzenden" ? "hidden md:block" : ""}`}>
-        {/* Marge Uitzenden */}
+      {/* Detacheren Cards Column */}
+      <div className={`md:contents ${activeTab !== "detacheren" ? "hidden md:block" : ""}`}>
+        {/* Marge Detacheren */}
         <div className="md:col-start-2 md:row-start-2 md:self-start rounded-xl bg-white border border-gray-100 shadow-sm p-4">
           <div className="flex items-center gap-2 mb-1">
-            <label className="text-sm text-gray-600">Marge Uitzenden (ingehouden %)</label>
+            <label className="text-sm text-gray-600">Marge Detacheren (ingehouden %)</label>
           <div className="group relative">
             <svg className="w-4 h-4 cursor-help text-blue-500" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
@@ -526,7 +526,7 @@ export default function Calculator({ values, onChange }: CalculatorProps) {
                   ⚠️ Let op: Marges verschillen ({marginZzp.toFixed(1)}% vs {marginEmp.toFixed(1)}%). Dit beïnvloedt de vergelijking.
                 </div>
               )}
-              Percentage dat wordt ingehouden door uitzendbureau. Marges zijn vaak hoger bij uitzenden omdat het bureau voorfinanciert (je krijgt direct betaald aan het einde van de maand).
+              Percentage dat wordt ingehouden door detacheringsbureau. Marges zijn vaak hoger bij detacheren omdat het bureau voorfinanciert (je krijgt direct betaald aan het einde van de maand).
             </div>
           </div>
         </div>
@@ -535,7 +535,7 @@ export default function Calculator({ values, onChange }: CalculatorProps) {
           </div>
         </div>
         
-        {/* Klanttarief Uitzenden — verwijderd op verzoek */}
+        {/* Klanttarief Detacheren — verwijderd op verzoek */}
         
         {/* Totaal werkgeverslasten */}
         <div className="md:col-start-2 md:row-start-4 md:self-start rounded-xl bg-white border border-gray-100 shadow-sm p-4">
@@ -683,10 +683,10 @@ export default function Calculator({ values, onChange }: CalculatorProps) {
                   <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-72 p-2 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 whitespace-normal">
                     {Math.abs(pensionTotalPct - (pensionEmployee + wgPensionEmployer)) > 1 && (
                       <div className="mb-2 pb-2 border-b border-gray-600">
-                        ⚠️ Let op: ZZP pensioen = {pensionTotalPct.toFixed(1)}% vs Uitzenden = {(pensionEmployee + wgPensionEmployer).toFixed(2)}%. Dit beïnvloedt de vergelijking.
+                        ⚠️ Let op: ZZP pensioen = {pensionTotalPct.toFixed(1)}% vs Detacheren = {(pensionEmployee + wgPensionEmployer).toFixed(2)}%. Dit beïnvloedt de vergelijking.
                       </div>
                     )}
-                    Totale pensioenpremie bij uitzenden bestaat uit werknemersdeel ({pensionEmployee.toFixed(1)}%) en werkgeversdeel ({wgPensionEmployer.toFixed(2)}%). Dit is vaak hoger dan bij ZZP omdat het uitzendbureau het pensioen voor je regelt en deels betaalt.
+                    Totale pensioenpremie bij detacheren bestaat uit werknemersdeel ({pensionEmployee.toFixed(1)}%) en werkgeversdeel ({wgPensionEmployer.toFixed(2)}%). Dit is vaak hoger dan bij ZZP omdat het detacheringsbureau het pensioen voor je regelt en deels betaalt.
                   </div>
                 </div>
               </div>
@@ -722,9 +722,9 @@ export default function Calculator({ values, onChange }: CalculatorProps) {
           </div>
         </div>
         
-        {/* Bruto uurloon Uitzenden */}
+        {/* Bruto uurloon Detacheren */}
         <div className="md:col-start-2 md:row-start-5 md:self-start rounded-xl bg-white border border-gray-100 shadow-sm p-4">
-          <p className="text-sm text-gray-600 mb-1">Bruto uurloon (Uitzenden)</p>
+          <p className="text-sm text-gray-600 mb-1">Bruto uurloon (Detacheren)</p>
           <div className="flex items-end justify-between mb-2">
             <span className="text-2xl font-semibold">{formatCurrencyWithDecimals(brutoUurloonEmp)}</span>
             <span className="text-xs text-gray-500">= {formatCurrencyWithDecimals(effectiveRateEmp)} − {formatCurrencyWithDecimals(employerCostsPerHour)}</span>
@@ -732,9 +732,9 @@ export default function Calculator({ values, onChange }: CalculatorProps) {
           <p className="text-xs text-gray-500">Werkgeverslasten per uur = effectieve rate × {employerTotal.toFixed(2)}%</p>
         </div>
         
-        {/* Netto uurloon Uitzenden */}
+        {/* Netto uurloon Detacheren */}
         <div className="md:col-start-2 md:row-start-6 md:self-start rounded-xl bg-white border border-gray-100 shadow-sm p-4">
-          <p className="text-sm text-gray-600 mb-1">Netto uurloon (Uitzenden)</p>
+          <p className="text-sm text-gray-600 mb-1">Netto uurloon (Detacheren)</p>
           <div className="flex items-end justify-between mb-2">
             <span className="text-2xl font-semibold">{formatCurrencyWithDecimals(nettoUurloon)}</span>
             <span className="text-xs text-gray-500">= {formatCurrencyWithDecimals(nettoJaar)} ÷ {empAnnualHours.toLocaleString("nl-NL")} uur</span>

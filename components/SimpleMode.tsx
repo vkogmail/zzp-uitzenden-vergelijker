@@ -19,7 +19,7 @@ export default function SimpleMode({ inputs }: SimpleModeProps) {
   // Orange kleur matcht met de verschil card eronder (orange-300 = #fdba74 meer oranje, minder geel)
   const zzpIsLower = result.zzp.nettoMaand < result.emp.nettoMaand;
   const zzpBarColor = zzpIsLower ? '#fdba74' : '#10b981'; // orange-300 als lager, groen als hoger
-  const empBarColor = zzpIsLower ? '#10b981' : '#fdba74'; // groen als ZZP lager is, orange-300 als uitzenden lager is
+  const empBarColor = zzpIsLower ? '#10b981' : '#fdba74'; // groen als ZZP lager is, orange-300 als detacheren lager is
 
   return (
     <div className="space-y-0">
@@ -60,13 +60,13 @@ export default function SimpleMode({ inputs }: SimpleModeProps) {
             </div>
           </div>
 
-          {/* Uitzenden Result */}
+          {/* Detacheren Result */}
           <div className={`rounded-xl p-6 border-2 ${
             result.emp.nettoMaand > result.zzp.nettoMaand 
               ? 'bg-green-50 border-green-400' 
               : 'bg-white border-gray-200'
           }`}>
-            <div className="text-sm text-gray-600 mb-1 font-medium">Als uitzendkracht:</div>
+            <div className="text-sm text-gray-600 mb-1 font-medium">Als gedetacheerde:</div>
             <div className="text-4xl font-bold text-gray-900 mb-2">
               {formatCurrencyWithDecimals(result.emp.nettoMaand)}
             </div>

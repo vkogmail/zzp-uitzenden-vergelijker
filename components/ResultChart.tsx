@@ -13,7 +13,7 @@ import {
 } from "recharts";
 import { ComparisonResult, formatCurrencyWithDecimals } from "@/lib/calculations";
 
-export default function ResultChart({ data, type }: { data: ComparisonResult; type: "zzp" | "uitzenden" }) {
+export default function ResultChart({ data, type }: { data: ComparisonResult; type: "zzp" | "detacheren" }) {
   const [isMounted, setIsMounted] = useState(false);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
