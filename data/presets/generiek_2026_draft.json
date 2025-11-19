@@ -35,7 +35,7 @@
       "aofPct": 6.26,
       "wkoPct": 0.50,
       "vacationPct": 8.0,
-      "pensionEmployerPct": 0,
+      "pensionEmployerPct": null,
       "insuranceOtherPct": 0.10
     },
     "employerOther": {

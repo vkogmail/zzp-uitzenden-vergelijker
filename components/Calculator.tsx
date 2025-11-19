@@ -345,7 +345,7 @@ export default function Calculator({ values, onChange }: CalculatorProps) {
                         ⚠️ Let op: ZZP pensioen = {pensionTotalPct.toFixed(1)}% vs Detacheren = {(pensionEmployee + wgPensionEmployer).toFixed(2)}%. Dit beïnvloedt de vergelijking.
                       </div>
                     )}
-                    Pensioenpremie voor ZZP'ers. Berekenen op grondslag van {pensionBasePct}% van de winst, met een maximum van 30% jaarruimte. Het totaal percentage ({pensionTotalPct.toFixed(1)}%) verschilt mogelijk van detacheren omdat je als ZZP'er zelf kunt kiezen hoeveel je inlegt.
+                    Pensioenpremie voor ZZP'ers. Berekenen op grondslag van {pensionBasePct}% van de winst, met een maximum van 30% jaarruimte. Bij ZZP leg je {pensionTotalPct.toFixed(1)}% totaal in (privé). Bij detacheren betaal je {pensionEmployee.toFixed(1)}% privé + {wgPensionEmployer.toFixed(2)}% werkgever = {(pensionEmployee + wgPensionEmployer).toFixed(2)}% totaal. De {pensionTotalPct.toFixed(1)}% bij ZZP is daarmee vergelijkbaar met het totaal bij detacheren.
                   </div>
                 </div>
               </div>
