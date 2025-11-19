@@ -123,14 +123,15 @@ export default function Home() {
                 ))}
               </select>
               {/* uitleg verplaatst naar tooltip bij label */}
-              <button
+              {/* Intern gebruik: Toon preset JSON knop */}
+              {/* <button
                 type="button"
                 onClick={() => setShowPresetOverlay(true)}
                 className="ml-auto flex-shrink-0 whitespace-nowrap rounded-md border border-gray-200 px-2.5 py-1.5 text-xs text-gray-700 hover:bg-gray-50"
                 aria-label="Toon preset JSON"
               >
                 Toon preset JSON
-              </button>
+              </button> */}
             </div>
           </div>
         </section>
@@ -354,7 +355,8 @@ export default function Home() {
       {/* Sticky Comparison Footer - Only in Expert Mode */}
       {!isSimpleMode && <StickyComparisonFooter data={result} inputs={inputs} />}
 
-      {showPresetOverlay && (
+      {/* Intern gebruik: Preset JSON overlay */}
+      {/* {showPresetOverlay && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center">
           <div className="absolute inset-0 bg-black/40" onClick={() => setShowPresetOverlay(false)} />
           <div className="relative z-[101] w-[min(92vw,900px)] max-h-[80vh] bg-white border border-gray-200 rounded-xl shadow-xl overflow-hidden">
@@ -390,7 +392,7 @@ export default function Home() {
             </div>
           </div>
         </div>
-      )}
+      )} */}
     </div>
   );
 }
