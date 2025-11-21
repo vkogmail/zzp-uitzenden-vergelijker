@@ -252,8 +252,9 @@ export default function Calculator({ values, onChange }: CalculatorProps) {
   const vakantiegeldEffectiefPct = vakantiegeldBasePct * (1 - effectieveBelastingdruk);
   const vakantiegeld = (omzet - bedrijfskosten - (heeftEchteAovVerzekering ? aov : 0)) * (vakantiegeldEffectiefPct / 100); // vakantiereserve (informatief)
   
-  // Netto = winst voor belasting - belasting - WW buffer - Zvw-premie
-  const nettoJaarBerekend = winstVoorBelasting - inkomstenbelasting - wwBuffer - zvwPremie;
+  // Netto = belastbaar inkomen (na aftrekposten) - belasting - WW buffer - Zvw-premie
+  // Aftrekposten (zelfstandigenaftrek + MKB-vrijstelling) zijn al afgetrokken in belastbaarInkomen
+  const nettoJaarBerekend = belastbaarInkomen - inkomstenbelasting - wwBuffer - zvwPremie;
   const nettoUurloonZzp = nettoJaarBerekend / zzpPaidHours;
   
   const [showZzpBreakdown, setShowZzpBreakdown] = useState(false);

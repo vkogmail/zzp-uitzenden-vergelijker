@@ -88,7 +88,9 @@ export default function DetailedResults({ data, inputs }: DetailedResultsProps) 
   const vakantiegeldEffectiefPct = vakantiegeldBasePct * (1 - effectieveBelastingdruk);
   const wwBuffer = omzet * 0.03;
   const vakantiegeld = (omzet - bedrijfskosten - (heeftEchteAovVerzekering ? aov : 0)) * (vakantiegeldEffectiefPct / 100);
-  const nettoJaarBerekend = winstVoorBelasting - inkomstenbelasting - wwBuffer - zzpCalc.zvwPremie;
+  // Netto = belastbaar inkomen (na aftrekposten) - belasting - WW buffer - Zvw-premie
+  // Aftrekposten (zelfstandigenaftrek + MKB-vrijstelling) zijn al afgetrokken in belastbaarInkomen
+  const nettoJaarBerekend = belastbaarInkomen - inkomstenbelasting - wwBuffer - zzpCalc.zvwPremie;
   
   // Employee calculations for comparison
   const pensionEmployee = (inputs as any).pensionEmployee ?? 7.5;

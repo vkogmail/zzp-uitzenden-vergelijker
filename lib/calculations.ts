@@ -275,9 +275,10 @@ export function calculateZzp(inputs: CalculatorInputs): ZzpResult {
 
   // === Stap 9: Netto resultaat ===
   const winstNaBelasting = winstVoorBelasting - inkomstenbelasting; // for reporting parity
-  // Netto = winst voor belasting - belasting - WW buffer - Zvw-premie
+  // Netto = belastbaar inkomen (na aftrekposten) - belasting - WW buffer - Zvw-premie
+  // Aftrekposten (zelfstandigenaftrek + MKB-vrijstelling) zijn al afgetrokken in belastbaarInkomen
   // Vakantiegeld blijft beschikbaar voor eigen toekenning en wordt niet apart afgetrokken
-  const nettoJaar = winstVoorBelasting - inkomstenbelasting - wwBuffer - zvwPremie;
+  const nettoJaar = belastbaarInkomen - inkomstenbelasting - wwBuffer - zvwPremie;
   const nettoMaand = nettoJaar / 12;
 
   return {
