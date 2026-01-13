@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { CalculatorInputs, ComparisonResult, calculateZzp, calculateEmployee, calculateIncomeTax, formatCurrency, formatCurrencyWithDecimals, getWorkableAnnualHours, getActivePresetConfig } from "@/lib/calculations";
+import VisualBreakdown from "./VisualBreakdown";
 
 interface DetailedResultsProps {
   data: ComparisonResult;
@@ -302,6 +303,11 @@ export default function DetailedResults({ data, inputs }: DetailedResultsProps) 
             )}
           </div>
         </div>
+      </div>
+
+      {/* Visual Breakdown Component */}
+      <div className="mb-6">
+        <VisualBreakdown data={data} inputs={inputs} />
       </div>
 
       {/* Tab Navigation - Mobile Only */}

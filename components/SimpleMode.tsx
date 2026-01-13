@@ -1,6 +1,7 @@
 "use client";
 
-import { CalculatorInputs, calculateAll, formatCurrency, formatCurrencyWithDecimals } from "@/lib/calculations";
+import { CalculatorInputs, calculateAll, formatCurrency, formatCurrencyWithDecimals, ComparisonResult } from "@/lib/calculations";
+import VisualBreakdown from "./VisualBreakdown";
 
 interface SimpleModeProps {
   inputs: CalculatorInputs;
@@ -8,7 +9,7 @@ interface SimpleModeProps {
 }
 
 export default function SimpleMode({ inputs }: SimpleModeProps) {
-  const result = calculateAll(inputs);
+  const result: ComparisonResult = calculateAll(inputs);
   
   // Bereken max waarde voor de bars (hoogste waarde = 100%)
   const maxValue = Math.max(result.zzp.nettoMaand, result.emp.nettoMaand);
@@ -23,72 +24,8 @@ export default function SimpleMode({ inputs }: SimpleModeProps) {
 
   return (
     <div className="space-y-0">
-      {/* Resultaat vergelijking - groot en duidelijk */}
-      <div className="rounded-2xl border-2 border-gray-200 bg-gradient-to-br from-white to-gray-50 p-8" style={{ boxShadow: '0 2px 4px 0 rgba(13, 13, 18, 0.05)' }}>
-        <h2 className="text-xl font-bold text-gray-800 mb-6 text-center">
-          Wat krijg je netto per maand?
-        </h2>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          {/* ZZP Result */}
-          <div className={`rounded-xl p-6 border-2 ${
-            result.zzp.nettoMaand > result.emp.nettoMaand 
-              ? 'bg-green-50 border-green-400' 
-              : 'bg-white border-gray-200'
-          }`}>
-            <div className="text-sm text-gray-600 mb-1 font-medium">Als ZZP'er:</div>
-            <div className="text-4xl font-bold text-gray-900 mb-2">
-              {formatCurrencyWithDecimals(result.zzp.nettoMaand)}
-            </div>
-            <div className="text-xs text-gray-500 mb-3">
-              per maand • {formatCurrency(result.zzp.nettoJaar)} per jaar
-            </div>
-            <div className="text-xs text-gray-500 mb-4">
-              Inclusief zelf toegekend vakantiegeld van {formatCurrency(result.zzp.vakantiegeld)} per jaar.
-            </div>
-            {/* Bar */}
-            <div className="w-full h-4 rounded-full overflow-hidden mt-2" style={{ backgroundColor: zzpIsLower ? '#e5e7eb' : 'transparent' }}>
-              <div 
-                className="h-full rounded-full transition-all duration-300"
-                style={{ 
-                  width: `${zzpBarPercentage}%`, 
-                  minWidth: '4px',
-                  backgroundColor: zzpBarColor,
-                  height: '100%'
-                }}
-              />
-            </div>
-          </div>
-
-          {/* Detacheren Result */}
-          <div className={`rounded-xl p-6 border-2 ${
-            result.emp.nettoMaand > result.zzp.nettoMaand 
-              ? 'bg-green-50 border-green-400' 
-              : 'bg-white border-gray-200'
-          }`}>
-            <div className="text-sm text-gray-600 mb-1 font-medium">Als gedetacheerde:</div>
-            <div className="text-4xl font-bold text-gray-900 mb-2">
-              {formatCurrencyWithDecimals(result.emp.nettoMaand)}
-            </div>
-            <div className="text-xs text-gray-500 mb-3">
-              per maand • {formatCurrency(result.emp.nettoJaar)} per jaar
-            </div>
-            {/* Bar */}
-            <div className="w-full h-4 rounded-full overflow-hidden mt-2" style={{ backgroundColor: !zzpIsLower ? '#e5e7eb' : 'transparent' }}>
-              <div 
-                className="h-full rounded-full transition-all duration-300"
-                style={{ 
-                  width: `${empBarPercentage}%`, 
-                  minWidth: '4px',
-                  backgroundColor: empBarColor,
-                  height: '100%'
-                }}
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-
+      {/* Visual Breakdown Component - includes comparison cards */}
+      <VisualBreakdown data={result} inputs={inputs} />
     </div>
   );
 }

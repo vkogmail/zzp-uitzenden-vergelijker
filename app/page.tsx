@@ -252,8 +252,8 @@ export default function Home() {
             </div>
           </div>
           
-          {/* Toggle Switch */}
-          <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
+          {/* Toggle Switch - Hidden for now, but keeping code for potential future use */}
+          {/* <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
             <div className="flex items-center justify-center gap-4 mb-2">
               <span className={`text-sm md:text-base font-medium transition-colors ${isSimpleMode ? 'text-gray-900' : 'text-gray-500'}`}>
                 Eenvoudig
@@ -276,7 +276,7 @@ export default function Home() {
                 ? "Snelle vergelijking met basisinstellingen - zie alleen het belangrijkste verschil"
                 : "Uitgebreide vergelijking met alle berekeningen, marges, werkgeverslasten en gedetailleerde breakdowns"}
             </p>
-          </div>
+          </div> */}
         </section>
 
         {isSimpleMode ? (
