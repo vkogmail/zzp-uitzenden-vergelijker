@@ -25,17 +25,10 @@ const rebondGrotesque = localFont({
       weight: "700",
       style: "normal",
     },
-    {
-      path: "../public/fonts/Rebond-Woff2/RebondGrotesque-Extrabold.woff2",
-      weight: "800",
-      style: "normal",
-    },
   ],
   display: "swap",
   adjustFontFallback: false,
   variable: "--font-rebond",
-  preload: true,
-  fallback: ["system-ui", "sans-serif"],
 });
 
 const geistSans = Geist({
@@ -90,7 +83,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${rebondGrotesque.variable} ${rebondGrotesque.className}`}>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased p-6`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         {children}
       </body>
     </html>
