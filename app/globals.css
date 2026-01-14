@@ -316,7 +316,34 @@ h2.text-lg.font-bold {
 @utility safe-area-bottom { padding-bottom: env(safe-area-inset-bottom); }
 @utility touch-manipulation { touch-action: manipulation; }
 
-/* 7) Notes:
+/* 7) Accordion animations for shadcn/ui components */
+@keyframes accordion-down {
+  from {
+    height: 0;
+  }
+  to {
+    height: var(--radix-accordion-content-height);
+  }
+}
+
+@keyframes accordion-up {
+  from {
+    height: var(--radix-accordion-content-height);
+  }
+  to {
+    height: 0;
+  }
+}
+
+@utility animate-accordion-down {
+  animation: accordion-down 0.2s ease-out;
+}
+
+@utility animate-accordion-up {
+  animation: accordion-up 0.2s ease-out;
+}
+
+/* 8) Notes:
    - You can now use native Tailwind utilities instead of custom color classes:
      bg-blue-50, border-blue-200, text-blue-900/800/700/600/500,
      text-gray-900/600/500, text-cyan-600, bg-amber-50, text-violet-700, etc.

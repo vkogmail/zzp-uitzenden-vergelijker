@@ -150,7 +150,21 @@ export default function VisualBreakdown({ data, inputs }: VisualBreakdownProps) 
     arbeidskortingEmp = 4000 * (1 - (belastbaarBedragEmp - 40000) / 90000);
   }
   const loonbelasting = Math.max(0, brutoBelastingEmp - algemeneHeffingskortingEmp - arbeidskortingEmp);
+  // Calculate annual client rate: rate per hour * annual hours
+  // Should be: 100 * 1836 = 183,600 (for 36 hours/week in 2026)
   const clientRateEmpAnnual = clientRateEmp * empAnnualHours;
+  
+  // Debug: verify calculation
+  if (process.env.NODE_ENV === 'development') {
+    console.log('VisualBreakdown Debug:', {
+      clientRateEmp,
+      empAnnualHours,
+      theoreticalAnnualHours,
+      hoursPerWeek,
+      clientRateEmpAnnual,
+      expected: clientRateEmp * empAnnualHours
+    });
+  }
 
   // Calculate employer cost breakdown components
   const werkgeverPremies = brutoSalaris * (
@@ -164,79 +178,100 @@ export default function VisualBreakdown({ data, inputs }: VisualBreakdownProps) 
   const reserveringen = vakantiegeldEmp;
   const pensioenWerkgever = brutoSalaris * ((cfgEmployer?.pensionEmployerPct ?? 0) / 100);
 
-  // Build segments for Detacheren - matching sketch structure
+  // Convert annual values to hourly for breakdown display (matching sketch)
+  // Sketch shows: 100 (client) → 85 (after margin) → 42.50 (gross) → 27.20 (net)
+  const clientRatePerHour = clientRateEmp; // Already per hour
+  const feePerHour = fee / empAnnualHours;
+  const tariefKandidaatPerHour = clientRatePerHour - feePerHour; // After margin deduction
+  const werkgeverPremiesPerHour = werkgeverPremies / empAnnualHours;
+  const werkgeverBelastingenPerHour = werkgeverBelastingen / empAnnualHours;
+  const reserveringenPerHour = reserveringen / empAnnualHours;
+  const pensioenWerkgeverPerHour = pensioenWerkgever / empAnnualHours;
+  const brutoLoonPerHour = brutoSalaris / empAnnualHours;
+  const pensioenWerknemerPerHour = pensioenWerknemer / empAnnualHours;
+  const loonheffingPerHour = loonbelasting / empAnnualHours;
+  const nettoPerHour = data.emp.nettoJaar / empAnnualHours;
+
+  // Build segments for Detacheren - matching sketch structure (HOURLY values)
   const empSegments: BreakdownSegment[] = [
     {
       id: "client-rate",
       label: "Klanttarief",
-      value: clientRateEmpAnnual,
+      value: clientRatePerHour, // Per hour (e.g., 100)
       color: "#10b981", // green
       percentage: 100,
     },
     {
       id: "margin",
       label: "Marge & Admin (CN)",
-      value: fee,
+      value: feePerHour,
       color: "#10b981", // green
-      percentage: (fee / clientRateEmpAnnual) * 100,
+      percentage: (feePerHour / clientRatePerHour) * 100,
       details: [
-        { label: `Marge (${marginPct}%)`, value: fee, percentage: marginPct },
+        { label: `Marge (${marginPct}%)`, value: feePerHour, percentage: marginPct },
       ],
     },
     {
       id: "werkgever-premies",
       label: "Werkgever premies",
-      value: werkgeverPremies,
+      value: werkgeverPremiesPerHour,
       color: "#06b6d4", // teal
-      percentage: (werkgeverPremies / clientRateEmpAnnual) * 100,
+      percentage: (werkgeverPremiesPerHour / clientRatePerHour) * 100,
       details: hasDetailedComponents ? [
-        { label: `AZV (Ziektewet)`, value: brutoSalaris * ((cfgEmployer?.azvPct ?? 0) / 100), percentage: cfgEmployer?.azvPct ?? 0 },
-        { label: `ZVW (Zorg)`, value: brutoSalaris * ((cfgEmployer?.zvwPct ?? 0) / 100), percentage: cfgEmployer?.zvwPct ?? 0 },
-        { label: `WhK WGA/ZW`, value: brutoSalaris * (((cfgEmployer?.whkWgaPct ?? 0) + (cfgEmployer?.whkZwFlexPct ?? 0)) / 100), percentage: (cfgEmployer?.whkWgaPct ?? 0) + (cfgEmployer?.whkZwFlexPct ?? 0) },
-        { label: `WW (Werkloosheid)`, value: brutoSalaris * ((cfgEmployer?.wwPct ?? 0) / 100), percentage: cfgEmployer?.wwPct ?? 0 },
-        { label: `Aof (Basis)`, value: brutoSalaris * ((cfgEmployer?.aofPct ?? 0) / 100), percentage: cfgEmployer?.aofPct ?? 0 },
+        { label: `AZV (Ziektewet)`, value: (brutoSalaris * ((cfgEmployer?.azvPct ?? 0) / 100)) / empAnnualHours, percentage: cfgEmployer?.azvPct ?? 0 },
+        { label: `ZVW (Zorg)`, value: (brutoSalaris * ((cfgEmployer?.zvwPct ?? 0) / 100)) / empAnnualHours, percentage: cfgEmployer?.zvwPct ?? 0 },
+        { label: `WhK WGA/ZW`, value: (brutoSalaris * (((cfgEmployer?.whkWgaPct ?? 0) + (cfgEmployer?.whkZwFlexPct ?? 0)) / 100)) / empAnnualHours, percentage: (cfgEmployer?.whkWgaPct ?? 0) + (cfgEmployer?.whkZwFlexPct ?? 0) },
+        { label: `WW (Werkloosheid)`, value: (brutoSalaris * ((cfgEmployer?.wwPct ?? 0) / 100)) / empAnnualHours, percentage: cfgEmployer?.wwPct ?? 0 },
+        { label: `Aof (Basis)`, value: (brutoSalaris * ((cfgEmployer?.aofPct ?? 0) / 100)) / empAnnualHours, percentage: cfgEmployer?.aofPct ?? 0 },
       ] : [
-        { label: `Werkgever premies`, value: werkgeverPremies },
+        { label: `Werkgever premies`, value: werkgeverPremiesPerHour },
       ],
     },
     {
       id: "werkgever-belastingen",
       label: "Werkgever Belastingen",
-      value: werkgeverBelastingen,
+      value: werkgeverBelastingenPerHour,
       color: "#06b6d4", // teal
-      percentage: (werkgeverBelastingen / clientRateEmpAnnual) * 100,
+      percentage: (werkgeverBelastingenPerHour / clientRatePerHour) * 100,
     },
     {
       id: "reserveringen",
       label: "Reserveringen (o.a. vak geld 10% dagen 8%)",
-      value: reserveringen,
+      value: reserveringenPerHour,
       color: "#ec4899", // pink - future benefit
-      percentage: (reserveringen / clientRateEmpAnnual) * 100,
+      percentage: (reserveringenPerHour / clientRatePerHour) * 100,
       isFutureBenefit: true,
       details: [
-        { label: `Vakantiegeld`, value: vakantiegeldEmp, percentage: vakantiegeldPct },
+        { label: `Vakantiegeld`, value: reserveringenPerHour, percentage: vakantiegeldPct },
       ],
     },
     {
       id: "pensioen-werkgever",
       label: "Pensioen (werkgever)",
-      value: pensioenWerkgever,
+      value: pensioenWerkgeverPerHour,
       color: "#ec4899", // pink - future benefit
-      percentage: (pensioenWerkgever / clientRateEmpAnnual) * 100,
+      percentage: (pensioenWerkgeverPerHour / clientRatePerHour) * 100,
       isFutureBenefit: true,
       details: [
-        { label: `Pensioen werkgever`, value: pensioenWerkgever, percentage: cfgEmployer?.pensionEmployerPct ?? 0 },
+        { label: `Pensioen werkgever`, value: pensioenWerkgeverPerHour, percentage: cfgEmployer?.pensionEmployerPct ?? 0 },
       ],
+    },
+    {
+      id: "bruto-loon",
+      label: "Bruto Loon (Salaris)",
+      value: brutoLoonPerHour,
+      color: "#3b82f6", // blue - gross salary
+      percentage: (brutoLoonPerHour / clientRatePerHour) * 100,
     },
     {
       id: "pensioen-werknemer",
       label: "Pensioen (Werknemer)",
-      value: pensioenWerknemer,
+      value: pensioenWerknemerPerHour,
       color: "#ec4899", // pink - future benefit
-      percentage: (pensioenWerknemer / clientRateEmpAnnual) * 100,
+      percentage: (pensioenWerknemerPerHour / clientRatePerHour) * 100,
       isFutureBenefit: true,
       details: [
-        { label: `Pensioen werknemer (${pensionEmployee}% op ${pensionBaseActual}%)`, value: pensioenWerknemer },
+        { label: `Pensioen werknemer (${pensionEmployee}% op ${pensionBaseActual}%)`, value: pensioenWerknemerPerHour },
       ],
     },
     {
@@ -249,111 +284,121 @@ export default function VisualBreakdown({ data, inputs }: VisualBreakdownProps) 
     {
       id: "loonheffing",
       label: "Loonheffing",
-      value: loonbelasting,
+      value: loonheffingPerHour,
       color: "#64748b", // gray
-      percentage: (loonbelasting / clientRateEmpAnnual) * 100,
+      percentage: (loonheffingPerHour / clientRatePerHour) * 100,
       details: [
-        { label: "Belastbaar bedrag", value: belastbaarBedragEmp },
-        { label: "Bruto belasting", value: brutoBelastingEmp },
-        { label: "Algemene heffingskorting", value: -algemeneHeffingskortingEmp },
-        { label: "Arbeidskorting", value: -arbeidskortingEmp },
-        { label: "Loonheffing", value: loonbelasting },
+        { label: "Belastbaar bedrag", value: belastbaarBedragEmp / empAnnualHours },
+        { label: "Bruto belasting", value: brutoBelastingEmp / empAnnualHours },
+        { label: "Algemene heffingskorting", value: -algemeneHeffingskortingEmp / empAnnualHours },
+        { label: "Arbeidskorting", value: -arbeidskortingEmp / empAnnualHours },
+        { label: "Loonheffing", value: loonheffingPerHour },
       ],
     },
     {
       id: "net-income",
       label: "Netto Inkomen",
-      value: data.emp.nettoJaar,
+      value: nettoPerHour,
       color: "#9333ea", // purple - direct income
-      percentage: (data.emp.nettoJaar / clientRateEmpAnnual) * 100,
+      percentage: (nettoPerHour / clientRatePerHour) * 100,
       isDirectIncome: true,
     },
   ];
 
-  // Build segments for ZZP - matching sketch structure
+  // Convert annual values to hourly for ZZP breakdown display (matching sketch)
+  const clientRateZzpPerHour = clientRateZzp; // Already per hour
+  const marginZzpPerHour = clientRateZzpPerHour * (marginZzp / 100);
+  const bedrijfskostenPerHour = bedrijfskosten / zzpPaidHours;
+  const pensioenPerHour = pensioen / zzpPaidHours;
+  const reserveringenZzpPerHour = (wwBuffer + zzpCalc.vakantiegeld) / zzpPaidHours;
+  const inkomstenbelastingPerHour = inkomstenbelasting / zzpPaidHours;
+  const zvwPremiePerHour = zzpCalc.zvwPremie / zzpPaidHours;
+  const nettoZzpPerHour = data.zzp.nettoJaar / zzpPaidHours;
+
+  // Build segments for ZZP - matching sketch structure (HOURLY values)
   const zzpSegments: BreakdownSegment[] = [
     {
       id: "client-rate",
       label: "Klanttarief",
-      value: clientRateZzpAnnual,
+      value: clientRateZzpPerHour, // Per hour (e.g., 100)
       color: "#10b981", // green
       percentage: 100,
     },
     {
       id: "margin",
       label: "Marge & Admin",
-      value: clientRateZzpAnnual * (marginZzp / 100),
+      value: marginZzpPerHour,
       color: "#10b981", // green
       percentage: (marginZzp / 100) * 100,
       details: [
-        { label: "Marge", value: clientRateZzpAnnual * (marginZzp / 100), percentage: marginZzp },
+        { label: "Marge", value: marginZzpPerHour, percentage: marginZzp },
       ],
     },
     {
       id: "bedrijfskosten",
       label: "Bedrijfskosten",
-      value: bedrijfskosten,
+      value: bedrijfskostenPerHour,
       color: "#06b6d4", // teal
-      percentage: (bedrijfskosten / clientRateZzpAnnual) * 100,
+      percentage: (bedrijfskostenPerHour / clientRateZzpPerHour) * 100,
       details: [
-        { label: `Bedrijfskosten (${costsPct}%)`, value: bedrijfskosten, percentage: costsPct },
+        { label: `Bedrijfskosten (${costsPct}%)`, value: bedrijfskostenPerHour, percentage: costsPct },
       ],
     },
     {
       id: "pensioen",
       label: "Pensioen Premie",
-      value: pensioen,
+      value: pensioenPerHour,
       color: "#ec4899", // pink - future benefit
-      percentage: (pensioen / clientRateZzpAnnual) * 100,
+      percentage: (pensioenPerHour / clientRateZzpPerHour) * 100,
       isFutureBenefit: true,
       details: [
-        { label: `Pensioen (${pensionTotalPct}% op ${pensionBasePct}%)`, value: pensioen },
+        { label: `Pensioen (${pensionTotalPct}% op ${pensionBasePct}%)`, value: pensioenPerHour },
       ],
     },
     {
       id: "reserveringen",
       label: "Reserveringen (WW buffer, vakantiegeld)",
-      value: wwBuffer + zzpCalc.vakantiegeld,
+      value: reserveringenZzpPerHour,
       color: "#ec4899", // pink - future benefit
-      percentage: ((wwBuffer + zzpCalc.vakantiegeld) / clientRateZzpAnnual) * 100,
+      percentage: (reserveringenZzpPerHour / clientRateZzpPerHour) * 100,
       isFutureBenefit: true,
       details: [
-        { label: "WW buffer (3%)", value: wwBuffer },
-        { label: "Vakantiegeld", value: zzpCalc.vakantiegeld },
+        { label: "WW buffer (3%)", value: wwBuffer / zzpPaidHours },
+        { label: "Vakantiegeld", value: zzpCalc.vakantiegeld / zzpPaidHours },
       ],
     },
     {
       id: "belastingen",
       label: "Belastingen",
-      value: inkomstenbelasting,
+      value: inkomstenbelastingPerHour,
       color: "#64748b", // gray
-      percentage: (inkomstenbelasting / clientRateZzpAnnual) * 100,
+      percentage: (inkomstenbelastingPerHour / clientRateZzpPerHour) * 100,
       details: [
-        { label: "Zelfstandigenaftrek", value: -zelfstandigenaftrek },
-        { label: "MKB-vrijstelling", value: -mkbVrijstelling },
-        { label: "Belastbaar inkomen", value: belastbaarInkomen },
-        { label: "Bruto belasting", value: brutoBelasting },
-        { label: "Algemene heffingskorting", value: -algemeneHeffingskorting },
-        { label: "Arbeidskorting", value: -arbeidskorting },
-        { label: "Inkomstenbelasting", value: inkomstenbelasting },
+        { label: "Zelfstandigenaftrek", value: -zelfstandigenaftrek / zzpPaidHours },
+        { label: "MKB-vrijstelling", value: -mkbVrijstelling / zzpPaidHours },
+        { label: "Belastbaar inkomen", value: belastbaarInkomen / zzpPaidHours },
+        { label: "Bruto belasting", value: brutoBelasting / zzpPaidHours },
+        { label: "Algemene heffingskorting", value: -algemeneHeffingskorting / zzpPaidHours },
+        { label: "Arbeidskorting", value: -arbeidskorting / zzpPaidHours },
+        { label: "Inkomstenbelasting", value: inkomstenbelastingPerHour },
       ],
     },
     {
       id: "zvw-premie",
       label: "ZVW premie",
-      value: zzpCalc.zvwPremie,
+      value: zvwPremiePerHour,
       color: "#64748b", // gray
-      percentage: (zzpCalc.zvwPremie / clientRateZzpAnnual) * 100,
+      percentage: (zvwPremiePerHour / clientRateZzpPerHour) * 100,
       details: [
-        { label: "ZVW premie", value: zzpCalc.zvwPremie },
+        { label: "ZVW premie", value: zvwPremiePerHour },
       ],
     },
     {
       id: "net-income",
       label: "Netto Inkomen",
-      value: data.zzp.nettoJaar,
+      value: nettoZzpPerHour,
       color: "#9333ea", // purple - direct income
-      percentage: (data.zzp.nettoJaar / clientRateZzpAnnual) * 100,
+      percentage: (nettoZzpPerHour / clientRateZzpPerHour) * 100,
       isDirectIncome: true,
     },
   ];
@@ -412,106 +457,109 @@ export default function VisualBreakdown({ data, inputs }: VisualBreakdownProps) 
         </h3>
       </div>
 
-      <div className="flex flex-col md:flex-row gap-6">
-        {/* Stacked Bar Chart (Left) - Flow from top to bottom with inline expansion */}
-        <div className="flex-1">
-          <div className="space-y-2">
-            {segments.slice(1).map((segment, index) => {
-              const heightPercentage = (segment.value / totalValue) * 100;
-              const minHeight = Math.max(heightPercentage * 3, 32); // Scale for visibility, minimum 32px
-              const isExpanded = expandedSegment === segment.id;
-              
-              return (
-                <div key={segment.id} className="space-y-2">
-                  <button
-                    onClick={() => segment.details && toggleSegment(segment.id)}
-                    className={`w-full rounded-lg transition-all relative ${
-                      segment.details ? "cursor-pointer hover:opacity-90 active:opacity-80" : "cursor-default"
-                    } ${
-                      isExpanded ? "ring-2 ring-gray-400 ring-offset-1" : ""
-                    }`}
-                    style={{
-                      height: `${minHeight}px`,
-                      backgroundColor: segment.color,
-                    }}
-                  >
-                    <div className="absolute inset-0 flex items-center justify-between px-3 text-white text-xs font-medium">
-                      <span className="font-semibold truncate">{segment.label}</span>
-                      <span className="ml-2 whitespace-nowrap">{formatCurrency(segment.value)}</span>
-                    </div>
-                  </button>
-                  
-                  {/* Expanded Details - Accordion style, expands inline below the clicked segment */}
-                  {isExpanded && segment.details && (
-                    <div className="p-4 bg-gray-50 rounded-lg border border-gray-200 transition-all animate-in slide-in-from-top-2">
-                      <h4 className="text-sm font-semibold text-gray-900 mb-3">{segment.label}</h4>
-                      <div className="space-y-2">
-                        {segment.details.map((detail, detailIndex) => (
-                          <div key={detailIndex} className="flex justify-between items-center">
-                            <div className="flex items-center gap-2">
-                              <div
-                                className="w-3 h-3 rounded-full flex-shrink-0"
-                                style={{ backgroundColor: segment.color }}
-                              />
-                              <span className="text-sm text-gray-700">{detail.label}</span>
-                              {detail.percentage !== undefined && (
-                                <span className="text-xs text-gray-500">({detail.percentage.toFixed(2)}%)</span>
-                              )}
-                            </div>
-                            <span className="text-sm font-medium text-gray-900">
-                              {formatCurrency(Math.abs(detail.value))}
-                            </span>
-                          </div>
-                        ))}
+      {/* Original Version */}
+      <div className="mb-8">
+        <div className="flex flex-col md:flex-row gap-6">
+          {/* Stacked Bar Chart (Left) - Flow from top to bottom with inline expansion */}
+          <div className="flex-1">
+            <div className="space-y-2">
+              {segments.slice(1).map((segment, index) => {
+                const heightPercentage = (segment.value / totalValue) * 100;
+                const minHeight = Math.max(heightPercentage * 3, 32); // Scale for visibility, minimum 32px
+                const isExpanded = expandedSegment === segment.id;
+                
+                return (
+                  <div key={segment.id} className="space-y-2">
+                    <button
+                      onClick={() => segment.details && toggleSegment(segment.id)}
+                      className={`w-full rounded-lg transition-all relative ${
+                        segment.details ? "cursor-pointer hover:opacity-90 active:opacity-80" : "cursor-default"
+                      } ${
+                        isExpanded ? "ring-2 ring-gray-400 ring-offset-1" : ""
+                      }`}
+                      style={{
+                        height: `${minHeight}px`,
+                        backgroundColor: segment.color,
+                      }}
+                    >
+                      <div className="absolute inset-0 flex items-center justify-between px-3 text-white text-xs font-medium">
+                        <span className="font-semibold truncate">{segment.label}</span>
+                        <span className="ml-2 whitespace-nowrap">{formatCurrency(segment.value)}</span>
                       </div>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Financial Breakdown (Right) */}
-        <div className="flex-1 space-y-4">
-          <div>
-            <div className="text-sm font-semibold text-gray-900 mb-2">Klanttarief</div>
-            <div className="text-2xl font-bold text-gray-900">
-              {formatCurrency(totalValue)}
+                    </button>
+                    
+                    {/* Expanded Details - Accordion style, expands inline below the clicked segment */}
+                    {isExpanded && segment.details && (
+                      <div className="p-4 bg-gray-50 rounded-lg border border-gray-200 transition-all animate-in slide-in-from-top-2">
+                        <h4 className="text-sm font-semibold text-gray-900 mb-3">{segment.label}</h4>
+                        <div className="space-y-2">
+                          {segment.details.map((detail, detailIndex) => (
+                            <div key={detailIndex} className="flex justify-between items-center">
+                              <div className="flex items-center gap-2">
+                                <div
+                                  className="w-3 h-3 rounded-full flex-shrink-0"
+                                  style={{ backgroundColor: segment.color }}
+                                />
+                                <span className="text-sm text-gray-700">{detail.label}</span>
+                                {detail.percentage !== undefined && (
+                                  <span className="text-xs text-gray-500">({detail.percentage.toFixed(2)}%)</span>
+                                )}
+                              </div>
+                              <span className="text-sm font-medium text-gray-900">
+                                {formatCurrency(Math.abs(detail.value))}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
 
-          <div className="space-y-3">
-            {segments.slice(1, -1).map((segment) => (
-              <div key={segment.id} className="flex items-center justify-between">
+          {/* Financial Breakdown (Right) */}
+          <div className="flex-1 space-y-4">
+            <div>
+              <div className="text-sm font-semibold text-gray-900 mb-2">Klanttarief</div>
+              <div className="text-2xl font-bold text-gray-900">
+                {formatCurrency(totalValue)}
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              {segments.slice(1, -1).map((segment) => (
+                <div key={segment.id} className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div
+                      className="w-3 h-3 rounded-full"
+                      style={{ backgroundColor: segment.color }}
+                    />
+                    <span className="text-sm text-gray-700">{segment.label}</span>
+                  </div>
+                  <span className="text-sm font-medium text-gray-900">
+                    {formatCurrency(segment.value)}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            <div className="pt-3 border-t border-gray-200">
+              <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div
                     className="w-3 h-3 rounded-full"
-                    style={{ backgroundColor: segment.color }}
+                    style={{ backgroundColor: segments[segments.length - 1].color }}
                   />
-                  <span className="text-sm text-gray-700">{segment.label}</span>
+                  <span className="text-sm font-semibold text-gray-900">
+                    {segments[segments.length - 1].label}
+                  </span>
                 </div>
-                <span className="text-sm font-medium text-gray-900">
-                  {formatCurrency(segment.value)}
+                <span className="text-lg font-bold text-gray-900">
+                  {formatCurrency(segments[segments.length - 1].value)}
                 </span>
               </div>
-            ))}
-          </div>
-
-          <div className="pt-3 border-t border-gray-200">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div
-                  className="w-3 h-3 rounded-full"
-                  style={{ backgroundColor: segments[segments.length - 1].color }}
-                />
-                <span className="text-sm font-semibold text-gray-900">
-                  {segments[segments.length - 1].label}
-                </span>
-              </div>
-              <span className="text-lg font-bold text-gray-900">
-                {formatCurrency(segments[segments.length - 1].value)}
-              </span>
             </div>
           </div>
         </div>

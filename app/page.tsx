@@ -5,6 +5,7 @@ import Calculator from "@/components/Calculator";
 import SimpleMode from "@/components/SimpleMode";
 import DetailedResults from "@/components/DetailedResults";
 import StickyComparisonFooter from "@/components/StickyComparisonFooter";
+import FigmaCalculator from "@/components/FigmaCalculator";
 import { CalculatorInputs, calculateAll, defaultInputs, formatCurrency, formatCurrencyWithDecimals, formatPercent, getWorkableAnnualHours, setActivePresetConfig, getActivePresetConfig, getDerivedEmployerCostsPct } from "@/lib/calculations";
 import BASELINE from "@/data/presets/current_2025_baseline.json";
 import STIPP_BASIS_2026 from "@/data/presets/stipp_basis_2026_draft.json";
@@ -79,6 +80,11 @@ export default function Home() {
         </nav>
       </div>
       
+      {/* FigmaMake Calculator */}
+      <FigmaCalculator />
+      
+      {/* Original Calculator (hidden for now) */}
+      {false && (
       <div className={`mx-auto max-w-4xl px-4 py-10 ${isSimpleMode ? 'pb-10' : 'pb-72'}`}>
         <header className="mb-4">
           <h1 className="ty-h1 text-center mb-3">
@@ -351,6 +357,7 @@ export default function Home() {
           </div>
         </section>
       </div>
+      )}
       
       {/* Sticky Comparison Footer - Only in Expert Mode */}
       {!isSimpleMode && <StickyComparisonFooter data={result} inputs={inputs} />}
