@@ -26,10 +26,11 @@ const rebondGrotesque = localFont({
       style: "normal",
     },
   ],
-        display: "swap",
-        adjustFontFallback: false,
-        variable: "--font-rebond",
-      });
+  display: "swap",
+  adjustFontFallback: false,
+  variable: "--font-rebond",
+  preload: true,
+});
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -82,8 +83,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${rebondGrotesque.variable} ${rebondGrotesque.className}`}>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+    <html lang="en" className={`${rebondGrotesque.variable} ${geistSans.variable} ${geistMono.variable}`}>
+      <body className={`${geistSans.className} antialiased`}>
         {children}
       </body>
     </html>

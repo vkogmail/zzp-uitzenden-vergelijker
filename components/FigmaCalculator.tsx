@@ -129,7 +129,7 @@ export default function FigmaCalculator() {
 
   return (
     <TooltipProvider>
-    <div className="min-h-screen bg-gray-50 font-sans text-gray-900 pb-20">
+    <div className="min-h-screen bg-gray-50 font-[var(--font-geist-sans)] text-gray-900 pb-20">
       
       {/* Fixed Configuration Button */}
       <button
