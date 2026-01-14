@@ -286,8 +286,16 @@ body {
   text-decoration-thickness: 1px;
 }
 
-/* 6) Force Rebond Grotesque on large currency numbers */
-.text-4xl.font-bold {
+/* 6) Force Rebond Grotesque on large headings and currency numbers */
+h1,
+.text-4xl.font-bold,
+.text-4xl.font-extrabold,
+.text-5xl.font-bold,
+.text-5xl.font-extrabold,
+.text-3xl.font-bold:not(h2),
+.text-3xl.font-extrabold:not(h2),
+.text-2xl.font-bold:not(h2),
+.text-2xl.font-extrabold:not(h2) {
   font-family: "Rebond Grotesque", rebondGrotesque, var(--font-rebond), var(--font-fallback-sans) !important;
 }
 
@@ -308,7 +316,9 @@ body {
 /* Force Geist on h2 elements - must be after the Rebond rules */
 h2,
 h2.text-xl.font-bold,
-h2.text-lg.font-bold {
+h2.text-lg.font-bold,
+h2.text-3xl.font-bold,
+h2.text-2xl.font-bold {
   font-family: var(--font-geist-sans), "Geist Variable", "Geist", var(--font-fallback-sans) !important;
 }
 
