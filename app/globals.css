@@ -287,8 +287,8 @@ body {
 }
 
 /* 6) Force Rebond Grotesque on large headings and currency numbers */
-/* Match CNDS playground approach: use rebondGrotesque first (Next.js generated name) */
-/* Now includes Extrabold (800) weight - matches CNDS setup */
+/* CNDS approach: Use rebondGrotesque directly (Next.js generated font name from className) */
+/* The rebondGrotesque.className on html sets font-family: rebondGrotesque */
 h1,
 h1.text-4xl,
 h1.text-5xl,
@@ -300,21 +300,21 @@ h1.text-5xl,
 .text-3xl.font-extrabold:not(h2),
 .text-2xl.font-bold:not(h2),
 .text-2xl.font-extrabold:not(h2) {
-  font-family: rebondGrotesque, "Rebond Grotesque", var(--font-rebond), var(--font-fallback-sans) !important;
+  font-family: rebondGrotesque !important;
 }
 
 /* Medium currency numbers - need to handle responsive classes */
 /* Exclude h2 elements from Rebond Grotesque */
-/* Match CNDS approach: include var(--font-rebond) in fallback chain */
+/* CNDS approach: Use rebondGrotesque directly */
 .text-lg.font-bold:not(h2),
 .text-xl.font-bold:not(h2) {
-  font-family: rebondGrotesque, "Rebond Grotesque", var(--font-rebond), var(--font-fallback-sans) !important;
+  font-family: rebondGrotesque !important;
 }
 
 @media (min-width: 768px) {
   .text-lg.md\:text-xl.font-bold:not(h2),
   .md\:text-xl.font-bold:not(h2) {
-    font-family: rebondGrotesque, "Rebond Grotesque", var(--font-rebond), var(--font-fallback-sans) !important;
+    font-family: rebondGrotesque !important;
   }
 }
 
