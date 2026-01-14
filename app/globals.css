@@ -294,6 +294,7 @@ body {
 /* Use multiple selectors to ensure we catch all h1 variations */
 /* Place this AFTER other font rules to ensure it takes precedence */
 /* IMPORTANT: All h1 elements should use Semibold (600) */
+/* Try both font names to ensure Safari matches correctly */
 h1.text-4xl.font-extrabold,
 h1.text-5xl.font-extrabold,
 h1.text-4xl.md\:text-5xl.font-extrabold,
@@ -304,7 +305,7 @@ h1[class*="text-5xl"],
 h1.font-extrabold,
 h1.font-bold,
 h1 {
-  font-family: rebondGrotesque !important;
+  font-family: rebondGrotesque, "Rebond Grotesque" !important;
   font-weight: 600 !important; /* Force Semibold (600) for all h1 - override extrabold */
   /* Safari needs exact font-weight match to use correct @font-face (Semibold = 600) */
 }
