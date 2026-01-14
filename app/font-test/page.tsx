@@ -108,6 +108,36 @@ export default function FontTestPage() {
                 Sample text with "Rebond Grotesque"
               </span>
             </div>
+            
+            <div>
+              <span className="text-gray-600">Using rebondGrotesque directly:</span>
+              <span className="ml-2 text-gray-900" style={{ fontFamily: 'rebondGrotesque, sans-serif' }}>
+                Sample text with rebondGrotesque (no quotes)
+              </span>
+            </div>
+            
+            <div className="mt-4">
+              <p className="text-sm text-gray-600 mb-2">Font Loading API Check:</p>
+              <button 
+                onClick={async () => {
+                  if ('fonts' in document) {
+                    try {
+                      const loaded = await (document as any).fonts.check('1em rebondGrotesque');
+                      console.log('Font rebondGrotesque loaded:', loaded);
+                      alert(`Font rebondGrotesque is ${loaded ? 'LOADED ✓' : 'NOT LOADED ✗'}`);
+                    } catch (e) {
+                      console.error('Font check error:', e);
+                      alert('Error checking font: ' + e);
+                    }
+                  } else {
+                    alert('Font Loading API not supported in this browser');
+                  }
+                }}
+                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              >
+                Check if rebondGrotesque is Loaded
+              </button>
+            </div>
           </div>
         </section>
 
