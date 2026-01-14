@@ -291,6 +291,7 @@ body {
 /* The rebondGrotesque.className on html sets font-family: rebondGrotesque */
 /* Need high specificity to override Tailwind - use element + class combinations */
 /* H1 should use Semibold (600) weight - must override font-extrabold (800) */
+/* Use multiple selectors to ensure we catch all h1 variations */
 h1.text-4xl.font-extrabold,
 h1.text-5xl.font-extrabold,
 h1.text-4xl.md\:text-5xl.font-extrabold,
@@ -298,9 +299,11 @@ h1.text-4xl.font-bold,
 h1.text-5xl.font-bold,
 h1[class*="text-4xl"],
 h1[class*="text-5xl"],
+h1.font-extrabold,
+h1.font-bold,
 h1 {
   font-family: rebondGrotesque !important;
-  font-weight: 600 !important; /* Force Semibold (600) for all h1 */
+  font-weight: 600 !important; /* Force Semibold (600) for all h1 - override extrabold */
 }
 /* Other large text can use their specified weights */
 .text-4xl.font-bold,
