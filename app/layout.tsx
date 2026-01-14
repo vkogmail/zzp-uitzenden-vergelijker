@@ -25,6 +25,11 @@ const rebondGrotesque = localFont({
       weight: "700",
       style: "normal",
     },
+    {
+      path: "../public/fonts/Rebond-Woff2/RebondGrotesque-Extrabold.woff2",
+      weight: "800",
+      style: "normal",
+    },
   ],
   display: "swap",
   adjustFontFallback: false,
