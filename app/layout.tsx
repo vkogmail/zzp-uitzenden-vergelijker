@@ -30,6 +30,7 @@ const rebondGrotesque = localFont({
   adjustFontFallback: false,
   variable: "--font-rebond",
   preload: true,
+  fallback: ["system-ui", "sans-serif"],
 });
 
 const geistSans = Geist({
