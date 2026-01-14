@@ -287,7 +287,6 @@ body {
 }
 
 /* 6) Force Rebond Grotesque on large headings and currency numbers */
-/* Safari compatibility: Use explicit font-family with fallback, ensure CSS variable is resolved */
 h1,
 .text-4xl.font-bold,
 .text-4xl.font-extrabold,
@@ -297,20 +296,14 @@ h1,
 .text-3xl.font-extrabold:not(h2),
 .text-2xl.font-bold:not(h2),
 .text-2xl.font-extrabold:not(h2) {
-  font-family: var(--font-rebond), "Rebond Grotesque", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif !important;
-  font-synthesis: none;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  font-family: "Rebond Grotesque", rebondGrotesque, var(--font-rebond), var(--font-fallback-sans) !important;
 }
 
 /* Medium currency numbers - need to handle responsive classes */
 /* Exclude h2 elements from Rebond Grotesque */
-/* Safari compatibility: Put CSS variable first */
 .text-lg.font-bold:not(h2),
 .text-xl.font-bold:not(h2) {
-  font-family: var(--font-rebond), "Rebond Grotesque", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif !important;
-  font-synthesis: none;
-  -webkit-font-smoothing: antialiased;
+  font-family: "Rebond Grotesque", rebondGrotesque, var(--font-rebond), var(--font-fallback-sans) !important;
 }
 
 @media (min-width: 768px) {
