@@ -486,7 +486,7 @@ export default function FigmaCalculator() {
       )}
       
       {/* SECTION 1: Intro */}
-      <section className="bg-white border-b border-gray-100 pt-16 pb-12 px-4">
+      <section className="bg-white border-b border-gray-100 pt-16 pb-12 px-4 w-full h-fit max-w-[1440px] rounded-2xl mx-auto" style={{ boxShadow: 'rgba(13, 13, 18, 0.05) 0px 2px 4px 0px' }}>
         <div className="max-w-4xl mx-auto text-center space-y-6">
           <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900">
             Van klanttarief naar jouw inkomen: <br className="hidden md:block" /> helder en eerlijk
@@ -989,20 +989,6 @@ export default function FigmaCalculator() {
                 </AccordionContent>
             </AccordionItem>
         </Accordion>
-      </section>
-
-      {/* SECTION 4: Explanation */}
-      <section className="bg-teal-50 border-y border-teal-100 py-12 px-4 mb-16">
-         <div className="max-w-3xl mx-auto flex gap-6 items-start">
-            <PiggyBank className="w-12 h-12 text-teal-600 shrink-0" />
-            <div className="space-y-2">
-                <h3 className="text-xl font-bold text-teal-900">Opbouw is van jou, voor later</h3>
-                <p className="text-teal-800 leading-relaxed">
-                    Pensioen en andere reserveringen zijn geen kosten die verdwijnen. Het is jouw geld dat we apart zetten voor later. 
-                    Zo bouw je zekerheid op zonder dat je er zelf aan hoeft te denken. Samen met je netto salaris is dit ({formatCurrency(reservationsTotal)}/maand) jouw totale beloning.
-                </p>
-            </div>
-         </div>
       </section>
 
       {/* SECTION 5: Detacheren vs ZZP */}
