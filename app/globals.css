@@ -309,7 +309,7 @@ h1 {
   font-weight: 600 !important; /* Force Semibold (600) for all h1 - override extrabold */
   /* Safari needs exact font-weight match to use correct @font-face (Semibold = 600) */
 }
-/* Other large text can use their specified weights */
+/* Other large text should also use Semibold (600) like h1 */
 .text-4xl.font-bold,
 .text-4xl.font-extrabold,
 .text-5xl.font-bold,
@@ -319,22 +319,25 @@ h1 {
 .text-3xl.font-extrabold:not(h2),
 .text-2xl.font-bold:not(h2),
 .text-2xl.font-extrabold:not(h2) {
-  font-family: rebondGrotesque !important;
-  font-weight: inherit !important;
+  font-family: rebondGrotesque, "Rebond Grotesque" !important;
+  font-weight: 600 !important; /* Use Semibold (600) like h1 */
 }
 
 /* Medium currency numbers - need to handle responsive classes */
 /* Exclude h2 elements from Rebond Grotesque */
 /* CNDS approach: Use rebondGrotesque directly */
+/* All Rebond Grotesque should use Semibold (600) */
 .text-lg.font-bold:not(h2),
 .text-xl.font-bold:not(h2) {
-  font-family: rebondGrotesque !important;
+  font-family: rebondGrotesque, "Rebond Grotesque" !important;
+  font-weight: 600 !important; /* Use Semibold (600) like h1 */
 }
 
 @media (min-width: 768px) {
   .text-lg.md\:text-xl.font-bold:not(h2),
   .md\:text-xl.font-bold:not(h2) {
-    font-family: rebondGrotesque !important;
+    font-family: rebondGrotesque, "Rebond Grotesque" !important;
+    font-weight: 600 !important; /* Use Semibold (600) like h1 */
   }
 }
 
