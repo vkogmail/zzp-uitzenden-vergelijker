@@ -83,7 +83,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${rebondGrotesque.variable} ${geistSans.variable} ${geistMono.variable}`}>
+    <html lang="en" className={`${rebondGrotesque.variable} ${rebondGrotesque.className} ${geistSans.variable} ${geistMono.variable}`}>
       <body className={`${geistSans.className} antialiased`}>
         {children}
       </body>
