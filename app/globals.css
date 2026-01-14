@@ -288,6 +288,7 @@ body {
 
 /* 6) Force Rebond Grotesque on large headings and currency numbers */
 /* Use rebondGrotesque directly (Next.js generated font name) - no quotes needed */
+/* Map font-extrabold (800) to font-bold (700) since we only have weights 400-700 */
 h1,
 h1.text-4xl,
 h1.text-5xl,
@@ -300,6 +301,7 @@ h1.text-5xl,
 .text-2xl.font-bold:not(h2),
 .text-2xl.font-extrabold:not(h2) {
   font-family: rebondGrotesque, "Rebond Grotesque", var(--font-fallback-sans) !important;
+  font-weight: 700 !important; /* Map extrabold (800) to bold (700) - only weight available */
 }
 
 /* Medium currency numbers - need to handle responsive classes */
