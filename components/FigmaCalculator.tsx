@@ -49,7 +49,9 @@ const CAOPresets: Record<CAOPreset, Partial<CalculatorConfig>> = {
     hasIKB: true,
     employerPensionRate: 0.159, // StiPP Plus
     employeePensionRate: 0.075,
-    annualFranchise: 19554.24,
+    hourlyFranchise: 9.24, // StiPP 2026: €9,24 per uur
+    // Oude implementatie (uitgecommentarieerd):
+    // annualFranchise: 19554.24,
   },
   NBBU: {
     // NBBU CAO (Nederlandse Bond van Bemiddelings- en Uitzendondernemingen)
@@ -65,7 +67,9 @@ const CAOPresets: Record<CAOPreset, Partial<CalculatorConfig>> = {
     hasIKB: false,
     employerPensionRate: 0.115, // StiPP Basis
     employeePensionRate: 0.055,
-    annualFranchise: 19554.24,
+    hourlyFranchise: 9.24, // StiPP 2026: €9,24 per uur
+    // Oude implementatie (uitgecommentarieerd):
+    // annualFranchise: 19554.24,
   },
   Custom: {}
 };
@@ -312,11 +316,11 @@ export default function FigmaCalculator() {
               <div className="space-y-4">
                 <h3 className="font-bold text-lg text-gray-900 border-b pb-2">Pensioen (StiPP)</h3>
                 <ConfigInput
-                  label="Jaarlijkse franchise (€)"
-                  value={config.annualFranchise}
-                  onChange={(val) => updateConfig({annualFranchise: val})}
+                  label="Franchise per uur (€) - StiPP 2026: €9,24"
+                  value={config.hourlyFranchise}
+                  onChange={(val) => updateConfig({hourlyFranchise: val})}
                   min={0}
-                  max={30000}
+                  max={50}
                   step={0.01}
                   prefix="€"
                 />

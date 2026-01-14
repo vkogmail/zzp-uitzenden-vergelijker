@@ -19,7 +19,11 @@ export interface CalculatorConfig {
   
   // Pensioen (StiPP-stijl)
   // Pensioen wordt berekend op het pensioengevend loon (bruto minus franchise)
-  annualFranchise: number; // Jaarlijkse franchise voor pensioenberekening (standaard €19.554,24)
+  // De franchise is een vast bedrag per uur dat wordt afgetrokken van het bruto uurloon
+  // voordat de pensioenpremie wordt berekend (StiPP 2026: €9,24 per uur)
+  hourlyFranchise: number; // Franchise per uur voor pensioenberekening (standaard €9,24)
+  // Oude implementatie (uitgecommentarieerd voor referentie):
+  // annualFranchise: number; // Jaarlijkse franchise (oude methode: €19.554,24 per jaar)
   employerPensionRate: number; // Werkgeverspensioen percentage (standaard 15.9%)
   employeePensionRate: number; // Werknemerspensioen percentage (standaard 7.5%)
   
@@ -68,7 +72,9 @@ export const defaultCalculatorConfig: CalculatorConfig = {
   companyMarginProfit: 0.05,
   companyMarginCosts: 0.10,
   conversionFactor: 1.9776,
-  annualFranchise: 19554.24,
+  hourlyFranchise: 9.24, // StiPP 2026: €9,24 per uur (naar boven afgerond)
+  // Oude implementatie (uitgecommentarieerd voor referentie):
+  // annualFranchise: 19554.24, // Oude methode: vast jaarlijks bedrag
   employerPensionRate: 0.159,
   employeePensionRate: 0.075,
   azvRate: 0.003,
@@ -193,10 +199,16 @@ export function calculateEmployeeDetailed(
 
   // STAP 4: Pensioenberekening (StiPP-stijl)
   // Pensioen wordt berekend op het pensioengevend loon (bruto minus franchise)
-  // De franchise is een jaarlijks bedrag dat niet meetelt voor pensioen
-  const annualFranchise = config.annualFranchise; // Jaarlijkse franchise (standaard €19.554,24)
-  const monthlyFranchise = annualFranchise / 12; // Maandelijkse franchise
+  // De franchise is een vast bedrag per uur (€9,24 in 2026) dat wordt afgetrokken
+  // van het bruto loon voordat de pensioenpremie wordt berekend
+  // Formule volgens StiPP 2026: Bruto uurloon - Franchise = Pensioengrondslag
+  const hourlyFranchise = config.hourlyFranchise; // Franchise per uur (standaard €9,24)
+  const monthlyFranchise = hourlyFranchise * MONTHLY_HOURS; // Maandelijkse franchise = €9,24 × maandelijkse uren
   const pensionableWageVal = grossMonthly - monthlyFranchise; // Pensioengevend loon
+  
+  // Oude implementatie (uitgecommentarieerd voor referentie):
+  // const annualFranchise = config.annualFranchise; // Jaarlijkse franchise (oude methode)
+  // const monthlyFranchise = annualFranchise / 12; // Maandelijkse franchise (vast bedrag, onafhankelijk van uren)
   
   // Werkgever en werknemer betalen beide een percentage van het pensioengevend loon
   const employerPensionVal = pensionableWageVal * config.employerPensionRate; // Werkgeversdeel
@@ -362,7 +374,7 @@ export function calculateEmployeeDetailed(
       azv: azvVal, // Arbeidsongeschiktheidsverzekering
       paww: pawwVal // Premie Arbeidsongeschiktheidsverzekering Werknemers
     },
-    pensionableWage: pensionableWageVal, // Pensioengevend loon (bruto minus franchise)
+    pensionableWage: pensionableWageVal, // Pensioengevend loon (bruto minus franchise per uur × maandelijkse uren)
     employerPension: employerPensionVal, // Werkgeverspensioen (komt bovenop netto loon)
     taxBreakdown: {
       // Opbreking van belastingen
