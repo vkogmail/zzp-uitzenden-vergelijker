@@ -290,13 +290,17 @@ body {
 /* CNDS approach: Use rebondGrotesque directly (Next.js generated font name from className) */
 /* The rebondGrotesque.className on html sets font-family: rebondGrotesque */
 /* Need high specificity to override Tailwind - use element + class combinations */
-/* Also ensure font-weight is preserved for Safari to match correctly */
+/* H1 should use Semibold (600) weight */
 h1.text-4xl.font-extrabold,
 h1.text-5xl.font-extrabold,
 h1.text-4xl.md\:text-5xl.font-extrabold,
 h1.text-4xl.font-bold,
 h1.text-5xl.font-bold,
-h1,
+h1 {
+  font-family: rebondGrotesque !important;
+  font-weight: 600 !important; /* Semibold for h1 */
+}
+/* Other large text can use their specified weights */
 .text-4xl.font-bold,
 .text-4xl.font-extrabold,
 .text-5xl.font-bold,
@@ -307,7 +311,6 @@ h1,
 .text-2xl.font-bold:not(h2),
 .text-2xl.font-extrabold:not(h2) {
   font-family: rebondGrotesque !important;
-  /* Ensure font-weight is preserved - Safari needs exact match */
   font-weight: inherit !important;
 }
 
