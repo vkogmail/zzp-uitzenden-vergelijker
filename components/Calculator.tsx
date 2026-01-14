@@ -3,7 +3,7 @@
 import React, { useState, useMemo } from 'react';
 import { clsx } from 'clsx';
 import { 
-  Calculator, 
+  Calculator as CalculatorIcon, 
   ShieldCheck, 
   Briefcase, 
   ChevronDown, 
@@ -26,7 +26,7 @@ import {
   calculateEmployeeDetailed, 
   defaultCalculatorConfig, 
   type CalculatorConfig,
-  type FigmaMakeEmployeeResult 
+  type EmployeeResult 
 } from '@/lib/calculations';
 
 // CalculatorConfig is imported from lib/calculations.ts
@@ -76,7 +76,7 @@ const CAOPresets: Record<CAOPreset, Partial<CalculatorConfig>> = {
 
 const defaultConfig: CalculatorConfig = defaultCalculatorConfig;
 
-export default function FigmaCalculator() {
+export default function Calculator() {
   const [hourlyRate, setHourlyRate] = useState([93.5]);
   const [hoursPerWeek, setHoursPerWeek] = useState([40]);
   const [config, setConfig] = useState<CalculatorConfig>(defaultConfig);
@@ -132,8 +132,8 @@ export default function FigmaCalculator() {
   }
 
   return (
-    <TooltipProvider>
-    <div className="min-h-screen bg-gray-50 font-[var(--font-geist-sans)] text-gray-900 pb-20">
+      <TooltipProvider>
+      <div className="min-h-screen bg-gray-50 font-[var(--font-geist-sans)] text-gray-900 pb-20">
       
       {/* Fixed Configuration Button */}
       <button
@@ -524,7 +524,7 @@ export default function FigmaCalculator() {
 
           <Card className="border-gray-100 shadow-sm hover:shadow-md transition-shadow bg-blue-50/50 border-blue-100">
             <CardHeader>
-              <Calculator className="w-8 h-8 text-blue-600 mb-2" />
+              <CalculatorIcon className="w-8 h-8 text-blue-600 mb-2" />
               <CardTitle className="text-lg text-blue-900">Jouw inkomen</CardTitle>
             </CardHeader>
             <CardContent>

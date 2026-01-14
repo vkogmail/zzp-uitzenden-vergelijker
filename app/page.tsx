@@ -1,6 +1,6 @@
 "use client";
 
-import FigmaCalculator from "@/components/FigmaCalculator";
+import Calculator from "@/components/Calculator";
 
 export default function Home() {
   return (
@@ -12,8 +12,8 @@ export default function Home() {
         </nav>
       </div>
       
-      {/* FigmaMake Calculator */}
-      <FigmaCalculator />
+      {/* Calculator */}
+      <Calculator />
     </div>
   );
 }

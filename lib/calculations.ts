@@ -123,7 +123,7 @@ export const defaultCalculatorConfig: CalculatorConfig = {
 // Alle bedragen zijn maandelijks, tenzij anders aangegeven.
 // ============================================================================
 
-export interface FigmaMakeEmployeeResult {
+export interface EmployeeResult {
   // Totals
   clientTotal: number;
   companyTotal: number;
@@ -189,7 +189,7 @@ export function calculateEmployeeDetailed(
   hourlyRate: number,
   hoursPerWeek: number,
   config: CalculatorConfig = defaultCalculatorConfig
-): FigmaMakeEmployeeResult {
+): EmployeeResult {
   // Constanten
   // Maandelijks aantal uren: 52 weken per jaar / 12 maanden
   const MONTHLY_HOURS = hoursPerWeek * (52 / 12);
