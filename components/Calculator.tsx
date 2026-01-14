@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { clsx } from 'clsx';
 import { 
   Calculator as CalculatorIcon, 
@@ -82,6 +82,7 @@ export default function Calculator() {
   const [config, setConfig] = useState<CalculatorConfig>(defaultConfig);
   const [showConfig, setShowConfig] = useState(false);
   const [selectedCAO, setSelectedCAO] = useState<CAOPreset>('ABU');
+  const [settingsEnabled, setSettingsEnabled] = useState(false);
   
   const applyCAOPreset = (cao: CAOPreset) => {
     setSelectedCAO(cao);
@@ -95,6 +96,24 @@ export default function Calculator() {
     setConfig({ ...config, ...updates });
     setSelectedCAO('Custom');
   };
+
+  // Keyboard shortcut to enable/disable settings panel (Cmd+Option+S or Ctrl+Alt+S)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Cmd+Option+S (Mac) or Ctrl+Alt+S (Windows/Linux)
+      // Check both lowercase and uppercase, and also check keyCode for compatibility
+      const isSKey = e.key === 's' || e.key === 'S' || e.keyCode === 83 || e.code === 'KeyS';
+      if ((e.metaKey || e.ctrlKey) && e.altKey && isSKey) {
+        e.preventDefault();
+        e.stopPropagation();
+        setSettingsEnabled(prev => !prev);
+      }
+    };
+
+    // Use capture phase to catch the event earlier
+    document.addEventListener('keydown', handleKeyDown, true);
+    return () => document.removeEventListener('keydown', handleKeyDown, true);
+  }, []);
 
   // --- Calculation Logic ---
   const result = useMemo(() => {
@@ -135,18 +154,21 @@ export default function Calculator() {
       <TooltipProvider>
       <div className="min-h-screen bg-gray-50 font-[var(--font-geist-sans)] text-gray-900 pb-20">
       
-      {/* Fixed Configuration Button */}
-      <button
-        onClick={() => setShowConfig(!showConfig)}
-        className="fixed bottom-8 right-8 bg-gray-800 hover:bg-gray-700 text-white p-4 rounded-full shadow-lg transition-all z-50 flex items-center gap-2"
-        title="Configuratie aanpassen"
-      >
-        <Settings className="w-6 h-6" />
-        {showConfig && <span className="text-sm font-medium pr-2">Sluiten</span>}
-      </button>
+      {/* Settings Panel - Only visible when enabled via keyboard shortcut (Cmd+Option+S / Ctrl+Alt+S) */}
+      {settingsEnabled && (
+        <>
+          {/* Fixed Configuration Button */}
+          <button
+            onClick={() => setShowConfig(!showConfig)}
+            className="fixed bottom-8 right-8 bg-gray-800 hover:bg-gray-700 text-white p-4 rounded-full shadow-lg transition-all z-50 flex items-center gap-2"
+            title="Configuratie aanpassen"
+          >
+            <Settings className="w-6 h-6" />
+            {showConfig && <span className="text-sm font-medium pr-2">Sluiten</span>}
+          </button>
 
-      {/* Configuration Panel */}
-      {showConfig && (
+          {/* Configuration Panel */}
+          {showConfig && (
         <div className="fixed inset-0 bg-black/50 z-40 flex items-start justify-end p-4 overflow-y-auto" onClick={() => setShowConfig(false)}>
           <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl my-8" onClick={(e) => e.stopPropagation()}>
             <div className="sticky top-0 bg-gray-800 text-white p-6 rounded-t-xl z-10">
@@ -483,6 +505,8 @@ export default function Calculator() {
             </div>
           </div>
         </div>
+          )}
+        </>
       )}
       
       {/* SECTION 1: Intro */}
@@ -497,7 +521,7 @@ export default function Calculator() {
         </div>
 
         {/* Explainer Cards */}
-        <div className="max-w-5xl mx-auto grid md:grid-cols-3 gap-6 mt-16 text-left">
+        {/* <div className="max-w-5xl mx-auto grid md:grid-cols-3 gap-6 mt-16 text-left">
           <Card className="border-gray-100 shadow-sm hover:shadow-md transition-shadow">
             <CardHeader>
               <Briefcase className="w-8 h-8 text-gray-400 mb-2" />
@@ -533,7 +557,7 @@ export default function Calculator() {
               </p>
             </CardContent>
           </Card>
-        </div>
+        </div> */}
       </section>
 
       {/* SECTION 2: Calculator + Simple Flow */}
@@ -573,12 +597,14 @@ export default function Calculator() {
                  <span className="text-sm font-medium text-blue-900">Actieve CAO:</span>
                  <span className="text-sm font-bold text-blue-700">{selectedCAO}</span>
                </div>
-               <button
-                 onClick={() => setShowConfig(true)}
-                 className="text-xs text-blue-600 hover:text-blue-800 underline"
-               >
-                 Wijzig CAO
-               </button>
+               {settingsEnabled && (
+                 <button
+                   onClick={() => setShowConfig(true)}
+                   className="text-xs text-blue-600 hover:text-blue-800 underline"
+                 >
+                   Wijzig CAO
+                 </button>
+               )}
              </div>
              
              <div className="grid md:grid-cols-2 md:gap-6 gap-6">
