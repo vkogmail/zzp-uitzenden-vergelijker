@@ -276,7 +276,8 @@ export function calculateEmployeeDetailed(
 
   // STAP 6: Belastbaar Loon
   // Het belastbaar loon is het bruto loon minus de fiscale reserveringen
-  const taxableMonthly = grossMonthly - reservationsMonthly;
+  // Belastbaar loon kan nooit negatief zijn
+const taxableMonthly = Math.max(0, grossMonthly - reservationsMonthly);
 
   // STAP 7: Nederlandse Loonbelasting Berekening (2026)
   // De Nederlandse belasting werkt met progressieve schijven en belastingkortingen
@@ -405,12 +406,13 @@ export function calculateEmployeeDetailed(
   //   - Dit is een UI-split, niet een fiscaal exacte decompositie.
   // ============================================================================
   const totalMonthlyDeductions = monthlyWageTaxAfterCredits;
+  
 
-  // Indicatieve split voor UI, telt exact op tot totalMonthlyDeductions
   const socialPremiumRate = config.socialPremiumRate;
-  const monthlySocialPremiums = totalMonthlyDeductions * socialPremiumRate;
-  const monthlyIncomeTax = Math.max(0, totalMonthlyDeductions - monthlySocialPremiums);
 
+// Indicatieve UI-split, niet gebruiken voor fiscale berekeningen
+const uiMonthlySocialPremiums = totalMonthlyDeductions * socialPremiumRate;
+const uiMonthlyIncomeTax = Math.max(0, totalMonthlyDeductions - uiMonthlySocialPremiums);
   // Netto Resultaat
   // Het bedrag dat de werknemer daadwerkelijk ontvangt op de bankrekening
   const netMonthly = taxableMonthly - totalMonthlyDeductions;
@@ -469,8 +471,8 @@ export function calculateEmployeeDetailed(
       // Opbreking van belastingen
       wageTaxBeforeCredits: monthlyWageTaxBeforeCredits, // Bruto loonbelasting (voor kortingen)
       taxCredits: monthlyTaxCredits, // Totale belastingkortingen
-      incomeTax: monthlyIncomeTax, // Indicatief voor UI
-      socialPremiums: monthlySocialPremiums, // Indicatief voor UI
+      incomeTax: uiMonthlyIncomeTax,
+      socialPremiums: uiMonthlySocialPremiums,
       totalDeductions: totalMonthlyDeductions // Totale inhouding (loonheffing na kortingen)
     },
     additionalBenefits: {
