@@ -1,4 +1,20 @@
+"use client";
+
+import { useEffect } from 'react';
+
 export default function FontTestPage() {
+  useEffect(() => {
+    // Log font info to console
+    if (typeof window !== 'undefined') {
+      const h1 = document.querySelector('h1');
+      if (h1) {
+        const computed = window.getComputedStyle(h1);
+        console.log('H1 computed font-family:', computed.fontFamily);
+        console.log('CSS variable --font-rebond:', getComputedStyle(document.documentElement).getPropertyValue('--font-rebond'));
+      }
+    }
+  }, []);
+
   return (
     <div className="min-h-screen bg-gray-50 p-8 space-y-8">
       <div className="max-w-4xl mx-auto">
