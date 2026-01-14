@@ -513,10 +513,10 @@ export default function Calculator() {
       <section className="bg-white border-b border-gray-100 pt-16 pb-12 px-4 w-full h-fit max-w-[1440px] rounded-2xl mx-auto" style={{ boxShadow: 'rgba(13, 13, 18, 0.05) 0px 2px 4px 0px' }}>
         <div className="max-w-4xl mx-auto text-center space-y-6">
           <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900">
-            Van klanttarief naar jouw inkomen: <br className="hidden md:block" /> helder en eerlijk
+            Je inkomen is meer dan je maandbedrag
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-            Zie precies waar het geld naartoe gaat: het bedrijf, jouw zekerheid en jouw salaris.
+            Zie wat je direct ontvangt en wat je opbouwt voor later.
           </p>
         </div>
 
@@ -563,29 +563,8 @@ export default function Calculator() {
       {/* SECTION 2: Calculator + Simple Flow */}
       <section className="py-16 px-4 max-w-5xl mx-auto space-y-12">
         <div className="text-center space-y-2">
-          <h2 className="text-3xl font-bold text-gray-900">Wat krijg jij hier uiteindelijk voor?</h2>
-          <p className="text-gray-500">Pas het uurtarief aan en zie direct wat je netto ontvangt én wat er voor je wordt opgebouwd.</p>
-        </div>
-
-        {/* Disclaimer */}
-        <div className="bg-amber-50 border-l-4 border-amber-400 p-4 rounded-lg max-w-3xl mx-auto">
-          <div className="flex items-start gap-3">
-            <div className="flex-shrink-0">
-              <svg className="w-5 h-5 text-amber-600 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-              </svg>
-            </div>
-            <div className="text-left">
-              <h3 className="text-sm font-bold text-amber-900 mb-1">Indicatieve berekening</h3>
-              <p className="text-xs text-amber-800 leading-relaxed">
-                Deze calculator geeft een <strong>realistische indicatie</strong> van je netto inkomen en arbeidsvoorwaarden. 
-                De exacte bedragen op je loonstrook kunnen afwijken door individuele omstandigheden, 
-                verschillende CAO-afspraken, loonheffingskortingen, en andere persoonlijke factoren. 
-                Gebruik deze tool als richtlijn, niet als definitieve berekening. 
-                <strong> En er kunnen geen rechten aan worden ontleend.</strong>
-              </p>
-            </div>
-          </div>
+          <h2 className="text-3xl font-bold text-gray-900">Inzicht in je totale beloning</h2>
+          <p className="text-gray-500">Een compleet beeld van je maandinkomen, extra's en opbouw voor later.</p>
         </div>
 
         {/* Controls */}
@@ -1016,6 +995,29 @@ export default function Calculator() {
                 </AccordionContent>
             </AccordionItem>
         </Accordion>
+      </section>
+
+      {/* Disclaimer */}
+      <section className="max-w-3xl mx-auto px-4 pb-8">
+        <div className="bg-amber-50 border-l-4 border-amber-400 p-4 rounded-lg max-w-3xl mx-auto">
+          <div className="flex items-start gap-3">
+            <div className="flex-shrink-0">
+              <svg className="w-5 h-5 text-amber-600 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="text-left">
+              <h3 className="text-sm font-bold text-amber-900 mb-1">Indicatieve berekening</h3>
+              <p className="text-xs text-amber-800 leading-relaxed">
+                Deze calculator geeft een <strong>realistische indicatie</strong> van je netto inkomen en arbeidsvoorwaarden. 
+                De exacte bedragen op je loonstrook kunnen afwijken door individuele omstandigheden, 
+                verschillende CAO-afspraken, loonheffingskortingen, en andere persoonlijke factoren. 
+                Gebruik deze tool als richtlijn, niet als definitieve berekening. 
+                <strong> En er kunnen geen rechten aan worden ontleend.</strong>
+              </p>
+            </div>
+          </div>
+        </div>
       </section>
 
       {/* SECTION 5: Detacheren vs ZZP */}
