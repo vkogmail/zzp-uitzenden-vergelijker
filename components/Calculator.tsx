@@ -213,6 +213,175 @@ export default function Calculator() {
             </div>
             
             <div className="p-6 space-y-6 max-h-[calc(100vh-200px)] overflow-y-auto">
+              {/* Berekeningen Uitleg */}
+              <div className="space-y-4 bg-green-50 p-4 rounded-lg border border-green-200">
+                <h3 className="font-bold text-lg text-green-900 flex items-center gap-2">
+                  <CalculatorIcon className="w-5 h-5" />
+                  Hoe werken de berekeningen?
+                </h3>
+                <Accordion type="single" collapsible className="w-full">
+                  <AccordionItem value="detacheren-berekening" className="border-0">
+                    <AccordionTrigger className="text-sm font-semibold text-green-800 hover:no-underline py-2">
+                      Detacheren Berekening
+                    </AccordionTrigger>
+                    <AccordionContent className="text-sm text-green-700 space-y-3 pt-2">
+                      <div className="bg-white p-3 rounded border border-green-200">
+                        <p className="font-semibold mb-2">Stap 1: Klanttarief → Bruto uurtarief</p>
+                        <p className="text-xs text-gray-600 mb-2">
+                          Het klanttarief wordt omgezet naar bruto uurtarief via de conversiefactor (standaard 1.9776).
+                        </p>
+                        <code className="text-xs bg-gray-100 p-1 rounded block">
+                          Bruto uurtarief = Klanttarief × Conversiefactor
+                        </code>
+                      </div>
+                      <div className="bg-white p-3 rounded border border-green-200">
+                        <p className="font-semibold mb-2">Stap 2: Bedrijfsmarge</p>
+                        <p className="text-xs text-gray-600 mb-2">
+                          Het bedrijf houdt een marge in (standaard 15%): 5% winst + 10% kosten/risico.
+                        </p>
+                        <code className="text-xs bg-gray-100 p-1 rounded block">
+                          Netto uurtarief = Bruto uurtarief × (1 - Bedrijfsmarge)
+                        </code>
+                      </div>
+                      <div className="bg-white p-3 rounded border border-green-200">
+                        <p className="font-semibold mb-2">Stap 3: Bruto maandsalaris</p>
+                        <p className="text-xs text-gray-600 mb-2">
+                          Maandelijkse uren: 52 weken ÷ 12 maanden × uren per week.
+                        </p>
+                        <code className="text-xs bg-gray-100 p-1 rounded block">
+                          Bruto maandsalaris = Netto uurtarief × Maanduren
+                        </code>
+                      </div>
+                      <div className="bg-white p-3 rounded border border-green-200">
+                        <p className="font-semibold mb-2">Stap 4: Pensioen (StiPP)</p>
+                        <p className="text-xs text-gray-600 mb-2">
+                          Pensioen wordt berekend op pensioengevend loon (bruto minus franchise van €9,24/uur).
+                          Werkgever en werknemer betalen beide een percentage.
+                        </p>
+                        <code className="text-xs bg-gray-100 p-1 rounded block">
+                          Pensioengrondslag = Bruto - (Franchise × Maanduren)<br/>
+                          Pensioen = Pensioengrondslag × (Werkgever% + Werknemer%)
+                        </code>
+                      </div>
+                      <div className="bg-white p-3 rounded border border-green-200">
+                        <p className="font-semibold mb-2">Stap 5: Belastingberekening</p>
+                        <p className="text-xs text-gray-600 mb-2">
+                          Progressieve belastingschijven (2026): Schijf 1 (35,75%), Schijf 2 (37,56%), Schijf 3 (49,50%).
+                          Loonheffingskortingen (arbeidskorting + algemene heffingskorting) worden afgetrokken.
+                        </p>
+                        <code className="text-xs bg-gray-100 p-1 rounded block">
+                          Belastbaar loon = Bruto - Pensioen - AZV - PAWW<br/>
+                          Belasting = Progressief berekend per schijf<br/>
+                          Netto = Belastbaar - Belasting + Kortingen
+                        </code>
+                      </div>
+                      <div className="bg-white p-3 rounded border border-green-200">
+                        <p className="font-semibold mb-2">Stap 6: Extra uitkeringen</p>
+                        <p className="text-xs text-gray-600 mb-2">
+                          Vakantiedagen (10,92%), vakantiegeld (8%), eindejaarsuitkering (4,5%), IKB (1,8%).
+                          Deze komen bovenop het netto loon.
+                        </p>
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                  
+                  <AccordionItem value="zzp-berekening" className="border-0">
+                    <AccordionTrigger className="text-sm font-semibold text-green-800 hover:no-underline py-2">
+                      ZZP Berekening
+                    </AccordionTrigger>
+                    <AccordionContent className="text-sm text-green-700 space-y-3 pt-2">
+                      <div className="bg-white p-3 rounded border border-green-200">
+                        <p className="font-semibold mb-2">Stap 1: Bruto omzet</p>
+                        <p className="text-xs text-gray-600 mb-2">
+                          We gaan uit van 80% factureerbare tijd (vakantie, feestdagen, ziekte, gaten tussen klussen).
+                        </p>
+                        <code className="text-xs bg-gray-100 p-1 rounded block">
+                          Bruto omzet = Uurtarief × Maanduren × 0.80
+                        </code>
+                      </div>
+                      <div className="bg-white p-3 rounded border border-green-200">
+                        <p className="font-semibold mb-2">Stap 2: Kosten & Risico</p>
+                        <p className="text-xs text-gray-600 mb-2">
+                          Ondernemersrisico (10%), overhead (8%: AOV, boekhouder, software, opleiding), buffer (5%: ziekte/gaten).
+                        </p>
+                        <code className="text-xs bg-gray-100 p-1 rounded block">
+                          Kosten = Omzet × (Risico% + Overhead% + Buffer%)
+                        </code>
+                      </div>
+                      <div className="bg-white p-3 rounded border border-green-200">
+                        <p className="font-semibold mb-2">Stap 3: Omzet na kosten</p>
+                        <code className="text-xs bg-gray-100 p-1 rounded block">
+                          Omzet na kosten = Bruto omzet - Kosten
+                        </code>
+                      </div>
+                      <div className="bg-white p-3 rounded border border-green-200">
+                        <p className="font-semibold mb-2">Stap 4: Pensioen (StiPP)</p>
+                        <p className="text-xs text-gray-600 mb-2">
+                          Zelfde systeem als detacheren: franchise €9,24/uur, werkgever + werknemer percentages.
+                          Berekeningsbasis is omzet na kosten (niet bruto).
+                        </p>
+                        <code className="text-xs bg-gray-100 p-1 rounded block">
+                          Pensioengrondslag = (Omzet na kosten) - (Franchise × Maanduren)<br/>
+                          Pensioen = Pensioengrondslag × (Werkgever% + Werknemer%)
+                        </code>
+                      </div>
+                      <div className="bg-white p-3 rounded border border-green-200">
+                        <p className="font-semibold mb-2">Stap 5: Netto vóór belasting</p>
+                        <code className="text-xs bg-gray-100 p-1 rounded block">
+                          Netto vóór belasting = Omzet na kosten - Pensioen
+                        </code>
+                      </div>
+                      <div className="bg-white p-3 rounded border border-green-200">
+                        <p className="font-semibold mb-2">Stap 6: Belastingreservering (indicatief)</p>
+                        <p className="text-xs text-gray-600 mb-2">
+                          Voor vergelijking met detacheren reserveren we 40% voor belasting.
+                          Dit is indicatief - exacte belasting hangt af van je situatie.
+                        </p>
+                        <code className="text-xs bg-gray-100 p-1 rounded block">
+                          Belastingreservering = Netto vóór belasting × 40%<br/>
+                          Netto op rekening (indicatief) = Netto vóór belasting - Belastingreservering
+                        </code>
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                  
+                  <AccordionItem value="vergelijking" className="border-0">
+                    <AccordionTrigger className="text-sm font-semibold text-green-800 hover:no-underline py-2">
+                      Vergelijking Detacheren vs ZZP
+                    </AccordionTrigger>
+                    <AccordionContent className="text-sm text-green-700 space-y-3 pt-2">
+                      <div className="bg-white p-3 rounded border border-green-200">
+                        <p className="font-semibold mb-2">"Dit ontvang je elke maand op je rekening"</p>
+                        <ul className="text-xs text-gray-600 space-y-1 list-disc list-inside">
+                          <li><strong>Detacheren:</strong> Netto na belasting (echte uitbetaling)</li>
+                          <li><strong>ZZP:</strong> Netto na belastingreservering (indicatief, 40% gereserveerd)</li>
+                        </ul>
+                        <p className="text-xs text-gray-600 mt-2">
+                          Dit maakt de vergelijking eerlijk: beide kanten tonen wat je daadwerkelijk op je rekening ontvangt.
+                        </p>
+                      </div>
+                      <div className="bg-white p-3 rounded border border-green-200">
+                        <p className="font-semibold mb-2">Pensioen</p>
+                        <ul className="text-xs text-gray-600 space-y-1 list-disc list-inside">
+                          <li><strong>Detacheren:</strong> Automatisch opgebouwd, verplicht</li>
+                          <li><strong>ZZP:</strong> Eigen pensioenopbouw (vrijwillig), zelfde StiPP-structuur</li>
+                        </ul>
+                      </div>
+                      <div className="bg-white p-3 rounded border border-green-200">
+                        <p className="font-semibold mb-2">Kosten & Risico</p>
+                        <ul className="text-xs text-gray-600 space-y-1 list-disc list-inside">
+                          <li><strong>Detacheren:</strong> Bedrijfsmarge (10%) + extra uitkeringen in loonstructuur</li>
+                          <li><strong>ZZP:</strong> Ondernemersrisico (10%) + overhead (8%) + buffer (5%) + belastingreservering (40%)</li>
+                        </ul>
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
+                <p className="text-xs text-green-600 italic mt-3">
+                  Deze uitleg is bedoeld voor admin/beheer doeleinden. Eindgebruikers zien alleen de resultaten.
+                </p>
+              </div>
+              
               {/* CAO Preset Selector */}
               <div className="space-y-4 bg-blue-50 p-4 rounded-lg border border-blue-200">
                 <h3 className="font-bold text-lg text-blue-900">CAO Selectie</h3>
