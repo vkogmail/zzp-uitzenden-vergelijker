@@ -210,6 +210,22 @@
 
   --spacing-18: 4.5rem;
   --spacing-22: 5.5rem;
+
+  /* CNDS Breakpoints (from packages/tokens/tokens/core.json) */
+  --breakpoint-smallMobile: 390px;
+  --breakpoint-mobile: 810px;
+  --breakpoint-tablet: 1199px;
+  --breakpoint-desktop: 1200px;
+  --breakpoint-containerMax: 1440px;
+
+  /* CNDS Breakpoints for Tailwind v4 utilities */
+  --breakpoint-sm-mobile: 390px;
+  --breakpoint-mobile: 810px;
+  --breakpoint-tablet: 1199px;
+  --breakpoint-desktop: 1200px;
+  
+  /* Max widths */
+  --width-container-max: 1440px;
 }
 
 /* 3) Base */
