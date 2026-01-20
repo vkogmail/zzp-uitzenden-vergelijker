@@ -1600,9 +1600,9 @@ export default function Calculator() {
             </div>
             <div className="grid grid-cols-2 gap-3 mt-auto pt-4 border-t border-blue-200/50">
               <div className="bg-white/50 rounded-lg p-3">
-                <div className="text-base font-bold text-gray-900">{formatCurrency(zzpResult.netBeforeTax)}</div>
-                <div className="text-[10px] text-gray-500 font-medium uppercase tracking-wide">Netto vóór belasting</div>
-                <div className="text-[10px] text-gray-400">{formatHourly(zzpResult.netBeforeTax, zzpResult.monthlyHours)}/u</div>
+                <div className="text-base font-bold text-gray-900">{formatCurrency(zzpNetAfterTaxIndicative)}</div>
+                <div className="text-[10px] text-gray-500 font-medium uppercase tracking-wide">Op rekening (indicatief)</div>
+                <div className="text-[10px] text-gray-400">{formatHourly(zzpNetAfterTaxIndicative, zzpResult.monthlyHours)}/u</div>
               </div>
               <div className="bg-violet-50/80 rounded-lg p-3">
                 <div className="text-base font-bold text-violet-700">{formatCurrency(zzpResult.employerPension + zzpResult.reservationBreakdown.employeePension)}</div>
@@ -1724,23 +1724,43 @@ export default function Calculator() {
                     </div>
                   </div>
 
-                  {/* Group E: Net Result */}
+                  {/* Group E: Net Before Tax */}
+                  <div className="p-6 bg-gray-100 space-y-4">
+                    <h3 className="font-semibold text-gray-700">Netto vóór belasting</h3>
+                    <BreakdownRow 
+                      label="Omzet na kosten - Pensioen" 
+                      value={zzpResult.netBeforeTax} 
+                      monthlyHours={zzpResult.monthlyHours}
+                      tooltip="Het bedrag dat overblijft na aftrek van alle kosten en pensioen, maar vóór belasting."
+                    />
+                  </div>
+
+                  {/* Group F: Indicatief op rekening na belastingreservering */}
                   <div className="p-6 bg-green-600 text-white space-y-6">
                     <div className="flex flex-col mobile:flex-row justify-between items-start mobile:items-center gap-4">
                       <div>
-                        <h3 className="text-xl font-bold">Netto vóór belasting</h3>
-                        <p className="text-green-100 text-sm">Dit is je netto inkomen vóór belasting</p>
+                        <h3 className="text-xl font-bold">Indicatief op rekening na belastingreservering</h3>
+                        <p className="text-green-100 text-sm">Dit ontvang je elke maand op je rekening (indicatief)</p>
                         <p className="text-green-200 text-xs mt-2 max-w-md">
-                          Belastingberekening wordt in een latere fase toegevoegd
+                          We reserveren tijdelijk {(config.zzpTaxReserveRate * 100).toFixed(0)}% voor belasting, exacte belasting hangt af van je situatie
                         </p>
                       </div>
                       <div className="text-left mobile:text-right">
                         <div className="text-3xl font-bold">
-                          {formatCurrency(zzpResult.netBeforeTax)}
+                          {formatCurrency(zzpNetAfterTaxIndicative)}
                         </div>
                         <div className="text-green-200 text-sm font-medium">
-                          {formatHourly(zzpResult.netBeforeTax, zzpResult.monthlyHours)} per uur
+                          {formatHourly(zzpNetAfterTaxIndicative, zzpResult.monthlyHours)} per uur
                         </div>
+                      </div>
+                    </div>
+                    <div className="bg-green-700/50 rounded-lg p-3 border border-green-400/30">
+                      <div className="flex justify-between items-baseline mb-1">
+                        <span className="text-xs text-green-100">Belastingreservering ({(config.zzpTaxReserveRate * 100).toFixed(0)}%)</span>
+                      </div>
+                      <div className="text-lg font-bold text-white">{formatCurrency(zzpTaxReserve)}</div>
+                      <div className="text-[10px] text-green-200 mt-1">
+                        Dit zetten veel zzp'ers apart om belasting te betalen
                       </div>
                     </div>
                   </div>
