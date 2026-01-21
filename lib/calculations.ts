@@ -72,12 +72,18 @@ export interface CalculatorConfig {
   hasYearEndBonus: boolean; // Of eindejaarsuitkering van toepassing is
   hasIKB: boolean; // Of IKB van toepassing is
 
-  // ZZP-specifieke aannames
-  zzpBillableRate: number;              // % van uren dat facturabel is (default 0.80) - alles-in: vakantie, feestdagen, ziekte, gaten
-  zzpEntrepreneurRiskRate: number;      // Ondernemersrisico percentage (default 0.10) - NIET gekoppeld aan companyMarginCosts
-  zzpOverheadRate: number;               // Extra kosten (AOV/boekhouder/software/opleiding/apparatuur) als % van omzet (default 0.08)
-  zzpBufferRate: number;                 // Buffer voor ziekte/gaten tussen opdrachten als % van omzet (default 0.05)
+  // ZZP-specifieke aannames (volgens Excel structuur)
+  zzpUnworkableRate: number;             // Percentage onwerkbaar (vakantie/feestdagen) (default 0.14 = 14%) - input variabel 0-10%
+  zzpSicknessCorrectionRate: number;      // Correctie korte termijn ziekte (default 0.06 = 6%) - input variabel 0-10%
+  zzpCompanyMarginRate: number;          // Bedrijfsmarge voor ZZP (default 0.05 = 5%) - zoals bij detacheren
+  zzpBusinessCostsRate: number;          // Kosten freelance bv incl verzekeringen (default 0.10 = 10%) - input variabel 0-10%
   zzpTaxReserveRate: number;             // Belastingreservering voor "netto op rekening (indicatief)" (default 0.40)
+  
+  // ZZP belasting instellingen (volgens Excel)
+  zzpMkbVrijstellingRate: number;        // MKB-vrijstelling percentage (default 0.1331 = 13.31%)
+  zzpZvwRate: number;                    // Zorgverzekeringswet bijdrage (default 0.0532 = 5.32%)
+  zzpZvwMaxIncome: number;               // Maximum inkomen voor ZVW (default 75518)
+  zzpTaxBracketLimit: number;            // Belastingschijf limiet voor ZZP (default 75518, i.p.v. 78426 voor werknemers)
 }
 
 // Standaard configuratie voor ABU/NBBU CAO met StiPP Plus pensioen
@@ -121,11 +127,18 @@ export const defaultCalculatorConfig: CalculatorConfig = {
   hasPAWW: true,
   hasYearEndBonus: true,
   hasIKB: true,
-  zzpBillableRate: 0.80,
-  zzpEntrepreneurRiskRate: 0.10,
-  zzpOverheadRate: 0.08,
-  zzpBufferRate: 0.05,
-  zzpTaxReserveRate: 0.40
+  // ZZP instellingen (volgens Excel)
+  zzpUnworkableRate: 0.14,              // 14% onwerkbaar (vakantie/feestdagen)
+  zzpSicknessCorrectionRate: 0.06,      // 6% ziekte correctie
+  zzpCompanyMarginRate: 0.05,           // 5% bedrijfsmarge
+  zzpBusinessCostsRate: 0.10,           // 10% kosten freelance bv
+  zzpTaxReserveRate: 0.40,              // 40% belastingreservering
+  
+  // ZZP belasting instellingen (volgens Excel)
+  zzpMkbVrijstellingRate: 0.1331,       // 13.31% MKB-vrijstelling
+  zzpZvwRate: 0.0532,                   // 5.32% ZVW bijdrage
+  zzpZvwMaxIncome: 75518,               // Max inkomen voor ZVW
+  zzpTaxBracketLimit: 75518             // Belastingschijf limiet (i.p.v. 78426)
 };
 
 // ============================================================================
@@ -188,28 +201,42 @@ export interface EmployeeResult {
 
 export interface ZZPResult {
   // Totals
-  revenueTotal: number;              // Bruto omzet (uurtarief × uren)
-  costsTotal: number;                // Totale kosten (ondernemersrisico + overige)
-  revenueAfterCosts: number;         // Omzet na kosten (revenueTotal - costsTotal)
-  reservationsTotal: number;         // Pensioen + andere reserveringen
-  netBeforeTax: number;              // Netto inkomen vóór belasting (revenueAfterCosts - reservationsTotal)
-  monthlyHours: number;
+  revenueTotal: number;              // Effectieve omzet (facturabel)
+  costsTotal: number;                // Totale kosten (marge + kosten)
+  revenueAfterCosts: number;         // Inkomen na marge en kosten
+  reservationsTotal: number;          // Pensioen + andere reserveringen
+  netBeforeTax: number;              // Inkomen vóór belasting (maandelijks)
+  netAfterTax: number;               // Netto na belasting (maandelijks, volgens Excel)
+  monthlyHours: number;               // Effectieve uren per maand
   
   // Breakdowns
   costsBreakdown: {
-    entrepreneurRisk: number;     // Ondernemersrisico (zzpEntrepreneurRiskRate)
-    vacationCosts: number;        // Vakantie/feestdagen (altijd 0 in Option A, maar veld blijft voor toekomstige flexibiliteit)
-    overheadCosts: number;        // AOV/boekhouder/software/opleiding/apparatuur
-    bufferCosts: number;          // Buffer voor ziekte/gaten tussen opdrachten
+    entrepreneurRisk: number;        // Bedrijfsmarge (5%)
+    vacationCosts: number;           // Vakantie/feestdagen (niet meer gebruikt, zit in onwerkbaar uren)
+    overheadCosts: number;           // Kosten freelance bv (10%)
+    bufferCosts: number;              // Buffer (niet meer gebruikt in nieuwe structuur)
   };
   reservationBreakdown: {
     employeePension: number;
     // Other reservations if needed
   };
   basePensionableWage: number;       // Basis pensioengrondslag (na franchise, voor compensatie)
-  pensionCompensation: number;      // Pensioencompensatie bedrag (indien actief)
+  pensionCompensation: number;       // Pensioencompensatie bedrag (indien actief)
   pensionableWage: number;           // Herrekende pensioengrondslag
-  employerPension: number;           // Werkgeverspensioen
+  employerPension: number;          // Werkgeverspensioen
+  taxBreakdown?: {                    // ZZP belasting breakdown (optioneel, alleen als belasting is berekend)
+    annualTaxableIncome: number;     // Belastbaar inkomen per jaar
+    annualDeductions: number;        // Aftrekposten per jaar
+    profitBeforeTax: number;         // Winst voor belasting
+    mkbVrijstelling: number;         // MKB-vrijstelling
+    taxableIncome: number;           // Belastbaar inkomen na vrijstelling
+    incomeTax: number;               // Inkomstenbelasting
+    zvwContribution: number;         // Zorgverzekeringswet bijdrage
+    algemeenHeffingskorting: number; // Algemene heffingskorting
+    arbeidskorting: number;         // Arbeidskorting
+    totalTax: number;                // Totale belasting
+    netAnnual: number;               // Netto per jaar
+  };
   additionalBenefits: {
     totalAdditionalBenefits: number;
     // ZZP-specific benefits if any
@@ -579,12 +606,14 @@ export function employeeResultToComparable(result: EmployeeResult): ComparableOu
  * (same concept as detacheren: "Dit ontvang je elke maand op je rekening")
  */
 export function zzpResultToComparable(result: ZZPResult, config: CalculatorConfig): ComparableOutcome {
-  // Calculate net after tax indicative for fair comparison
-  const taxReservation = calculateZZPTaxReservation(result, config);
+  // Use real net after tax if available, otherwise calculate from tax reservation
+  const netNow = result.netAfterTax !== undefined 
+    ? result.netAfterTax 
+    : calculateZZPTaxReservation(result, config).netAfterTaxIndicative;
   
   return {
     grossTotal: result.revenueTotal,         // ZZP: bruto omzet
-    netNow: taxReservation.netAfterTaxIndicative,  // ZZP: net after tax reservation (indicatief)
+    netNow: netNow,                          // ZZP: net after tax (real calculation or indicative)
     laterReserved: result.employerPension + result.reservationBreakdown.employeePension,
     costsAndRisk: result.costsTotal,        // ZZP: total costs
     monthlyHours: result.monthlyHours
@@ -592,18 +621,27 @@ export function zzpResultToComparable(result: ZZPResult, config: CalculatorConfi
 }
 
 /**
- * Temporary ZZP tax reservation calculation (UX bridge, not real tax model)
- * This is used to make "Dit ontvang je elke maand op je rekening" comparable
- * between Detacheren (after tax) and ZZP (before tax).
+ * ZZP tax reservation calculation
+ * Uses real tax calculation if available (netAfterTax), otherwise falls back to percentage-based estimate
  * 
  * @param zzpResult - The ZZP calculation result
- * @param config - Calculator config with zzpTaxReserveRate
+ * @param config - Calculator config with zzpTaxReserveRate (fallback)
  * @returns Object with tax reserve amount and net after tax indicative
  */
 export function calculateZZPTaxReservation(
   zzpResult: ZZPResult,
   config: CalculatorConfig
 ): { taxReserve: number; netAfterTaxIndicative: number } {
+  // If real tax calculation is available (netAfterTax), use that
+  if (zzpResult.netAfterTax !== undefined) {
+    const taxReserve = zzpResult.netBeforeTax - zzpResult.netAfterTax;
+    return {
+      taxReserve,
+      netAfterTaxIndicative: zzpResult.netAfterTax
+    };
+  }
+  
+  // Fallback to percentage-based estimate (for backwards compatibility)
   const taxReserve = zzpResult.netBeforeTax * config.zzpTaxReserveRate;
   const netAfterTaxIndicative = zzpResult.netBeforeTax - taxReserve;
   
@@ -614,100 +652,173 @@ export function calculateZZPTaxReservation(
 }
 
 /**
- * Berekent het gedetailleerde netto inkomen voor een ZZP'er (vóór belasting)
+ * Berekent het gedetailleerde netto inkomen voor een ZZP'er (volgens Excel structuur)
  *
- * Deze functie volgt de flow van uurtarief naar netto inkomen vóór belasting:
- * 1. Bruto omzet (uurtarief × uren)
- * 2. Kosten (ondernemersrisico 10% + vakantie/feestdagen + overige kosten)
- * 3. Omzet na kosten
- * 4. Pensioenberekening (EXACT zelfde StiPP-structuur als detacheren, alleen basis verschilt)
- * 5. Reserveringen
- * 6. Netto vóór belasting
+ * Deze functie volgt de flow van uurtarief naar netto inkomen:
+ * 1. Uren per jaar berekenen
+ * 2. Onwerkbaar uren (vakantie/feestdagen) en ziekte correctie
+ * 3. Netto uren met correctie
+ * 4. Effectieve omzet (facturabel)
+ * 5. Marge (5%) en kosten (10%)
+ * 6. Pensioenberekening (EXACT zelfde StiPP-structuur als detacheren)
+ * 7. Inkomen voor belasting
+ * 8. ZZP belasting met MKB-vrijstelling
+ * 9. Netto na belasting
  *
  * @param hourlyRate - Het uurtarief (€/uur)
  * @param hoursPerWeek - Aantal gewerkte uren per week
- * @param config - Configuratie object met pensioeninstellingen (zelfde als detacheren)
+ * @param config - Configuratie object met ZZP-instellingen
  * @returns Gedetailleerd resultaat met alle tussenstappen en eindbedragen
  */
 export function calculateZZPDetailed(
   hourlyRate: number,
   hoursPerWeek: number,
-  config: CalculatorConfig = defaultCalculatorConfig
+  config: CalculatorConfig = defaultCalculatorConfig,
+  detacherenEmployeePension?: number, // Optioneel: pensioen uit detacheren berekening (volgens Excel: "Pensioen (uit deta calc)")
+  detacherenEmployerPension?: number  // Optioneel: werkgeverspensioen uit detacheren berekening
 ): ZZPResult {
-  // Constanten
-  // Maandelijks aantal uren: 52 weken per jaar / 12 maanden
-  const MONTHLY_HOURS = hoursPerWeek * (52 / 12);
+  // STAP 1: Uren per jaar berekenen (volgens Excel)
+  const WEEKS_PER_YEAR = 52;
+  const hoursPerYear = hoursPerWeek * WEEKS_PER_YEAR; // B6 = B4*B5
 
-  // STAP 1: Bruto Omzet
-  // Het totale bedrag dat de ZZP'er factureert
-  // 80% factureerbare tijd over het jaar (vakantie, feestdagen, ziekte, gaten tussen klussen)
-  const revenueTotal = hourlyRate * MONTHLY_HOURS * config.zzpBillableRate;
+  // STAP 2: Onwerkbaar uren en ziekte correctie (volgens Excel)
+  const unworkableHours = hoursPerYear * config.zzpUnworkableRate; // C7 = B6*B7 (14%)
+  const netHours = hoursPerYear - unworkableHours; // B8 = B6-C7
+  const sicknessCorrection = hoursPerYear * config.zzpSicknessCorrectionRate; // C9 = B9*B6 (6%)
+  const netHoursWithCorrection = netHours - sicknessCorrection; // B10 = B8-C9
 
-  // STAP 2: Kosten
-  // Kosten worden meegenomen als expliciete aftrekposten
-  // Option A: billableRate is "alles-in" (incl vakantie/feestdagen/ziekte/gaten)
-  // Daarom is vacationCosts = 0 (zit al in billableRate)
+  // STAP 3: Effectief werkbaar per maand en effectieve omzet (volgens Excel)
+  const effectiveHoursPerMonth = netHoursWithCorrection / 12; // B11 = B10/12
+  const effectiveRevenue = effectiveHoursPerMonth * hourlyRate; // B12 = B11*B3 (effectieve omzet facturabel)
+
+  // STAP 4: Marge en kosten (volgens Excel structuur)
+  const companyMargin = effectiveRevenue * config.zzpCompanyMarginRate; // C15 = B15*B12 (5%)
+  const incomeAfterMargin = effectiveRevenue - companyMargin; // B16 = B12-C15
+  const businessCosts = effectiveRevenue * config.zzpBusinessCostsRate; // C17 = B17*B12 (10%)
+  const incomeAfterMarginAndCosts = incomeAfterMargin - businessCosts; // B18 = B16-C17
+
+  // STAP 5: Pensioenberekening
+  // Volgens Excel: "Pensioen (uit deta calc)" - gebruik hetzelfde pensioen als detacheren
+  let employeePensionVal: number;
+  let employerPensionVal: number;
+  let basePensionableWage: number;
+  let pensionCompensationVal: number;
+  let pensionableWageVal: number;
+
+  if (detacherenEmployeePension !== undefined && detacherenEmployerPension !== undefined) {
+    // Gebruik pensioen uit detacheren berekening (volgens Excel)
+    employeePensionVal = detacherenEmployeePension;
+    employerPensionVal = detacherenEmployerPension;
+    // Voor backwards compatibility: bereken de pensioengrondslag terug (ongeveer)
+    // Dit is alleen voor display doeleinden, de werkelijke pensioenwaarden komen uit detacheren
+    const totalPensionRate = config.employerPensionRate + config.employeePensionRate;
+    pensionableWageVal = totalPensionRate > 0 ? (employeePensionVal + employerPensionVal) / totalPensionRate : 0;
+    basePensionableWage = pensionableWageVal;
+    pensionCompensationVal = 0; // Vereenvoudigd: geen compensatie als we pensioen overnemen
+  } else {
+    // Fallback: bereken pensioen zelf (oude logica, voor backwards compatibility)
+    const hourlyFranchise = config.hourlyFranchise; // Franchise per uur (standaard €9,24)
+    const monthlyFranchise = hourlyFranchise * effectiveHoursPerMonth; // Maandelijkse franchise
+
+    // Basis pensioengrondslag (geclamped, zelfde logica als detacheren)
+    basePensionableWage = Math.max(0, incomeAfterMarginAndCosts - monthlyFranchise);
+    
+    // Pensioencompensatie (optioneel, zelfde logica als detacheren)
+    pensionCompensationVal = config.pensionCompensationEnabled
+      ? basePensionableWage * config.pensionCompensationRate
+      : 0;
+    
+    // Herrekende pensioengrondslag
+    pensionableWageVal = basePensionableWage + pensionCompensationVal;
+
+    // Werkgever en werknemer betalen beide een percentage (zelfde als detacheren)
+    employerPensionVal = pensionableWageVal * config.employerPensionRate;
+    employeePensionVal = pensionableWageVal * config.employeePensionRate;
+  }
+
+  // STAP 6: Inkomen voor belasting (volgens Excel)
+  // B19 in Excel is het TOTAAL pensioen (employee + employer), niet alleen employee
+  const totalPension = employeePensionVal + employerPensionVal;
+  const incomeBeforeTax = incomeAfterMarginAndCosts - totalPension; // B20 = B18-B19
+
+  // STAP 7: ZZP Belasting berekening (volgens Excel)
+  // Belastbaar inkomen (jaar) = inkomen na marge * 12
+  const annualIncomeAfterMargin = incomeAfterMargin * 12; // B23 = B16*12
   
-  // Ondernemersrisico: aparte ZZP-config waarde (NIET gekoppeld aan companyMarginCosts)
-  const entrepreneurRisk = revenueTotal * config.zzpEntrepreneurRiskRate;
+  // Aftrek posten = (pensioen + kosten) * 12
+  // B19 in Excel is het TOTAAL pensioen (employee + employer), niet alleen employee
+  const annualDeductions = (totalPension + businessCosts) * 12; // B24 = (B19+C17)*12
   
-  // Vakantie/feestdagen: 0 in Option A (zit al in billableRate)
-  const vacationCosts = 0;
+  // Winst voor belasting
+  const profitBeforeTax = annualIncomeAfterMargin - annualDeductions; // B25 = B23-B24
   
-  // Overhead kosten (AOV/boekhouder/software/opleiding/apparatuur)
-  const overheadCosts = revenueTotal * config.zzpOverheadRate;
+  // MKB-vrijstelling
+  const mkbVrijstelling = profitBeforeTax * config.zzpMkbVrijstellingRate; // C26 = B25*B26 (13.31%)
   
-  // Buffer voor ziekte/gaten tussen opdrachten
-  const bufferCosts = revenueTotal * config.zzpBufferRate;
-  
-  const costsTotal = entrepreneurRisk + vacationCosts + overheadCosts + bufferCosts;
+  // Belastbaar inkomen
+  const taxableIncome = profitBeforeTax - mkbVrijstelling; // B27 = B25-C26
 
-  // STAP 3: Omzet na kosten
-  const revenueAfterCosts = revenueTotal - costsTotal;
+  // Inkomstenbelasting (volgens Excel formule)
+  let incomeTax = 0;
+  if (taxableIncome <= config.zzpTaxBracketLimit) {
+    incomeTax = taxableIncome * 0.3697; // B28 = B27*0.3697
+  } else {
+    incomeTax = (config.zzpTaxBracketLimit * 0.3697) + ((taxableIncome - config.zzpTaxBracketLimit) * 0.495);
+  }
 
-  // STAP 4: Pensioenberekening (EXACT zelfde StiPP-structuur als detacheren)
-  // Alleen de basis verschilt: revenueAfterCosts i.p.v. grossMonthly
-  const hourlyFranchise = config.hourlyFranchise; // Franchise per uur (standaard €9,24)
-  const monthlyFranchise = hourlyFranchise * MONTHLY_HOURS; // Maandelijkse franchise
+  // Zorgverzekeringswet bijdrage
+  const zvwContribution = Math.min(taxableIncome, config.zzpZvwMaxIncome) * config.zzpZvwRate; // B29 = MIN(B27, 75518) * 0.0532
 
-  // Basis pensioengrondslag (geclamped, zelfde logica als detacheren)
-  const basePensionableWage = Math.max(0, revenueAfterCosts - monthlyFranchise);
-  
-  // Pensioencompensatie (optioneel, zelfde logica als detacheren)
-  const pensionCompensationVal = config.pensionCompensationEnabled
-    ? basePensionableWage * config.pensionCompensationRate
-    : 0;
-  
-  // Herrekende pensioengrondslag
-  const pensionableWageVal = basePensionableWage + pensionCompensationVal;
+  // Algemene heffingskorting (volgens Excel formule)
+  let algemeenHeffingskorting = 0;
+  if (taxableIncome <= 24813) {
+    algemeenHeffingskorting = 3070; // B30 = 3070
+  } else if (taxableIncome >= 76817) {
+    algemeenHeffingskorting = 0; // B30 = 0
+  } else {
+    algemeenHeffingskorting = 3070 - ((taxableIncome - 24813) * 0.06095); // B30 = 3070-(B27-24813)*0.06095
+  }
 
-  // Werkgever en werknemer betalen beide een percentage (zelfde als detacheren)
-  const employerPensionVal = pensionableWageVal * config.employerPensionRate;
-  const employeePensionVal = pensionableWageVal * config.employeePensionRate;
+  // Arbeidskorting (volgens Excel formule)
+  let arbeidskorting = 0;
+  if (taxableIncome <= 11413) {
+    arbeidskorting = taxableIncome * 0.08231; // B31 = B27*0.08231
+  } else if (taxableIncome <= 39957) {
+    arbeidskorting = 939 + ((taxableIncome - 11413) * 0.29861); // B31 = 939+((B27-11413)*0.29861)
+  } else if (taxableIncome <= 124935) {
+    arbeidskorting = 5532 - ((taxableIncome - 39957) * 0.0651); // B31 = 5532-((B27-39957)*0.0651)
+  } else {
+    arbeidskorting = 0; // B31 = 0
+  }
 
-  // STAP 5: Reserveringen
-  // Pensioen is de hoofdreservering
-  const reservationsTotal = employeePensionVal;
+  // Belastingdruk
+  const totalTax = incomeTax + zvwContribution - algemeenHeffingskorting - arbeidskorting; // B32 = B28+B29-B30-B31
 
-  // STAP 6: Netto vóór belasting
-  const netBeforeTax = revenueAfterCosts - reservationsTotal;
+  // Netto per jaar en per maand
+  const netAnnual = taxableIncome - totalTax; // B34 = B27-B32
+  const netMonthly = netAnnual / 12; // B35 = B34/12
+
+  // Voor backwards compatibility: netBeforeTax is inkomen voor belasting (maandelijks)
+  // Dit wordt gebruikt in de UI voor "netto vóór belasting"
+  const netBeforeTax = incomeBeforeTax;
 
   // Retourneer alle berekende waarden
   return {
     // Totalen
-    revenueTotal: revenueTotal,
-    costsTotal: costsTotal,
-    revenueAfterCosts: revenueAfterCosts,
-    reservationsTotal: reservationsTotal,
-    netBeforeTax: netBeforeTax,
-    monthlyHours: MONTHLY_HOURS,
+    revenueTotal: effectiveRevenue, // Effectieve omzet (facturabel)
+    costsTotal: companyMargin + businessCosts, // Marge + kosten
+    revenueAfterCosts: incomeAfterMarginAndCosts, // Inkomen na marge en kosten
+    reservationsTotal: employeePensionVal, // Pensioen reservering
+    netBeforeTax: netBeforeTax, // Inkomen voor belasting (maandelijks, voor UI)
+    netAfterTax: netMonthly, // Netto na belasting (maandelijks, volgens Excel)
+    monthlyHours: effectiveHoursPerMonth, // Effectieve uren per maand
 
     // Breakdowns
     costsBreakdown: {
-      entrepreneurRisk: entrepreneurRisk,
-      vacationCosts: 0,  // Option A: zit al in billableRate
-      overheadCosts: overheadCosts,
-      bufferCosts: bufferCosts,
+      entrepreneurRisk: companyMargin, // Bedrijfsmarge (5%)
+      vacationCosts: 0, // Zit al in onwerkbaar uren
+      overheadCosts: businessCosts, // Kosten freelance bv (10%)
+      bufferCosts: 0, // Niet meer gebruikt in nieuwe structuur
     },
     reservationBreakdown: {
       employeePension: employeePensionVal,
@@ -716,6 +827,19 @@ export function calculateZZPDetailed(
     pensionCompensation: pensionCompensationVal,
     pensionableWage: pensionableWageVal,
     employerPension: employerPensionVal,
+    taxBreakdown: {
+      annualTaxableIncome: annualIncomeAfterMargin,
+      annualDeductions: annualDeductions,
+      profitBeforeTax: profitBeforeTax,
+      mkbVrijstelling: mkbVrijstelling,
+      taxableIncome: taxableIncome,
+      incomeTax: incomeTax,
+      zvwContribution: zvwContribution,
+      algemeenHeffingskorting: algemeenHeffingskorting,
+      arbeidskorting: arbeidskorting,
+      totalTax: totalTax,
+      netAnnual: netAnnual,
+    },
     additionalBenefits: {
       totalAdditionalBenefits: 0, // No additional benefits in this phase
     },

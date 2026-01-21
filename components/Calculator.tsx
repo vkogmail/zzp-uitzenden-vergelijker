@@ -132,12 +132,15 @@ export default function Calculator() {
   }, [hourlyRate, hoursPerWeek, config]);
 
   const zzpResult = useMemo(() => {
+    // Gebruik pensioen uit detacheren berekening (volgens Excel: "Pensioen (uit deta calc)")
     return calculateZZPDetailed(
       hourlyRate[0],
       hoursPerWeek[0],
-      config
+      config,
+      result.reservationBreakdown.employeePension, // Pensioen uit detacheren
+      result.employerPension // Werkgeverspensioen uit detacheren
     );
-  }, [hourlyRate, hoursPerWeek, config]);
+  }, [hourlyRate, hoursPerWeek, config, result.reservationBreakdown.employeePension, result.employerPension]);
 
   // Comparison mappers (ONLY for comparison header view)
   const detacherenComparable = useMemo(() => employeeResultToComparable(result), [result]);
@@ -235,12 +238,12 @@ export default function Calculator() {
                         </code>
                       </div>
                       <div className="bg-white p-3 rounded border border-green-200">
-                        <p className="font-semibold mb-2">Stap 2: Bedrijfsmarge</p>
+                        <p className="font-semibold mb-2">Stap 2: Marge CreateNew</p>
                         <p className="text-xs text-gray-600 mb-2">
-                          Het bedrijf houdt een marge in (standaard 15%): 5% winst + 10% kosten/risico.
+                          CreateNew houdt een marge in (standaard 15%): 5% winst + 10% kosten/risico.
                         </p>
                         <code className="text-xs bg-gray-100 p-1 rounded block">
-                          Netto uurtarief = Bruto uurtarief × (1 - Bedrijfsmarge)
+                          Netto uurtarief = Bruto uurtarief × (1 - Marge CreateNew)
                         </code>
                       </div>
                       <div className="bg-white p-3 rounded border border-green-200">
@@ -291,55 +294,63 @@ export default function Calculator() {
                     </AccordionTrigger>
                     <AccordionContent className="text-sm text-green-700 space-y-3 pt-2">
                       <div className="bg-white p-3 rounded border border-green-200">
-                        <p className="font-semibold mb-2">Stap 1: Bruto omzet</p>
+                        <p className="font-semibold mb-2">Stap 1: Uren berekening</p>
                         <p className="text-xs text-gray-600 mb-2">
-                          We gaan uit van 80% factureerbare tijd (vakantie, feestdagen, ziekte, gaten tussen klussen).
+                          Uren per jaar = uren per week × 52. Onwerkbaar (vakantie/feestdagen) en ziekte correctie worden afgetrokken.
                         </p>
                         <code className="text-xs bg-gray-100 p-1 rounded block">
-                          Bruto omzet = Uurtarief × Maanduren × 0.80
+                          Uren per jaar = Uren/week × 52<br/>
+                          Onwerkbaar uren = Uren per jaar × Onwerkbaar%<br/>
+                          Netto uren = Uren per jaar - Onwerkbaar uren<br/>
+                          Ziekte correctie = Uren per jaar × Ziekte%<br/>
+                          Netto met correctie = Netto uren - Ziekte correctie<br/>
+                          Effectief per maand = Netto met correctie ÷ 12
                         </code>
                       </div>
                       <div className="bg-white p-3 rounded border border-green-200">
-                        <p className="font-semibold mb-2">Stap 2: Kosten & Risico</p>
-                        <p className="text-xs text-gray-600 mb-2">
-                          Ondernemersrisico (10%), overhead (8%: AOV, boekhouder, software, opleiding), buffer (5%: ziekte/gaten).
-                        </p>
+                        <p className="font-semibold mb-2">Stap 2: Effectieve omzet</p>
                         <code className="text-xs bg-gray-100 p-1 rounded block">
-                          Kosten = Omzet × (Risico% + Overhead% + Buffer%)
+                          Effectieve omzet = Effectief uren/maand × Uurtarief
                         </code>
                       </div>
                       <div className="bg-white p-3 rounded border border-green-200">
-                        <p className="font-semibold mb-2">Stap 3: Omzet na kosten</p>
+                        <p className="font-semibold mb-2">Stap 3: Marge CreateNew en kosten</p>
+                        <p className="text-xs text-gray-600 mb-2">
+                          Marge CreateNew (5%) en kosten freelance bv (10%: incl verzekeringen).
+                        </p>
                         <code className="text-xs bg-gray-100 p-1 rounded block">
-                          Omzet na kosten = Bruto omzet - Kosten
+                          Marge CreateNew = Omzet × 5%<br/>
+                          Inkomen na marge CreateNew = Omzet - Marge CreateNew<br/>
+                          Kosten = Omzet × 10%<br/>
+                          Inkomen na marge CreateNew en kosten = Inkomen na marge CreateNew - Kosten
                         </code>
                       </div>
                       <div className="bg-white p-3 rounded border border-green-200">
                         <p className="font-semibold mb-2">Stap 4: Pensioen (StiPP)</p>
                         <p className="text-xs text-gray-600 mb-2">
                           Zelfde systeem als detacheren: franchise €9,24/uur, werkgever + werknemer percentages.
-                          Berekeningsbasis is omzet na kosten (niet bruto).
+                          Berekeningsbasis is inkomen na marge en kosten.
                         </p>
                         <code className="text-xs bg-gray-100 p-1 rounded block">
-                          Pensioengrondslag = (Omzet na kosten) - (Franchise × Maanduren)<br/>
+                          Pensioengrondslag = (Inkomen na marge en kosten) - (Franchise × Maanduren)<br/>
                           Pensioen = Pensioengrondslag × (Werkgever% + Werknemer%)
                         </code>
                       </div>
                       <div className="bg-white p-3 rounded border border-green-200">
-                        <p className="font-semibold mb-2">Stap 5: Netto vóór belasting</p>
-                        <code className="text-xs bg-gray-100 p-1 rounded block">
-                          Netto vóór belasting = Omzet na kosten - Pensioen
-                        </code>
-                      </div>
-                      <div className="bg-white p-3 rounded border border-green-200">
-                        <p className="font-semibold mb-2">Stap 6: Belastingreservering (indicatief)</p>
+                        <p className="font-semibold mb-2">Stap 5: ZZP Belasting</p>
                         <p className="text-xs text-gray-600 mb-2">
-                          Voor vergelijking met detacheren reserveren we 40% voor belasting.
-                          Dit is indicatief - exacte belasting hangt af van je situatie.
+                          Belastbaar inkomen (jaar) = inkomen na marge CreateNew × 12. Aftrekposten = (pensioen + kosten) × 12.
+                          Winst voor belasting - MKB-vrijstelling (13.31%) = belastbaar inkomen.
+                          Inkomstenbelasting + ZVW - kortingen = totale belasting.
                         </p>
                         <code className="text-xs bg-gray-100 p-1 rounded block">
-                          Belastingreservering = Netto vóór belasting × 40%<br/>
-                          Netto op rekening (indicatief) = Netto vóór belasting - Belastingreservering
+                          Belastbaar inkomen (jaar) = Inkomen na marge CreateNew × 12<br/>
+                          Aftrekposten = (Pensioen + Kosten) × 12<br/>
+                          Winst voor belasting = Belastbaar inkomen - Aftrekposten<br/>
+                          MKB-vrijstelling = Winst × 13.31%<br/>
+                          Belastbaar inkomen = Winst - MKB-vrijstelling<br/>
+                          Netto per jaar = Belastbaar inkomen - Totale belasting<br/>
+                          Netto per maand = Netto per jaar ÷ 12
                         </code>
                       </div>
                     </AccordionContent>
@@ -370,8 +381,8 @@ export default function Calculator() {
                       <div className="bg-white p-3 rounded border border-green-200">
                         <p className="font-semibold mb-2">Kosten & Risico</p>
                         <ul className="text-xs text-gray-600 space-y-1 list-disc list-inside">
-                          <li><strong>Detacheren:</strong> Bedrijfsmarge (10%) + extra uitkeringen in loonstructuur</li>
-                          <li><strong>ZZP:</strong> Ondernemersrisico (10%) + overhead (8%) + buffer (5%) + belastingreservering (40%)</li>
+                          <li><strong>Detacheren:</strong> Marge CreateNew (15%) + extra uitkeringen in loonstructuur</li>
+                          <li><strong>ZZP:</strong> Marge CreateNew (5%) + kosten freelance bv (10%) + belasting (volgens ZZP tarieven met MKB-vrijstelling)</li>
                         </ul>
                       </div>
                     </AccordionContent>
@@ -485,7 +496,7 @@ export default function Calculator() {
               
               {/* Company Margin */}
               <div className="space-y-4">
-                <h3 className="font-bold text-lg text-gray-900 border-b pb-2">Bedrijfsmarge</h3>
+                <h3 className="font-bold text-lg text-gray-900 border-b pb-2">Marge CreateNew</h3>
                 <ConfigInput
                   label="Totale marge (%)"
                   value={config.companyMarginTotal * 100}
@@ -692,6 +703,56 @@ export default function Calculator() {
                   onChange={(val) => updateConfig({ikbRate: val / 100})}
                   min={0}
                   max={10}
+                  step={0.1}
+                  suffix="%"
+                />
+              </div>
+
+              {/* ZZP Settings */}
+              <div className="space-y-4">
+                <h3 className="font-bold text-lg text-gray-900 border-b pb-2">ZZP Instellingen</h3>
+                <ConfigInput
+                  label="Onwerkbaar percentage (%) - vakantie/feestdagen"
+                  value={config.zzpUnworkableRate * 100}
+                  onChange={(val) => updateConfig({zzpUnworkableRate: val / 100})}
+                  min={0}
+                  max={10}
+                  step={0.1}
+                  suffix="%"
+                />
+                <ConfigInput
+                  label="Ziekte correctie (%) - korte termijn ziekte"
+                  value={config.zzpSicknessCorrectionRate * 100}
+                  onChange={(val) => updateConfig({zzpSicknessCorrectionRate: val / 100})}
+                  min={0}
+                  max={10}
+                  step={0.1}
+                  suffix="%"
+                />
+                <ConfigInput
+                  label="Marge CreateNew (%)"
+                  value={config.zzpCompanyMarginRate * 100}
+                  onChange={(val) => updateConfig({zzpCompanyMarginRate: val / 100})}
+                  min={0}
+                  max={20}
+                  step={0.1}
+                  suffix="%"
+                />
+                <ConfigInput
+                  label="Kosten freelance bv (%) - incl verzekeringen"
+                  value={config.zzpBusinessCostsRate * 100}
+                  onChange={(val) => updateConfig({zzpBusinessCostsRate: val / 100})}
+                  min={0}
+                  max={10}
+                  step={0.1}
+                  suffix="%"
+                />
+                <ConfigInput
+                  label="Belastingreservering (%) - voor indicatief netto"
+                  value={config.zzpTaxReserveRate * 100}
+                  onChange={(val) => updateConfig({zzpTaxReserveRate: val / 100})}
+                  min={0}
+                  max={50}
                   step={0.1}
                   suffix="%"
                 />
@@ -1003,9 +1064,8 @@ export default function Calculator() {
                         Bekijk uitsplitsing
                       </summary>
                       <div className="mt-2 space-y-1.5 text-[10px] text-green-200/80 pl-2 border-l border-green-400/30">
-                        <div>• Ondernemersrisico ({(config.zzpEntrepreneurRiskRate * 100).toFixed(0)}%): {formatCurrency(zzpResult.costsBreakdown.entrepreneurRisk)}</div>
-                        <div>• Overhead ({(config.zzpOverheadRate * 100).toFixed(0)}%): {formatCurrency(zzpResult.costsBreakdown.overheadCosts)}</div>
-                        <div>• Buffer ({(config.zzpBufferRate * 100).toFixed(0)}%): {formatCurrency(zzpResult.costsBreakdown.bufferCosts)}</div>
+                        <div>• Marge CreateNew ({(config.zzpCompanyMarginRate * 100).toFixed(0)}%): {formatCurrency(zzpResult.costsBreakdown.entrepreneurRisk)}</div>
+                        <div>• Kosten freelance bv ({(config.zzpBusinessCostsRate * 100).toFixed(0)}%): {formatCurrency(zzpResult.costsBreakdown.overheadCosts)}</div>
                       </div>
                     </details>
                   </div>
@@ -1120,7 +1180,7 @@ export default function Calculator() {
 
             {/* Step 2: Company Share */}
             <div className="bg-gray-50 p-6 rounded-xl border border-gray-200 flex flex-col gap-2 relative">
-                <div className="text-xs font-bold uppercase tracking-wider text-gray-400">Bedrijfskosten & marge</div>
+                <div className="text-xs font-bold uppercase tracking-wider text-gray-400">Marge CreateNew</div>
                 <div className="flex flex-col mb-3">
                      <div className="flex items-baseline gap-2 mb-1">
                           <span className="text-xs text-gray-500">Winst (5%)</span>
@@ -1191,7 +1251,7 @@ export default function Calculator() {
                         {/* Group A: Company Share */}
                         <div className="p-6 bg-gray-50/50 space-y-4">
                             <div className="flex items-center justify-between">
-                                <h3 className="font-semibold text-gray-700">Kosten en marge</h3>
+                                <h3 className="font-semibold text-gray-700">Marge CreateNew (15%)</h3>
                                 <span className="text-[10px] text-gray-500 max-w-[50%] text-right leading-tight">
                                     Dit deel gaat naar kosten, risico en het draaiend houden van het platform
                                 </span>
@@ -1206,7 +1266,7 @@ export default function Calculator() {
                                 label="Winst (5%)" 
                                 value={marginBreakdown.profit} 
                                 monthlyHours={monthlyHours}
-                                tooltip="Dit is de marge van het detacheringsbureau. Deze winst maakt het mogelijk om te investeren in betere dienstverlening, opdrachtenwerving en innovatie."
+                                tooltip="Dit is de marge van CreateNew. Deze winst maakt het mogelijk om te investeren in betere dienstverlening, opdrachtenwerving en innovatie."
                             />
                             <div className="flex justify-between items-center pt-2 border-t border-gray-200 text-gray-500 text-sm font-medium">
                                 <span>Totaal inhouding bedrijf</span>
@@ -1573,16 +1633,12 @@ export default function Calculator() {
             <div className="text-xs font-bold uppercase tracking-wider text-gray-400">Kosten & Risico</div>
             <div className="flex flex-col mb-3">
               <div className="flex items-baseline gap-2 mb-1">
-                <span className="text-xs text-gray-500">Ondernemersrisico (10%)</span>
+                <span className="text-xs text-gray-500">Marge CreateNew ({(config.zzpCompanyMarginRate * 100).toFixed(0)}%)</span>
                 <span className="text-2xl font-bold text-gray-900">{formatCurrency(zzpResult.costsBreakdown.entrepreneurRisk)}</span>
               </div>
               <div className="flex items-baseline gap-2">
-                <span className="text-xs text-gray-500">Overhead ({(config.zzpOverheadRate * 100).toFixed(0)}%)</span>
+                <span className="text-xs text-gray-500">Kosten freelance bv ({(config.zzpBusinessCostsRate * 100).toFixed(0)}%)</span>
                 <span className="text-sm font-medium text-gray-600">{formatCurrency(zzpResult.costsBreakdown.overheadCosts)}</span>
-              </div>
-              <div className="flex items-baseline gap-2">
-                <span className="text-xs text-gray-500">Buffer ({(config.zzpBufferRate * 100).toFixed(0)}%)</span>
-                <span className="text-sm font-medium text-gray-600">{formatCurrency(zzpResult.costsBreakdown.bufferCosts)}</span>
               </div>
             </div>
             <div className="text-xs text-gray-500 mt-auto">Totaal: {formatCurrency(zzpResult.costsTotal)}</div>
@@ -1645,26 +1701,20 @@ export default function Calculator() {
                     <h3 className="font-semibold text-gray-700">Kosten</h3>
                     <div className="bg-blue-50 p-3 rounded-lg border border-blue-200 mb-3">
                       <p className="text-xs text-blue-900 leading-relaxed">
-                        <strong>We gaan uit van {(config.zzpBillableRate * 100).toFixed(0)}% factureerbare tijd over het jaar.</strong> Dit betekent dat 20% van je tijd niet facturabel is: vakantie, feestdagen, ziekte, en gaten tussen klussen.
+                        <strong>Onwerkbaar: {(config.zzpUnworkableRate * 100).toFixed(0)}%</strong> (vakantie/feestdagen) + <strong>Ziekte correctie: {(config.zzpSicknessCorrectionRate * 100).toFixed(0)}%</strong>. Dit bepaalt je effectieve factureerbare uren.
                       </p>
                     </div>
                     <BreakdownRow 
-                      label={`Ondernemersrisico (${(config.zzpEntrepreneurRiskRate * 100).toFixed(0)}%)`}
+                      label={`Marge CreateNew (${(config.zzpCompanyMarginRate * 100).toFixed(0)}%)`}
                       value={zzpResult.costsBreakdown.entrepreneurRisk} 
                       monthlyHours={zzpResult.monthlyHours}
-                      tooltip="Het risico dat je draagt als zelfstandige: geen doorbetaling bij ziekte, geen opdracht, etc."
+                      tooltip="Marge CreateNew (zoals bij detacheren, maar 5% i.p.v. 15%)"
                     />
                     <BreakdownRow 
-                      label={`Overhead (${(config.zzpOverheadRate * 100).toFixed(0)}%)`}
+                      label={`Kosten freelance bv (${(config.zzpBusinessCostsRate * 100).toFixed(0)}%)`}
                       value={zzpResult.costsBreakdown.overheadCosts} 
                       monthlyHours={zzpResult.monthlyHours}
-                      tooltip="AOV, boekhouder, software, opleiding, apparatuur en andere zakelijke kosten."
-                    />
-                    <BreakdownRow 
-                      label={`Buffer (${(config.zzpBufferRate * 100).toFixed(0)}%)`}
-                      value={zzpResult.costsBreakdown.bufferCosts} 
-                      monthlyHours={zzpResult.monthlyHours}
-                      tooltip="Reserve voor ziekte en gaten tussen opdrachten."
+                      tooltip="Alle bedrijfskosten inclusief verzekeringen"
                     />
                     <div className="flex justify-between items-center pt-2 border-t border-gray-300 text-gray-700 text-sm font-semibold">
                       <span>Totaal kosten</span>
@@ -1685,43 +1735,16 @@ export default function Calculator() {
 
                   {/* Group D: Pension */}
                   <div className="p-6 bg-violet-50/30 space-y-4">
-                    <h3 className="font-semibold text-gray-700">Pensioen (StiPP-structuur)</h3>
+                    <h3 className="font-semibold text-gray-700">Pensioen</h3>
+                    <p className="text-xs text-gray-600 mb-2">
+                      Zelfde pensioen als bij detacheren (volgens Excel: "Pensioen (uit deta calc)")
+                    </p>
                     <BreakdownRow 
-                      label="Basis pensioengrondslag (na franchise)" 
-                      value={zzpResult.basePensionableWage} 
+                      label="Totaal pensioen inleg" 
+                      value={zzpResult.employerPension + zzpResult.reservationBreakdown.employeePension} 
                       monthlyHours={zzpResult.monthlyHours}
-                      tooltip="De pensioengrondslag na aftrek van de franchise (€9,24 per uur). Dit is dezelfde berekening als bij detacheren."
+                      tooltip="Totaal pensioen, gelijk aan detacheren."
                     />
-                    {zzpResult.pensionCompensation > 0 && (
-                      <BreakdownRow 
-                        label="Pensioencompensatie" 
-                        value={zzpResult.pensionCompensation} 
-                        monthlyHours={zzpResult.monthlyHours}
-                        tooltip="Compensatie die wordt toegevoegd aan de basis pensioengrondslag."
-                      />
-                    )}
-                    <BreakdownRow 
-                      label="Herrekende pensioengrondslag" 
-                      value={zzpResult.pensionableWage} 
-                      monthlyHours={zzpResult.monthlyHours}
-                      tooltip="De pensioengrondslag waarover pensioen wordt berekend."
-                    />
-                    <BreakdownRow 
-                      label="Werknemerspensioen ({(config.employeePensionRate * 100).toFixed(1)}%)" 
-                      value={zzpResult.reservationBreakdown.employeePension} 
-                      monthlyHours={zzpResult.monthlyHours}
-                      tooltip="Het percentage van de pensioengrondslag dat jij als werknemer betaalt."
-                    />
-                    <BreakdownRow 
-                      label="Werkgeverspensioen ({(config.employerPensionRate * 100).toFixed(1)}%)" 
-                      value={zzpResult.employerPension} 
-                      monthlyHours={zzpResult.monthlyHours}
-                      tooltip="Het percentage van de pensioengrondslag dat als werkgeversdeel wordt opgebouwd."
-                    />
-                    <div className="flex justify-between items-center pt-2 border-t border-gray-300 text-gray-700 text-sm font-semibold">
-                      <span>Totaal pensioen inleg</span>
-                      <span>{formatCurrency(zzpResult.employerPension + zzpResult.reservationBreakdown.employeePension)}</span>
-                    </div>
                   </div>
 
                   {/* Group E: Net Before Tax */}
