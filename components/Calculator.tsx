@@ -1317,9 +1317,9 @@ export default function Calculator() {
       {/* SECTION 4: Calculator + Simple Flow (Detacheren Tab) */}
       {activeTab === 'detacheren' && (
       <div className="max-w-5xl mx-auto" style={{ paddingLeft: '1rem', paddingRight: '1rem' }}>
-      <section className="py-16 space-y-12">
+      <section className="pt-8 pb-16 space-y-12">
         {/* Controls */}
-        <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-200 max-w-3xl mx-auto">
+        <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-200">
              {/* CAO Indicator */}
              <div className="mb-6 flex items-center justify-between bg-blue-50 p-3 rounded-lg border border-blue-200">
                <div className="flex items-center gap-2">
@@ -1761,7 +1761,7 @@ export default function Calculator() {
       {activeTab === 'detacheren' && (
       <div className="max-w-5xl mx-auto" style={{ paddingLeft: '1rem', paddingRight: '1rem' }}>
       <section className="pb-8">
-        <div className="bg-amber-50 border-l-4 border-amber-400 p-4 rounded-lg max-w-3xl mx-auto">
+        <div className="bg-amber-50 border-l-4 border-amber-400 p-4 rounded-lg">
           <div className="flex items-start gap-3">
             <div className="flex-shrink-0">
               <svg className="w-5 h-5 text-amber-600 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
@@ -1787,9 +1787,9 @@ export default function Calculator() {
       {/* SECTION 5: ZZP Tab */}
       {activeTab === 'zzp' && (
       <div className="max-w-5xl mx-auto" style={{ paddingLeft: '1rem', paddingRight: '1rem' }}>
-      <section className="py-16 space-y-12">
+      <section className="pt-8 pb-16 space-y-12">
         {/* Controls */}
-        <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-200 max-w-3xl mx-auto">
+        <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-200">
           <div className="grid mobile:grid-cols-2 mobile:gap-6 gap-6">
             <div className="space-y-3 flex flex-col">
               <div className="flex flex-col gap-1">
@@ -1897,7 +1897,7 @@ export default function Calculator() {
         </div>
 
         {/* Detailed Breakdown for ZZP */}
-        <section className="max-w-3xl mx-auto px-4 pb-16">
+        <section className="pb-16">
           <Accordion type="single" collapsible className="w-full">
             <AccordionItem value="breakdown" className="border border-gray-200 rounded-xl overflow-hidden bg-white shadow-sm">
               <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-gray-50 transition-colors">
