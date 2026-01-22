@@ -109,6 +109,8 @@ function ValueBlock({
   breakdown,
   formatCurrency,
   variant,
+  baseTotal,
+  correction,
 }: {
   title: string;
   subtitle: string;
@@ -117,15 +119,22 @@ function ValueBlock({
   breakdown: ValueBreakdown;
   formatCurrency: (n: number) => string;
   variant: 'detacheren' | 'zzp';
+  baseTotal?: number;
+  correction?: number;
 }) {
   const keys: (keyof Omit<ValueBreakdown, 'total'>)[] = ['marge', 'kosten', 'pensioen', 'belasting', 'netto'];
   const base = variant === 'detacheren' ? 'bg-blue-50 border-blue-200' : 'bg-green-50 border-green-200';
   
   // Calculate percentages for vertical bar chart
+  // Use baseTotal for percentage calculation if provided (to align charts)
   const totalValue = keys.reduce((sum, k) => sum + Math.max(0, breakdown[k]), 0);
+  const percentageBase = baseTotal ?? totalValue;
   
   // Total height for the vertical bar chart (in pixels)
   const CHART_HEIGHT = 500;
+  
+  // Use baseTotal if provided, otherwise use total
+  const displayTotal = baseTotal ?? total;
   
   return (
     <div className={`p-6 rounded-2xl border ${base}`}>
@@ -140,9 +149,28 @@ function ValueBlock({
           <p className="text-sm text-gray-500">{subtitle}</p>
         </div>
       </div>
-      <div className="mb-4 flex justify-between items-baseline">
-        <div className="text-xs font-semibold uppercase tracking-wider text-gray-500">{totalLabel}</div>
-        <div className="text-2xl font-bold text-gray-900">{formatCurrency(total)}</div>
+      <div className="mb-4">
+        <div className="flex justify-between items-baseline">
+          <div>
+            <div className="text-xs font-semibold uppercase tracking-wider text-gray-500">{totalLabel}</div>
+            <div className="text-xs text-gray-400">
+              {variant === 'detacheren' 
+                ? 'Inclusief vakantie & feestdagen' 
+                : 'Factureerbare omzet (excl. vakantie/feestdagen)'}
+            </div>
+          </div>
+          <div className="text-2xl font-bold text-gray-900">{formatCurrency(displayTotal)}</div>
+        </div>
+        <div className="mt-2 pt-2 border-t border-gray-200 h-8 flex justify-between items-baseline">
+          {correction !== undefined && correction > 0 ? (
+            <>
+              <div className="text-xs text-gray-500">Correctie onwerkbare uren (14%)</div>
+              <div className="text-sm font-semibold text-red-600">- {formatCurrency(correction)}</div>
+            </>
+          ) : (
+            <div className="invisible text-xs">Spacer</div>
+          )}
+        </div>
       </div>
       
       {/* Vertical Stacked Bar Chart */}
@@ -150,7 +178,7 @@ function ValueBlock({
         {keys.map((k) => {
           const v = breakdown[k];
           if (v <= 0) return null;
-          const percentage = (v / totalValue) * 100;
+          const percentage = (v / percentageBase) * 100;
           const bgColor = VALUE_COLORS[k].split(' ')[0]; // Get just the bg color
           const textColor = VALUE_COLORS[k].split(' ')[1]; // Get the text color
           
@@ -1219,6 +1247,8 @@ export default function Calculator() {
                 breakdown={zzpValueBreakdown}
                 formatCurrency={formatCurrency}
                 variant="zzp"
+                baseTotal={detacherenValueBreakdown.total}
+                correction={detacherenValueBreakdown.total - zzpValueBreakdown.total}
               />
             </div>
 
