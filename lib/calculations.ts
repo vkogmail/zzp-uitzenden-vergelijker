@@ -651,6 +651,58 @@ export function calculateZZPTaxReservation(
   };
 }
 
+// ============================================================================
+// Value Breakdown voor "Vergelijk de Waarde" (marge, kosten, belasting, pensioen, netto)
+// Bron: config/berekeningen; percentages komen overeen met Excel (o.a. marge 15% vs 5%).
+// Later kunnen waarden uit xlsx worden geladen.
+// ============================================================================
+
+export interface ValueBreakdown {
+  marge: number;      // Marge & Risico (CreateNew 15% detacheren, 5% ZZP)
+  kosten: number;     // Kosten & Voorzieningen
+  belasting: number;
+  pensioen: number;
+  netto: number;
+  total: number;
+}
+
+export function getDetacherenValueBreakdown(result: EmployeeResult): ValueBreakdown {
+  const total = result.clientTotal;
+  // Marge = 5% (profit portion of company margin)
+  const marge = result.marginBreakdown.profit;
+  // Bedrijfskosten = 10% (admin/costs portion of company margin)
+  const kosten = result.marginBreakdown.admin;
+  // Pensioen = werkgever + werknemer pensioen (totale pensioenwaarde)
+  const pensioen = result.employerPension + result.reservationBreakdown.employeePension;
+  // Belastingen Premies en afdrachten = 
+  //   Totaal ingehouden (reservationsTotal + taxesTotal)
+  //   + Werkgeverslasten (candidateTotal - grossTotal - employerPension)
+  //   - Extra uitkeringen (vakantiedagen + vakantiegeld + eindejaarsuitkering + IKB)
+  //   - Werknemerspensioen (zit al in Pensioen, dus aftrekken om dubbeltelling te voorkomen)
+  const totaalIngehouden = result.reservationsTotal + result.taxesTotal;
+  const werkgeverslasten = result.candidateTotal - result.grossTotal - result.employerPension;
+  const belasting = totaalIngehouden + werkgeverslasten 
+    - result.additionalBenefits.totalAdditionalBenefits 
+    - result.reservationBreakdown.employeePension;
+  // Netto = netto loon + extra uitkeringen (vakantiedagen, vakantiegeld, eindejaarsuitkering, IKB)
+  const netto = result.netTotal + result.additionalBenefits.totalAdditionalBenefits;
+  return { marge, kosten, belasting, pensioen, netto, total };
+}
+
+export function getZZPValueBreakdown(
+  zzpResult: ZZPResult,
+  config: CalculatorConfig
+): ValueBreakdown {
+  const total = zzpResult.revenueTotal;
+  const marge = zzpResult.costsBreakdown.entrepreneurRisk;
+  const kosten = zzpResult.costsBreakdown.overheadCosts;
+  const pensioen = zzpResult.employerPension + zzpResult.reservationBreakdown.employeePension;
+  const taxRes = calculateZZPTaxReservation(zzpResult, config);
+  const netto = zzpResult.netAfterTax ?? taxRes.netAfterTaxIndicative;
+  const belasting = zzpResult.netBeforeTax - netto;
+  return { marge, kosten, belasting, pensioen, netto, total };
+}
+
 /**
  * Berekent het gedetailleerde netto inkomen voor een ZZP'er (volgens Excel structuur)
  *
