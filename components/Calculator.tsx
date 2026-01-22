@@ -2033,14 +2033,14 @@ export default function Calculator() {
                           <div className="p-3 rounded-lg space-y-2 bg-gray-100 border border-gray-200">
                             <div className="flex justify-between items-center text-xs">
                               <span className="font-medium text-gray-700">Winst voor belasting (jaarlijks)</span>
-                              <span className="font-bold text-gray-900">{formatCurrency(zzpResult.taxBreakdown.profitBeforeTax * 12)}</span>
+                              <span className="font-bold text-gray-900">{formatCurrency(zzpResult.taxBreakdown.profitBeforeTax)}</span>
                             </div>
                             <div className="flex justify-between items-center text-xs text-gray-600">
                               <span className="font-medium">− Zelfstandigenaftrek</span>
                               <span className="font-bold">− {formatCurrency(zzpResult.taxBreakdown.annualDeductions)}</span>
                             </div>
                             <div className="flex justify-between items-center text-xs text-gray-600">
-                              <span className="font-medium">− MKB-vrijstelling (14%)</span>
+                              <span className="font-medium">− MKB-vrijstelling ({(config.zzpMkbVrijstellingRate * 100).toFixed(2)}%)</span>
                               <span className="font-bold">− {formatCurrency(zzpResult.taxBreakdown.mkbVrijstelling)}</span>
                             </div>
                             <p className="text-[10px] leading-relaxed text-gray-500">
@@ -2050,7 +2050,7 @@ export default function Calculator() {
                           
                           <div className="p-3 bg-gray-100 rounded-lg flex justify-between items-center text-sm border border-gray-200">
                             <span className="font-medium text-gray-700">Belastbaar inkomen (jaarlijks)</span>
-                            <span className="font-bold text-gray-900">{formatCurrency(zzpResult.taxBreakdown.taxableIncome * 12)}</span>
+                            <span className="font-bold text-gray-900">{formatCurrency(zzpResult.taxBreakdown.taxableIncome)}</span>
                           </div>
                           
                           <div className="space-y-3">
@@ -2061,19 +2061,19 @@ export default function Calculator() {
                             <div className="p-3 rounded-lg space-y-2 bg-gray-100 border border-gray-200">
                               <div className="flex justify-between items-center text-xs">
                                 <span className="font-medium text-gray-700">Inkomstenbelasting (jaarlijks)</span>
-                                <span className="font-bold text-gray-900">{formatCurrency(zzpResult.taxBreakdown.incomeTax * 12)}</span>
+                                <span className="font-bold text-gray-900">{formatCurrency(zzpResult.taxBreakdown.incomeTax)}</span>
                               </div>
                               <div className="flex justify-between items-center text-xs">
                                 <span className="font-medium text-gray-700">Zvw-premie (jaarlijks)</span>
-                                <span className="font-bold text-gray-900">{formatCurrency(zzpResult.taxBreakdown.zvwContribution * 12)}</span>
+                                <span className="font-bold text-gray-900">{formatCurrency(zzpResult.taxBreakdown.zvwContribution)}</span>
                               </div>
                               <div className="flex justify-between items-center text-xs text-gray-600">
                                 <span className="font-medium">− Algemene heffingskorting</span>
-                                <span className="font-bold">− {formatCurrency(zzpResult.taxBreakdown.algemeenHeffingskorting * 12)}</span>
+                                <span className="font-bold">− {formatCurrency(zzpResult.taxBreakdown.algemeenHeffingskorting)}</span>
                               </div>
                               <div className="flex justify-between items-center text-xs text-gray-600">
                                 <span className="font-medium">− Arbeidskorting</span>
-                                <span className="font-bold">− {formatCurrency(zzpResult.taxBreakdown.arbeidskorting * 12)}</span>
+                                <span className="font-bold">− {formatCurrency(zzpResult.taxBreakdown.arbeidskorting)}</span>
                               </div>
                               <p className="text-[10px] leading-relaxed text-gray-500">
                                 Heffingskortingen verlagen de belasting die je betaalt
