@@ -920,15 +920,18 @@ export default function Calculator() {
       )}
       
       {/* SECTION 1: Intro */}
-      <section className="bg-white border-b border-gray-100 pt-16 pb-12 px-4 w-full h-fit max-w-container-max rounded-2xl mx-auto" style={{ boxShadow: 'rgba(13, 13, 18, 0.05) 0px 2px 4px 0px' }}>
-        <div className="max-w-4xl mx-auto text-center space-y-6">
-          <h1 className="text-4xl mobile:text-5xl font-extrabold tracking-tight text-gray-900">
-            Je inkomen is meer dan je maandbedrag
-          </h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-            Zie wat je direct ontvangt en wat je opbouwt voor later.
-          </p>
-        </div>
+      <div className="max-w-5xl mx-auto" style={{ paddingLeft: '1rem', paddingRight: '1rem' }}>
+        <section className="bg-white border-b border-gray-100 pt-16 pb-12 rounded-2xl" style={{ boxShadow: 'rgba(13, 13, 18, 0.05) 0px 2px 4px 0px' }}>
+          <div className="text-center space-y-6 px-6">
+            <h1 className="text-4xl mobile:text-5xl font-extrabold tracking-tight text-gray-900">
+              Je inkomen is meer dan je maandbedrag
+            </h1>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+              Zie wat je direct ontvangt en wat je opbouwt voor later.
+            </p>
+          </div>
+        </section>
+      </div>
 
         {/* Explainer Cards */}
         {/* <div className="max-w-5xl mx-auto grid md:grid-cols-3 gap-6 mt-16 text-left">
@@ -968,7 +971,6 @@ export default function Calculator() {
             </CardContent>
           </Card>
         </div> */}
-      </section>
 
       {/* SECTION 2: Tab Navigation */}
       <section className="py-8 px-4 max-w-5xl mx-auto">
@@ -1013,14 +1015,15 @@ export default function Calculator() {
 
       {/* SECTION 3: Comparison View (when activeTab === 'comparison') */}
       {activeTab === 'comparison' && (
-        <section className="pt-8 pb-16 px-4 max-w-container-max mx-auto space-y-12">
+        <div className="max-w-5xl mx-auto" style={{ paddingLeft: '1rem', paddingRight: '1rem' }}>
+        <section className="pt-8 pb-16 space-y-12">
           {/* <div className="text-center space-y-2">
             <h2 className="text-3xl font-bold text-gray-900">Detacheren vs ZZP</h2>
             <p className="text-gray-500">Pas je uurtarief en uren aan en zie direct wat je overhoudt.</p>
           </div> */}
 
           {/* Controls */}
-          <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-200 max-w-3xl mx-auto">
+          <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-200 max-w-5xl mx-auto">
             {/* CAO Indicator */}
             <div className="mb-6 flex items-center justify-between bg-blue-50 p-3 rounded-lg border border-blue-200">
               <div className="flex items-center gap-2">
@@ -1249,12 +1252,6 @@ export default function Calculator() {
 
           {/* Vergelijk de Waarde – Verdeling marge, kosten, belasting, pensioen, netto */}
           <div className="max-w-5xl mx-auto space-y-6">
-            <div className="text-center space-y-2">
-              <h2 className="text-2xl font-bold text-gray-900">Waar gaat je geld naartoe?</h2>
-              <p className="text-gray-500 text-sm max-w-2xl mx-auto">
-                Van bruto omzet naar netto: zie hoe marge, kosten, belastingen en pensioen je totaal beïnvloeden.
-              </p>
-            </div>
 
             <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-10 space-y-6">
               <div className="grid mobile:grid-cols-2 gap-10">
@@ -1314,16 +1311,13 @@ export default function Calculator() {
             </div>
           </div>
         </section>
+        </div>
       )}
 
       {/* SECTION 4: Calculator + Simple Flow (Detacheren Tab) */}
       {activeTab === 'detacheren' && (
-      <section className="py-16 px-4 max-w-5xl mx-auto space-y-12">
-        <div className="text-center space-y-2">
-          <h2 className="text-3xl font-bold text-gray-900">Inzicht in je totale beloning</h2>
-          <p className="text-gray-500">Een compleet beeld van je maandinkomen, extra's en opbouw voor later.</p>
-        </div>
-
+      <div className="max-w-5xl mx-auto" style={{ paddingLeft: '1rem', paddingRight: '1rem' }}>
+      <section className="py-16 space-y-12">
         {/* Controls */}
         <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-200 max-w-3xl mx-auto">
              {/* CAO Indicator */}
@@ -1457,11 +1451,13 @@ export default function Calculator() {
         </div>
 
       </section>
+      </div>
       )}
 
       {/* SECTION 3: Detailed Breakdown (Detacheren Tab) */}
       {activeTab === 'detacheren' && (
-      <section className="max-w-3xl mx-auto px-4 pb-16">
+      <div className="max-w-5xl mx-auto" style={{ paddingLeft: '1rem', paddingRight: '1rem' }}>
+      <section className="pb-16">
         <Accordion type="single" collapsible className="w-full">
             <AccordionItem value="breakdown" className="border border-gray-200 rounded-xl overflow-hidden bg-white shadow-sm">
                 <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-gray-50 transition-colors">
@@ -1758,11 +1754,13 @@ export default function Calculator() {
             </AccordionItem>
         </Accordion>
       </section>
+      </div>
       )}
 
       {/* Disclaimer (Detacheren Tab) */}
       {activeTab === 'detacheren' && (
-      <section className="max-w-3xl mx-auto px-4 pb-8">
+      <div className="max-w-5xl mx-auto" style={{ paddingLeft: '1rem', paddingRight: '1rem' }}>
+      <section className="pb-8">
         <div className="bg-amber-50 border-l-4 border-amber-400 p-4 rounded-lg max-w-3xl mx-auto">
           <div className="flex items-start gap-3">
             <div className="flex-shrink-0">
@@ -1783,16 +1781,13 @@ export default function Calculator() {
           </div>
         </div>
       </section>
+      </div>
       )}
 
       {/* SECTION 5: ZZP Tab */}
       {activeTab === 'zzp' && (
-      <section className="py-16 px-4 max-w-5xl mx-auto space-y-12">
-        <div className="text-center space-y-2">
-          <h2 className="text-3xl font-bold text-gray-900">ZZP Berekening</h2>
-          <p className="text-gray-500">Berekening van je inkomen als zelfstandige zonder personeel.</p>
-        </div>
-
+      <div className="max-w-5xl mx-auto" style={{ paddingLeft: '1rem', paddingRight: '1rem' }}>
+      <section className="py-16 space-y-12">
         {/* Controls */}
         <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-200 max-w-3xl mx-auto">
           <div className="grid mobile:grid-cols-2 mobile:gap-6 gap-6">
@@ -2173,6 +2168,7 @@ export default function Calculator() {
           </Accordion>
         </section>
       </section>
+      </div>
       )}
 
       {/* SECTION 6: Detacheren vs ZZP (old comparison - can be removed or kept) */}
