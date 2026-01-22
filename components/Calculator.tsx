@@ -130,6 +130,7 @@ function ValueBlock({
   variant,
   baseTotal,
   correction,
+  unworkableRate,
 }: {
   title: string;
   subtitle: string;
@@ -140,6 +141,7 @@ function ValueBlock({
   variant: 'detacheren' | 'zzp';
   baseTotal?: number;
   correction?: number;
+  unworkableRate?: number;
 }) {
   const keys: (keyof Omit<ValueBreakdown, 'total'>)[] = ['marge', 'kosten', 'pensioen', 'belasting', 'netto'];
   
@@ -223,7 +225,7 @@ function ValueBlock({
               background: 'repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(156, 163, 175, 0.1) 10px, rgba(156, 163, 175, 0.1) 12px)'
             }}
           >
-            <span className="text-sm font-semibold text-gray-500">Correctie onwerkbare uren (14%)</span>
+            <span className="text-sm font-semibold text-gray-500">Onbetaalde vakantie en feestdagen {unworkableRate ? `${(unworkableRate * 100).toFixed(0)}%` : '14%'}</span>
             <span className="text-sm font-bold text-gray-600">- {formatCurrency(correction)}</span>
           </div>
         )}
@@ -1275,6 +1277,7 @@ export default function Calculator() {
                   variant="zzp"
                   baseTotal={detacherenValueBreakdown.total}
                   correction={detacherenValueBreakdown.total - zzpValueBreakdown.total}
+                  unworkableRate={config.zzpUnworkableRate}
                 />
               </div>
 
