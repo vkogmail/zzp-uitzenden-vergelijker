@@ -109,6 +109,71 @@
   /* Background and foreground */
   --background: var(--grey-cool-5);
   --foreground: var(--grey-cool-400);
+
+  /* Value Breakdown Color Palettes - Linked to bar charts */
+  /* Marge (Lime Green Palette) */
+  --color-marge-100: #F5FBEA;
+  --color-marge-200: #DAEBB5;
+  --color-marge-300: #88B228;
+  --color-marge-400: #4E6517;
+  --color-marge-500: #2A360E;
+
+  /* Bedrijfskosten (Cyan/Aqua Blue Palette) */
+  --color-kosten-100: #F5FBFC;
+  --color-kosten-200: #D7ECF4;
+  --color-kosten-300: #24B0D5;
+  --color-kosten-400: #1A6C80;
+  --color-kosten-500: #0F3945;
+
+  /* Pensioen (Golden Yellow Palette) */
+  --color-pensioen-100: #FCFBF4;
+  --color-pensioen-200: #F6EFD1;
+  --color-pensioen-300: #DDA600;
+  --color-pensioen-400: #7E620B;
+  --color-pensioen-500: #413306;
+
+  /* Belastingen (Bright Orange Palette) */
+  --color-belasting-100: #FDF9F6;
+  --color-belasting-200: #F9E7DB;
+  --color-belasting-300: #F47C2F;
+  --color-belasting-400: #8D471E;
+  --color-belasting-500: #4C2611;
+
+  /* Netto (Sky Blue/Royal Blue Palette) */
+  --color-netto-100: #F5FBFF;
+  --color-netto-200: #D7EDF9;
+  --color-netto-300: #389BEF;
+  --color-netto-400: #2566A3;
+  --color-netto-500: #14375A;
+
+  /* Additional palettes for future use */
+  /* Cool Grey Palette */
+  --color-grey-cool-100: #EFF2F5;
+  --color-grey-cool-200: #D6DDE4;
+  --color-grey-cool-300: #6D7D8F;
+  --color-grey-cool-400: #3C4456;
+  --color-grey-cool-500: #1F232D;
+
+  /* Lavender Purple Palette */
+  --color-lavender-100: #F9F7FB;
+  --color-lavender-200: #E8DEEE;
+  --color-lavender-300: #B99ECB;
+  --color-lavender-400: #6F5E80;
+  --color-lavender-500: #3C3345;
+
+  /* Deep Purple/Indigo Palette */
+  --color-purple-100: #F5F3FB;
+  --color-purple-200: #DFD7EC;
+  --color-purple-300: #7F58B8;
+  --color-purple-400: #4E3D73;
+  --color-purple-500: #271E3A;
+
+  /* Emerald Green/Teal Green Palette */
+  --color-emerald-100: #F5FDFB;
+  --color-emerald-200: #D7F2E8;
+  --color-emerald-300: #1B9F6F;
+  --color-emerald-400: #135E44;
+  --color-emerald-500: #0A3224;
 }
 
 /* 2) Tailwind theme bridge */
