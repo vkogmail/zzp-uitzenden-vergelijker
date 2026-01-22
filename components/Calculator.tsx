@@ -1017,7 +1017,7 @@ export default function Calculator() {
       {/* SECTION 3: Comparison View (when activeTab === 'comparison') */}
       {activeTab === 'comparison' && (
         <div className="max-w-5xl mx-auto" style={{ paddingLeft: '1rem', paddingRight: '1rem' }}>
-        <section className="pt-8 pb-16 space-y-12">
+        <section className="pt-8 space-y-12">
           {/* <div className="text-center space-y-2">
             <h2 className="text-3xl font-bold text-gray-900">Detacheren vs ZZP</h2>
             <p className="text-gray-500">Pas je uurtarief en uren aan en zie direct wat je overhoudt.</p>
@@ -1061,7 +1061,7 @@ export default function Calculator() {
                   min={30}
                   max={200}
                   step={0.5}
-                  className="w-full"
+                  className="w-full py-4"
                 />
               </div>
 
@@ -1081,7 +1081,7 @@ export default function Calculator() {
                   min={16}
                   max={40}
                   step={1}
-                  className="w-full"
+                  className="w-full py-4"
                 />
               </div>
             </div>
@@ -1313,6 +1313,31 @@ export default function Calculator() {
             </div>
           </div>
         </section>
+
+        {/* Disclaimer (Comparison Tab) */}
+        <div className="max-w-5xl mx-auto pt-8" style={{ paddingLeft: '1rem', paddingRight: '1rem' }}>
+          <section className="pb-8">
+            <div className="bg-amber-50 border-l-4 border-amber-400 p-4 rounded-lg">
+              <div className="flex items-start gap-3">
+                <div className="flex-shrink-0">
+                  <svg className="w-5 h-5 text-amber-600 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div className="text-left">
+                  <h3 className="text-sm font-bold text-amber-900 mb-1">Indicatieve berekening</h3>
+                  <p className="text-xs text-amber-800 leading-relaxed">
+                    Deze calculator geeft een <strong>realistische indicatie</strong> van je netto inkomen en arbeidsvoorwaarden. 
+                    De exacte bedragen op je loonstrook kunnen afwijken door individuele omstandigheden, 
+                    verschillende CAO-afspraken, loonheffingskortingen, en andere persoonlijke factoren. 
+                    Gebruik deze tool als richtlijn, niet als definitieve berekening. 
+                    <strong> En er kunnen geen rechten aan worden ontleend.</strong>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
         </div>
       )}
 
@@ -1358,7 +1383,7 @@ export default function Calculator() {
                       max={150}
                       step={0.5}
                       onValueChange={setHourlyRate}
-                      className="py-4"
+                      className="w-full py-4"
                     />
                   </div>
                   
@@ -1380,7 +1405,7 @@ export default function Calculator() {
                       max={40}
                       step={1}
                       onValueChange={setHoursPerWeek}
-                      className="py-4"
+                      className="w-full py-4"
                     />
                   </div>
              </div>
@@ -1388,30 +1413,33 @@ export default function Calculator() {
 
         {/* Visual Flow */}
         <div className="flex flex-col md:flex-row gap-4 items-stretch">
-            {/* Step 1: Client Pays */}
-            <div className="bg-white p-6 rounded-xl border border-gray-200 flex flex-col gap-2 relative group flex-1">
-                <div className="text-xs font-bold uppercase tracking-wider text-gray-400">WAT DE KLANT BETAALT</div>
-                <div className="flex flex-col">
-                     <span className="text-2xl font-bold text-gray-900">{formatCurrency(clientTotal)}</span>
-                     <span className="text-sm font-medium text-gray-400">{formatHourly(clientTotal)} /uur</span>
+            {/* First two cards side by side on mobile */}
+            <div className="flex flex-row gap-4 items-stretch">
+                {/* Step 1: Client Pays */}
+                <div className="bg-white p-6 rounded-xl border border-gray-200 flex flex-col gap-2 relative group flex-1">
+                    <div className="text-xs font-bold uppercase tracking-wider text-gray-400">WAT DE KLANT BETAALT</div>
+                    <div className="flex flex-col">
+                         <span className="text-2xl font-bold text-gray-900">{formatCurrency(clientTotal)}</span>
+                         <span className="text-sm font-medium text-gray-400">{formatHourly(clientTotal)} /uur</span>
+                    </div>
+                    <div className="text-sm text-gray-500 mt-1">Het volledige maandbedrag</div>
                 </div>
-                <div className="text-sm text-gray-500 mt-1">Het volledige maandbedrag</div>
-            </div>
 
-            {/* Step 2: Company Share - Match Marge color from bar chart */}
-            <div className="bg-[#E8F4D9] p-6 rounded-xl border border-[#4E6517]/20 flex flex-col gap-2 relative flex-1">
-                <div className="text-xs font-bold uppercase tracking-wider text-[#4A6B0F]">MARGE CREATENEW</div>
-                <div className="flex flex-col mb-3">
-                     <div className="flex items-baseline gap-2 mb-1">
-                          <span className="text-xs text-[#4A6B0F]">Winst (5%)</span>
-                          <span className="text-2xl font-bold text-[#4A6B0F]">{formatCurrency(marginBreakdown.profit)}</span>
-                     </div>
-                     <div className="flex items-baseline gap-2">
-                          <span className="text-[10px] text-[#4A6B0F]/70">Kosten (10%)</span>
-                          <span className="text-sm font-medium text-[#4A6B0F]">{formatCurrency(marginBreakdown.admin)}</span>
-                     </div>
+                {/* Step 2: Company Share - Match Marge color from bar chart */}
+                <div className="bg-[#E8F4D9] p-6 rounded-xl border border-[#4E6517]/20 flex flex-col gap-2 relative flex-1">
+                    <div className="text-xs font-bold uppercase tracking-wider text-[#4A6B0F]">MARGE CREATENEW</div>
+                    <div className="flex flex-col mb-3">
+                         <div className="flex items-baseline gap-2 mb-1">
+                              <span className="text-xs text-[#4A6B0F]">Winst (5%)</span>
+                              <span className="text-2xl font-bold text-[#4A6B0F]">{formatCurrency(marginBreakdown.profit)}</span>
+                         </div>
+                         <div className="flex items-baseline gap-2">
+                              <span className="text-[10px] text-[#4A6B0F]/70">Kosten (10%)</span>
+                              <span className="text-sm font-medium text-[#4A6B0F]">{formatCurrency(marginBreakdown.admin)}</span>
+                         </div>
+                    </div>
+                    <div className="text-xs text-[#4A6B0F] mt-auto">Totaal: {formatCurrency(companyTotal)}</div>
                 </div>
-                <div className="text-xs text-[#4A6B0F] mt-auto">Totaal: {formatCurrency(companyTotal)}</div>
             </div>
 
             {/* Step 3: Candidate Total */}
@@ -1457,7 +1485,7 @@ export default function Calculator() {
       {/* SECTION 3: Detailed Breakdown (Detacheren Tab) */}
       {activeTab === 'detacheren' && (
       <div className="max-w-5xl mx-auto" style={{ paddingLeft: '1rem', paddingRight: '1rem' }}>
-      <section className="pb-16">
+      <section>
         <Accordion type="single" collapsible defaultValue="breakdown" className="w-full">
             <AccordionItem value="breakdown" className="border border-gray-200 rounded-xl overflow-hidden bg-white shadow-sm">
                 <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-gray-50 transition-colors">
@@ -1757,7 +1785,7 @@ export default function Calculator() {
 
       {/* Disclaimer (Detacheren Tab) */}
       {activeTab === 'detacheren' && (
-      <div className="max-w-5xl mx-auto" style={{ paddingLeft: '1rem', paddingRight: '1rem' }}>
+      <div className="max-w-5xl mx-auto pt-8" style={{ paddingLeft: '1rem', paddingRight: '1rem' }}>
       <section className="pb-8">
         <div className="bg-amber-50 border-l-4 border-amber-400 p-4 rounded-lg">
           <div className="flex items-start gap-3">
@@ -1835,30 +1863,33 @@ export default function Calculator() {
 
         {/* Visual Flow for ZZP */}
         <div className="flex flex-col md:flex-row gap-4 items-stretch">
-          {/* Step 1: Revenue */}
-          <div className="bg-white p-6 rounded-xl border border-gray-200 flex flex-col gap-2 relative group flex-1">
-            <div className="text-xs font-bold uppercase tracking-wider text-gray-400">BRUTO OMZET</div>
-            <div className="flex flex-col">
-              <span className="text-2xl font-bold text-gray-900">{formatCurrency(zzpResult.revenueTotal)}</span>
-              <span className="text-sm font-medium text-gray-400">{formatHourly(zzpResult.revenueTotal, zzpResult.monthlyHours)} /uur</span>
+          {/* First two cards side by side on mobile */}
+          <div className="flex flex-row gap-4 items-stretch">
+            {/* Step 1: Revenue */}
+            <div className="bg-white p-6 rounded-xl border border-gray-200 flex flex-col gap-2 relative group flex-1">
+              <div className="text-xs font-bold uppercase tracking-wider text-gray-400">BRUTO OMZET</div>
+              <div className="flex flex-col">
+                <span className="text-2xl font-bold text-gray-900">{formatCurrency(zzpResult.revenueTotal)}</span>
+                <span className="text-sm font-medium text-gray-400">{formatHourly(zzpResult.revenueTotal, zzpResult.monthlyHours)} /uur</span>
+              </div>
+              <div className="text-sm text-gray-500 mt-1">Uurtarief × uren</div>
             </div>
-            <div className="text-sm text-gray-500 mt-1">Uurtarief × uren</div>
-          </div>
 
-          {/* Step 2: Costs - Match Marge color from bar chart */}
-          <div className="bg-[#E8F4D9] p-6 rounded-xl border border-[#4E6517]/20 flex flex-col gap-2 relative flex-1">
-            <div className="text-xs font-bold uppercase tracking-wider text-[#4A6B0F]">KOSTEN & RISICO</div>
-            <div className="flex flex-col mb-3">
-              <div className="flex items-baseline gap-2 mb-1">
-                <span className="text-xs text-[#4A6B0F]">Marge CreateNew ({(config.zzpCompanyMarginRate * 100).toFixed(0)}%)</span>
-                <span className="text-2xl font-bold text-[#4A6B0F]">{formatCurrency(zzpResult.costsBreakdown.entrepreneurRisk)}</span>
+            {/* Step 2: Costs - Match Marge color from bar chart */}
+            <div className="bg-[#E8F4D9] p-6 rounded-xl border border-[#4E6517]/20 flex flex-col gap-2 relative flex-1">
+              <div className="text-xs font-bold uppercase tracking-wider text-[#4A6B0F]">KOSTEN & RISICO</div>
+              <div className="flex flex-col mb-3">
+                <div className="flex items-baseline gap-2 mb-1">
+                  <span className="text-xs text-[#4A6B0F]">Marge CreateNew ({(config.zzpCompanyMarginRate * 100).toFixed(0)}%)</span>
+                  <span className="text-2xl font-bold text-[#4A6B0F]">{formatCurrency(zzpResult.costsBreakdown.entrepreneurRisk)}</span>
+                </div>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-[10px] text-[#4A6B0F]/70">Kosten</span>
+                  <span className="text-sm font-medium text-[#4A6B0F]">{formatCurrency(zzpResult.costsBreakdown.overheadCosts)}</span>
+                </div>
               </div>
-              <div className="flex items-baseline gap-2">
-                <span className="text-[10px] text-[#4A6B0F]/70">Kosten</span>
-                <span className="text-sm font-medium text-[#4A6B0F]">{formatCurrency(zzpResult.costsBreakdown.overheadCosts)}</span>
-              </div>
+              <div className="text-xs text-[#4A6B0F] mt-auto">Totaal: {formatCurrency(zzpResult.costsTotal)}</div>
             </div>
-            <div className="text-xs text-[#4A6B0F] mt-auto">Totaal: {formatCurrency(zzpResult.costsTotal)}</div>
           </div>
 
           {/* Step 3: Revenue After Costs */}
@@ -1893,7 +1924,7 @@ export default function Calculator() {
         </div>
 
         {/* Detailed Breakdown for ZZP */}
-        <section className="pb-16">
+        <section>
           <Accordion type="single" collapsible defaultValue="breakdown" className="w-full">
             <AccordionItem value="breakdown" className="border border-gray-200 rounded-xl overflow-hidden bg-white shadow-sm">
               <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-gray-50 transition-colors">
@@ -2163,6 +2194,31 @@ export default function Calculator() {
           </Accordion>
         </section>
       </section>
+
+      {/* Disclaimer (ZZP Tab) */}
+      <div className="max-w-5xl mx-auto pt-8" style={{ paddingLeft: '1rem', paddingRight: '1rem' }}>
+        <section className="pb-8">
+          <div className="bg-amber-50 border-l-4 border-amber-400 p-4 rounded-lg">
+            <div className="flex items-start gap-3">
+              <div className="flex-shrink-0">
+                <svg className="w-5 h-5 text-amber-600 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="text-left">
+                <h3 className="text-sm font-bold text-amber-900 mb-1">Indicatieve berekening</h3>
+                <p className="text-xs text-amber-800 leading-relaxed">
+                  Deze calculator geeft een <strong>realistische indicatie</strong> van je netto inkomen en arbeidsvoorwaarden. 
+                  De exacte bedragen op je loonstrook kunnen afwijken door individuele omstandigheden, 
+                  verschillende CAO-afspraken, loonheffingskortingen, en andere persoonlijke factoren. 
+                  Gebruik deze tool als richtlijn, niet als definitieve berekening. 
+                  <strong> En er kunnen geen rechten aan worden ontleend.</strong>
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
       </div>
       )}
 
