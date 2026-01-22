@@ -177,7 +177,7 @@ function ValueBlock({
 }
 
 export default function Calculator() {
-  const [hourlyRate, setHourlyRate] = useState([93.5]);
+  const [hourlyRate, setHourlyRate] = useState([100]);
   const [hoursPerWeek, setHoursPerWeek] = useState([40]);
   const [config, setConfig] = useState<CalculatorConfig>(defaultConfig);
   const [showConfig, setShowConfig] = useState(false);
@@ -1018,7 +1018,7 @@ export default function Calculator() {
                   value={hoursPerWeek}
                   onValueChange={setHoursPerWeek}
                   min={16}
-                  max={60}
+                  max={40}
                   step={1}
                   className="w-full"
                 />

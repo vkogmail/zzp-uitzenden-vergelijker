@@ -74,7 +74,7 @@ export interface CalculatorConfig {
 
   // ZZP-specifieke aannames (volgens Excel structuur)
   zzpUnworkableRate: number;             // Percentage onwerkbaar (vakantie/feestdagen) (default 0.14 = 14%) - input variabel 0-10%
-  zzpSicknessCorrectionRate: number;      // Correctie korte termijn ziekte (default 0.06 = 6%) - input variabel 0-10%
+  zzpSicknessCorrectionRate: number;      // Correctie korte termijn ziekte (default 0.00 = 0%) - input variabel 0-10%
   zzpCompanyMarginRate: number;          // Bedrijfsmarge voor ZZP (default 0.05 = 5%) - zoals bij detacheren
   zzpBusinessCostsRate: number;          // Kosten freelance bv incl verzekeringen (default 0.10 = 10%) - input variabel 0-10%
   zzpTaxReserveRate: number;             // Belastingreservering voor "netto op rekening (indicatief)" (default 0.40)
@@ -129,7 +129,7 @@ export const defaultCalculatorConfig: CalculatorConfig = {
   hasIKB: true,
   // ZZP instellingen (volgens Excel)
   zzpUnworkableRate: 0.14,              // 14% onwerkbaar (vakantie/feestdagen)
-  zzpSicknessCorrectionRate: 0.06,      // 6% ziekte correctie
+  zzpSicknessCorrectionRate: 0.00,      // 0% ziekte correctie (configureerbaar 0-10%)
   zzpCompanyMarginRate: 0.05,           // 5% bedrijfsmarge
   zzpBusinessCostsRate: 0.10,           // 10% kosten freelance bv
   zzpTaxReserveRate: 0.40,              // 40% belastingreservering
