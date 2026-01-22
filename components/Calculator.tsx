@@ -922,7 +922,7 @@ export default function Calculator() {
       
       {/* SECTION 1: Intro */}
       <div className="max-w-5xl mx-auto" style={{ paddingLeft: '1rem', paddingRight: '1rem' }}>
-        <section className="bg-white border-b border-gray-100 pt-16 pb-12 rounded-2xl" style={{ boxShadow: 'rgba(13, 13, 18, 0.05) 0px 2px 4px 0px' }}>
+        <section className="bg-white border-b border-gray-100 pt-12 pb-12 rounded-2xl" style={{ boxShadow: 'rgba(13, 13, 18, 0.05) 0px 2px 4px 0px' }}>
           <div className="text-center space-y-6 px-6">
             <h1 className="text-4xl mobile:text-5xl font-extrabold tracking-tight text-gray-900">
               Je inkomen is meer dan je maandbedrag
@@ -1017,7 +1017,7 @@ export default function Calculator() {
       {/* SECTION 3: Comparison View (when activeTab === 'comparison') */}
       {activeTab === 'comparison' && (
         <div className="max-w-5xl mx-auto" style={{ paddingLeft: '1rem', paddingRight: '1rem' }}>
-        <section className="pt-8 space-y-12">
+        <section className="space-y-3">
           {/* <div className="text-center space-y-2">
             <h2 className="text-3xl font-bold text-gray-900">Detacheren vs ZZP</h2>
             <p className="text-gray-500">Pas je uurtarief en uren aan en zie direct wat je overhoudt.</p>
@@ -1315,9 +1315,9 @@ export default function Calculator() {
         </section>
 
         {/* Disclaimer (Comparison Tab) */}
-        <div className="max-w-5xl mx-auto pt-8" style={{ paddingLeft: '1rem', paddingRight: '1rem' }}>
+        <div className="max-w-5xl mx-auto mt-3">
           <section className="pb-8">
-            <div className="bg-amber-50 border-l-4 border-amber-400 p-4 rounded-lg">
+            <div className="bg-amber-50 p-4 rounded-lg" style={{ borderWidth: '1px 1px 1px 4px', borderStyle: 'solid', borderColor: 'rgba(251, 191, 36, 1)' }}>
               <div className="flex items-start gap-3">
                 <div className="flex-shrink-0">
                   <svg className="w-5 h-5 text-amber-600 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
@@ -1344,7 +1344,7 @@ export default function Calculator() {
       {/* SECTION 4: Calculator + Simple Flow (Detacheren Tab) */}
       {activeTab === 'detacheren' && (
       <div className="max-w-5xl mx-auto" style={{ paddingLeft: '1rem', paddingRight: '1rem' }}>
-      <section className="pt-8 pb-16 space-y-12">
+      <section className="space-y-3">
         {/* Controls */}
         <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-200">
              {/* CAO Indicator */}
@@ -1484,7 +1484,7 @@ export default function Calculator() {
 
       {/* SECTION 3: Detailed Breakdown (Detacheren Tab) */}
       {activeTab === 'detacheren' && (
-      <div className="max-w-5xl mx-auto" style={{ paddingLeft: '1rem', paddingRight: '1rem' }}>
+      <div className="max-w-5xl mx-auto mt-3">
       <section>
         <Accordion type="single" collapsible defaultValue="breakdown" className="w-full">
             <AccordionItem value="breakdown" className="border border-gray-200 rounded-xl overflow-hidden bg-white shadow-sm">
@@ -1785,9 +1785,9 @@ export default function Calculator() {
 
       {/* Disclaimer (Detacheren Tab) */}
       {activeTab === 'detacheren' && (
-      <div className="max-w-5xl mx-auto pt-8" style={{ paddingLeft: '1rem', paddingRight: '1rem' }}>
+      <div className="max-w-5xl mx-auto mt-3">
       <section className="pb-8">
-        <div className="bg-amber-50 border-l-4 border-amber-400 p-4 rounded-lg">
+        <div className="bg-amber-50 p-4 rounded-lg" style={{ borderWidth: '1px 1px 1px 4px', borderStyle: 'solid', borderColor: 'rgba(251, 191, 36, 1)' }}>
           <div className="flex items-start gap-3">
             <div className="flex-shrink-0">
               <svg className="w-5 h-5 text-amber-600 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
@@ -1813,7 +1813,7 @@ export default function Calculator() {
       {/* SECTION 5: ZZP Tab */}
       {activeTab === 'zzp' && (
       <div className="max-w-5xl mx-auto" style={{ paddingLeft: '1rem', paddingRight: '1rem' }}>
-      <section className="pt-8 pb-16 space-y-12">
+      <section className="pt-8 space-y-12">
         {/* Controls */}
         <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-200">
           <div className="grid mobile:grid-cols-2 mobile:gap-6 gap-6">
@@ -2196,9 +2196,9 @@ export default function Calculator() {
       </section>
 
       {/* Disclaimer (ZZP Tab) */}
-      <div className="max-w-5xl mx-auto pt-8" style={{ paddingLeft: '1rem', paddingRight: '1rem' }}>
+      <div className="max-w-5xl mx-auto mt-3">
         <section className="pb-8">
-          <div className="bg-amber-50 border-l-4 border-amber-400 p-4 rounded-lg">
+          <div className="bg-amber-50 p-4 rounded-lg" style={{ borderWidth: '1px 1px 1px 4px', borderStyle: 'solid', borderColor: 'rgba(251, 191, 36, 1)' }}>
             <div className="flex items-start gap-3">
               <div className="flex-shrink-0">
                 <svg className="w-5 h-5 text-amber-600 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
