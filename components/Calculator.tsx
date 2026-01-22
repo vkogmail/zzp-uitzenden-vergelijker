@@ -14,7 +14,11 @@ import {
   XCircle,
   Palmtree,
   Coins,
-  Settings
+  Settings,
+  TrendingUp,
+  Building2,
+  Receipt,
+  Wallet
 } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -93,13 +97,35 @@ const VALUE_LABELS: Record<keyof Omit<ValueBreakdown, 'total'>, string> = {
   netto: 'Totaal te Ontvangen / te Besteden',
 };
 
-const VALUE_COLORS = {
-  marge: 'bg-teal-100 text-teal-900',
-  kosten: 'bg-gray-200 text-gray-800',
-  belasting: 'bg-blue-200 text-blue-900',
-  pensioen: 'bg-violet-200 text-violet-900',
-  netto: 'bg-amber-200 text-amber-900',
+// Icons for each value type
+const VALUE_ICONS: Record<keyof Omit<ValueBreakdown, 'total'>, React.ComponentType<{ className?: string }>> = {
+  marge: TrendingUp,
+  kosten: Building2,
+  pensioen: PiggyBank,
+  belasting: Receipt,
+  netto: Wallet,
+};
+
+// Colors for ZZP (light shades matching Detacheren color families)
+const VALUE_COLORS_ZZP = {
+  marge: 'bg-[#E8F4D9] text-[#4A6B0F]',      // Light green (matches #91BA00)
+  kosten: 'bg-[#E0F7FA] text-[#0097A7]',     // Light cyan (matches #33D7F2)
+  pensioen: 'bg-[#FFF8E1] text-[#F57C00]',   // Light yellow/amber (matches #FFC400)
+  belasting: 'bg-[#FFF3E0] text-[#E65100]',  // Light orange (matches #FF6200)
+  netto: 'bg-[#E3F2FD] text-[#1565C0]',      // Light blue (matches #0085FF)
 } as const;
+
+// Colors for Detacheren (vibrant)
+const VALUE_COLORS_DETACHEREN = {
+  marge: 'bg-[#91BA00] text-white',          // Green
+  kosten: 'bg-[#33D7F2] text-white',         // Cyan
+  pensioen: 'bg-[#FFC400] text-white',       // Yellow/Amber
+  belasting: 'bg-[#FF6200] text-white',      // Orange
+  netto: 'bg-[#0085FF] text-white',          // Blue
+} as const;
+
+// Keep for backwards compatibility / legend
+const VALUE_COLORS = VALUE_COLORS_ZZP;
 
 function ValueBlock({
   title,
@@ -123,7 +149,6 @@ function ValueBlock({
   correction?: number;
 }) {
   const keys: (keyof Omit<ValueBreakdown, 'total'>)[] = ['marge', 'kosten', 'pensioen', 'belasting', 'netto'];
-  const base = variant === 'detacheren' ? 'bg-blue-50 border-blue-200' : 'bg-green-50 border-green-200';
   
   // Calculate percentages for vertical bar chart
   // Use baseTotal for percentage calculation if provided (to align charts)
@@ -137,12 +162,12 @@ function ValueBlock({
   const displayTotal = baseTotal ?? total;
   
   return (
-    <div className={`p-6 rounded-2xl border ${base}`}>
-      <div className="flex items-center gap-2 mb-4">
+    <div>
+      <div className="flex items-start gap-2 mb-4">
         {variant === 'detacheren' ? (
-          <Briefcase className="w-5 h-5 text-blue-600" />
+          <Briefcase className="w-5 h-5 text-blue-600 mt-1" />
         ) : (
-          <CalculatorIcon className="w-5 h-5 text-green-600" />
+          <CalculatorIcon className="w-5 h-5 text-green-600 mt-1" />
         )}
         <div>
           <h3 className="text-lg font-bold text-gray-900">{title}</h3>
@@ -150,7 +175,7 @@ function ValueBlock({
         </div>
       </div>
       <div className="mb-4">
-        <div className="flex justify-between items-baseline">
+        <div className="flex justify-between items-start">
           <div>
             <div className="text-xs font-semibold uppercase tracking-wider text-gray-500">{totalLabel}</div>
             <div className="text-xs text-gray-400">
@@ -159,7 +184,7 @@ function ValueBlock({
                 : 'Factureerbare omzet (excl. vakantie/feestdagen)'}
             </div>
           </div>
-          <div className="text-2xl font-bold text-gray-900">{formatCurrency(displayTotal)}</div>
+          <div className="text-2xl font-bold text-gray-900 leading-none">{formatCurrency(displayTotal)}</div>
         </div>
         <div className="mt-2 pt-2 border-t border-gray-200 h-8 flex justify-between items-baseline">
           {correction !== undefined && correction > 0 ? (
@@ -179,18 +204,21 @@ function ValueBlock({
           const v = breakdown[k];
           if (v <= 0) return null;
           const percentage = (v / percentageBase) * 100;
-          const bgColor = VALUE_COLORS[k].split(' ')[0]; // Get just the bg color
-          const textColor = VALUE_COLORS[k].split(' ')[1]; // Get the text color
+          const colorSet = variant === 'detacheren' ? VALUE_COLORS_DETACHEREN : VALUE_COLORS_ZZP;
+          const bgColor = colorSet[k].split(' ')[0]; // Get just the bg color
+          const textColor = colorSet[k].split(' ')[1]; // Get the text color
           
           // Use center alignment for small bars, top alignment for larger ones
           const isSmallBar = percentage < 15;
+          const Icon = VALUE_ICONS[k];
           return (
             <div
               key={k}
               className={`${bgColor} flex justify-between ${isSmallBar ? 'items-center' : 'items-start pt-3'} px-4 transition-all duration-500 rounded-lg`}
               style={{ height: `${percentage}%`, minHeight: '40px' }}
             >
-              <span className={`text-sm font-semibold ${textColor}`}>
+              <span className={`text-sm font-semibold ${textColor} flex items-center gap-1.5`}>
+                <Icon className="w-4 h-4" />
                 {VALUE_LABELS[k]}
               </span>
               <span className={`text-sm font-bold ${textColor}`}>
@@ -199,6 +227,17 @@ function ValueBlock({
             </div>
           );
         })}
+        {/* Hatched empty section for ZZP to show the correction difference */}
+        {correction !== undefined && correction > 0 && (
+          <div
+            className="rounded-lg border border-gray-300"
+            style={{ 
+              height: `${(correction / percentageBase) * 100}%`,
+              minHeight: '40px',
+              background: 'repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(156, 163, 175, 0.1) 10px, rgba(156, 163, 175, 0.1) 12px)'
+            }}
+          />
+        )}
       </div>
     </div>
   );
@@ -984,10 +1023,10 @@ export default function Calculator() {
 
       {/* SECTION 3: Comparison View (when activeTab === 'comparison') */}
       {activeTab === 'comparison' && (
-        <section className="py-16 px-4 max-w-container-max mx-auto space-y-12">
+        <section className="pt-8 pb-16 px-4 max-w-container-max mx-auto space-y-12">
           <div className="text-center space-y-2">
-            <h2 className="text-3xl font-bold text-gray-900">Vergelijking: Detacheren vs ZZP</h2>
-            <p className="text-gray-500">Vergelijk je inkomen, opbouw en kosten tussen beide modellen.</p>
+            <h2 className="text-3xl font-bold text-gray-900">Detacheren vs ZZP</h2>
+            <p className="text-gray-500">Pas je uurtarief en uren aan en zie direct wat je overhoudt.</p>
           </div>
 
           {/* Controls */}
@@ -1221,58 +1260,67 @@ export default function Calculator() {
           {/* Vergelijk de Waarde – Verdeling marge, kosten, belasting, pensioen, netto */}
           <div className="max-w-5xl mx-auto space-y-6">
             <div className="text-center space-y-2">
-              <h2 className="text-2xl font-bold text-gray-900">Vergelijk de Waarde</h2>
+              <h2 className="text-2xl font-bold text-gray-900">Waar gaat je geld naartoe?</h2>
               <p className="text-gray-500 text-sm max-w-2xl mx-auto">
-                Transparante vergelijking van de financiële opbouw. Van totale omzet (ZZP) en totale loonkosten (Detacheren) naar wat er onderaan de streep overblijft.
+                Van bruto omzet naar netto: zie hoe marge, kosten, belastingen en pensioen je totaal beïnvloeden.
               </p>
             </div>
 
-            <div className="grid mobile:grid-cols-2 gap-6">
-              {/* Detacheren – Waarde-blok */}
-              <ValueBlock
-                title="Detacheren"
-                subtitle="Loondienst + Benefits"
-                total={detacherenValueBreakdown.total}
-                totalLabel="TOTALE WAARDE"
-                breakdown={detacherenValueBreakdown}
-                formatCurrency={formatCurrency}
-                variant="detacheren"
-              />
-              {/* ZZP – Waarde-blok */}
-              <ValueBlock
-                title="ZZP / Freelance"
-                subtitle="Ondernemerschap"
-                total={zzpValueBreakdown.total}
-                totalLabel="TOTALE OMZET"
-                breakdown={zzpValueBreakdown}
-                formatCurrency={formatCurrency}
-                variant="zzp"
-                baseTotal={detacherenValueBreakdown.total}
-                correction={detacherenValueBreakdown.total - zzpValueBreakdown.total}
-              />
-            </div>
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-10 space-y-6">
+              <div className="grid mobile:grid-cols-2 gap-10">
+                {/* Detacheren – Waarde-blok */}
+                <ValueBlock
+                  title="Detacheren"
+                  subtitle="Loondienst + Benefits"
+                  total={detacherenValueBreakdown.total}
+                  totalLabel="TOTALE WAARDE"
+                  breakdown={detacherenValueBreakdown}
+                  formatCurrency={formatCurrency}
+                  variant="detacheren"
+                />
+                {/* ZZP – Waarde-blok */}
+                <ValueBlock
+                  title="ZZP / Freelance"
+                  subtitle="Ondernemerschap"
+                  total={zzpValueBreakdown.total}
+                  totalLabel="TOTALE OMZET"
+                  breakdown={zzpValueBreakdown}
+                  formatCurrency={formatCurrency}
+                  variant="zzp"
+                  baseTotal={detacherenValueBreakdown.total}
+                  correction={detacherenValueBreakdown.total - zzpValueBreakdown.total}
+                />
+              </div>
 
-            <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-gray-500">
-              <span className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full bg-teal-100" />
-                Marge & Risico
-              </span>
-              <span className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full bg-gray-300" />
-                Kosten & Voorzieningen
-              </span>
-              <span className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full bg-blue-200" />
-                Belasting
-              </span>
-              <span className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full bg-violet-300" />
-                Pensioen
-              </span>
-              <span className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full bg-amber-300" />
-                Totaal te Ontvangen / te Besteden
-              </span>
+              <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-gray-500">
+                <span className="flex items-center gap-2">
+                  <span className="w-3 h-3 rounded-sm bg-[#91BA00]" />
+                  {VALUE_LABELS.marge}
+                </span>
+                <span className="flex items-center gap-2">
+                  <span className="w-3 h-3 rounded-sm bg-[#33D7F2]" />
+                  {VALUE_LABELS.kosten}
+                </span>
+                <span className="flex items-center gap-2">
+                  <span className="w-3 h-3 rounded-sm bg-[#FFC400]" />
+                  {VALUE_LABELS.pensioen}
+                </span>
+                <span className="flex items-center gap-2">
+                  <span className="w-3 h-3 rounded-sm bg-[#FF6200]" />
+                  {VALUE_LABELS.belasting}
+                </span>
+                <span className="flex items-center gap-2">
+                  <span className="w-3 h-3 rounded-sm bg-[#0085FF]" />
+                  {VALUE_LABELS.netto}
+                </span>
+                <span className="flex items-center gap-2">
+                  <span 
+                    className="w-3 h-3 rounded-sm border border-gray-300" 
+                    style={{ background: 'repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(156, 163, 175, 0.15) 2px, rgba(156, 163, 175, 0.15) 3px)' }}
+                  />
+                  Onwerkbare uren (ZZP)
+                </span>
+              </div>
             </div>
           </div>
         </section>
