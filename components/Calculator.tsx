@@ -378,7 +378,7 @@ export default function Calculator() {
                   <CalculatorIcon className="w-5 h-5" />
                   Hoe werken de berekeningen?
                 </h3>
-                <Accordion type="single" collapsible className="w-full">
+                <Accordion type="multiple" defaultValue={["detacheren-berekening", "zzp-berekening", "vergelijking"]} className="w-full">
                   <AccordionItem value="detacheren-berekening" className="border-0">
                     <AccordionTrigger className="text-sm font-semibold text-green-800 hover:no-underline py-2">
                       Detacheren Berekening
@@ -1458,7 +1458,7 @@ export default function Calculator() {
       {activeTab === 'detacheren' && (
       <div className="max-w-5xl mx-auto" style={{ paddingLeft: '1rem', paddingRight: '1rem' }}>
       <section className="pb-16">
-        <Accordion type="single" collapsible className="w-full">
+        <Accordion type="single" collapsible defaultValue="breakdown" className="w-full">
             <AccordionItem value="breakdown" className="border border-gray-200 rounded-xl overflow-hidden bg-white shadow-sm">
                 <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-gray-50 transition-colors">
                     <div className="flex flex-col items-start text-left">
@@ -1641,7 +1641,7 @@ export default function Calculator() {
                         </div>
 
                         {/* Group E: Netto Result */}
-                        <div className="p-8 bg-[#E3F2FD] text-[#1565C0] space-y-6 border border-[#2566A3]/20 rounded-lg">
+                        <div className="p-8 bg-[#E3F2FD] text-[#1565C0] space-y-6 rounded-b-lg">
                             <div className="flex flex-col mobile:flex-row justify-between items-start mobile:items-center gap-4">
                                 <div>
                                     <h3 className="text-xl font-bold text-[#1565C0]">Netto loon</h3>
@@ -1894,7 +1894,7 @@ export default function Calculator() {
 
         {/* Detailed Breakdown for ZZP */}
         <section className="pb-16">
-          <Accordion type="single" collapsible className="w-full">
+          <Accordion type="single" collapsible defaultValue="breakdown" className="w-full">
             <AccordionItem value="breakdown" className="border border-gray-200 rounded-xl overflow-hidden bg-white shadow-sm">
               <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-gray-50 transition-colors">
                 <div className="flex flex-col items-start text-left">
@@ -2079,7 +2079,7 @@ export default function Calculator() {
                             
                             <BreakdownRow 
                               label="Totale belasting (maandelijks)" 
-                              value={zzpResult.taxBreakdown.totalTax} 
+                              value={zzpResult.taxBreakdown.totalTax / 12} 
                               monthlyHours={zzpResult.monthlyHours}
                               tooltip="Dit is de totale belasting die je per maand betaalt: inkomstenbelasting + Zvw-premie minus heffingskortingen. Dit bedrag wordt maandelijks gereserveerd."
                             />
@@ -2090,14 +2090,14 @@ export default function Calculator() {
                   </div>
 
                   {/* Group F: Net Result */}
-                  <div className="p-8 bg-[#E3F2FD] text-[#1565C0] space-y-6 border border-[#2566A3]/20 rounded-lg">
+                  <div className="p-8 bg-[#E3F2FD] text-[#1565C0] space-y-6 rounded-b-lg">
                     <div className="flex flex-col mobile:flex-row justify-between items-start mobile:items-center gap-4">
                       <div>
                         <h3 className="text-xl font-bold text-[#1565C0]">Indicatief op rekening na belastingreservering</h3>
                         <p className="text-[#1565C0]/80 text-sm">Dit ontvang je elke maand op je rekening (indicatief)</p>
                         <p className="text-[#1565C0]/60 text-xs mt-2 max-w-md">
                           {zzpResult.taxBreakdown 
-                            ? `Exacte belasting berekend op basis van je situatie. Je betaalt ${formatCurrency(zzpResult.taxBreakdown.totalTax)} per maand aan belasting.`
+                            ? `Exacte belasting berekend op basis van je situatie. Je betaalt ${formatCurrency(zzpResult.taxBreakdown.totalTax / 12)} per maand aan belasting.`
                             : `We reserveren tijdelijk ${(config.zzpTaxReserveRate * 100).toFixed(0)}% voor belasting, exacte belasting hangt af van je situatie`
                           }
                         </p>
