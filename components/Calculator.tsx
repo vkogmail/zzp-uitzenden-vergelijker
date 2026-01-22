@@ -120,6 +120,13 @@ function ValueBlock({
 }) {
   const keys: (keyof Omit<ValueBreakdown, 'total'>)[] = ['marge', 'kosten', 'pensioen', 'belasting', 'netto'];
   const base = variant === 'detacheren' ? 'bg-blue-50 border-blue-200' : 'bg-green-50 border-green-200';
+  
+  // Calculate percentages for vertical bar chart
+  const totalValue = keys.reduce((sum, k) => sum + Math.max(0, breakdown[k]), 0);
+  
+  // Total height for the vertical bar chart (in pixels)
+  const CHART_HEIGHT = 500;
+  
   return (
     <div className={`p-6 rounded-2xl border ${base}`}>
       <div className="flex items-center gap-2 mb-4">
@@ -133,18 +140,34 @@ function ValueBlock({
           <p className="text-sm text-gray-500">{subtitle}</p>
         </div>
       </div>
-      <div className="mb-4">
+      <div className="mb-4 flex justify-between items-baseline">
         <div className="text-xs font-semibold uppercase tracking-wider text-gray-500">{totalLabel}</div>
         <div className="text-2xl font-bold text-gray-900">{formatCurrency(total)}</div>
       </div>
-      <div className="space-y-2">
+      
+      {/* Vertical Stacked Bar Chart */}
+      <div className="flex flex-col gap-1" style={{ height: CHART_HEIGHT }}>
         {keys.map((k) => {
           const v = breakdown[k];
           if (v <= 0) return null;
+          const percentage = (v / totalValue) * 100;
+          const bgColor = VALUE_COLORS[k].split(' ')[0]; // Get just the bg color
+          const textColor = VALUE_COLORS[k].split(' ')[1]; // Get the text color
+          
+          // Use center alignment for small bars, top alignment for larger ones
+          const isSmallBar = percentage < 15;
           return (
-            <div key={k} className={`flex justify-between items-center rounded-lg px-3 py-2 ${VALUE_COLORS[k]}`}>
-              <span className="text-sm font-medium">{VALUE_LABELS[k]}</span>
-              <span className="font-bold">{formatCurrency(v)}</span>
+            <div
+              key={k}
+              className={`${bgColor} flex justify-between ${isSmallBar ? 'items-center' : 'items-start pt-3'} px-4 transition-all duration-500 rounded-lg`}
+              style={{ height: `${percentage}%`, minHeight: '40px' }}
+            >
+              <span className={`text-sm font-semibold ${textColor}`}>
+                {VALUE_LABELS[k]}
+              </span>
+              <span className={`text-sm font-bold ${textColor}`}>
+                {formatCurrency(v)}
+              </span>
             </div>
           );
         })}
