@@ -1982,6 +1982,9 @@ export default function Calculator() {
                       <p className="text-[10px] leading-relaxed text-gray-500">
                         Niet je volledige omzet telt mee voor pensioenopbouw. We trekken een vast bedrag (franchise) af van je omzet na kosten.
                       </p>
+                      <p className="text-[10px] leading-relaxed text-gray-600 font-medium mt-2">
+                        Dit pensioen is vergelijkbaar gemaakt met de wettelijke pensioenverplichting voor flexwerkers volgens de ABU CAO. Dit is een aan te raden bedrag voor zzp'ers.
+                      </p>
                     </div>
                     
                     <BreakdownRow 
