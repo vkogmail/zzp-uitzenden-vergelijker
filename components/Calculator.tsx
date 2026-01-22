@@ -1484,7 +1484,7 @@ export default function Calculator() {
 
       {/* SECTION 3: Detailed Breakdown (Detacheren Tab) */}
       {activeTab === 'detacheren' && (
-      <div className="max-w-5xl mx-auto mt-3">
+      <div className="max-w-5xl mx-auto mt-3" style={{ paddingLeft: '1rem', paddingRight: '1rem' }}>
       <section>
         <Accordion type="single" collapsible defaultValue="breakdown" className="w-full">
             <AccordionItem value="breakdown" className="border border-gray-200 rounded-xl overflow-hidden bg-white shadow-sm">
@@ -1813,7 +1813,7 @@ export default function Calculator() {
       {/* SECTION 5: ZZP Tab */}
       {activeTab === 'zzp' && (
       <div className="max-w-5xl mx-auto" style={{ paddingLeft: '1rem', paddingRight: '1rem' }}>
-      <section className="pt-8 space-y-12">
+      <section className="space-y-3">
         {/* Controls */}
         <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-200">
           <div className="grid mobile:grid-cols-2 mobile:gap-6 gap-6">
