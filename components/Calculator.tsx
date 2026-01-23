@@ -1005,7 +1005,7 @@ export default function Calculator() {
             <h1 className="text-4xl mobile:text-5xl font-extrabold tracking-tight text-gray-900">
               Je inkomen is meer<br />dan je maandbedrag
             </h1>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
               Zie wat je direct ontvangt en wat je opbouwt voor later.
             </p>
           </div>
