@@ -217,19 +217,19 @@ function ValueBlock({
         })}
         {correction !== undefined && correction > 0 && (
           <div
-            className="rounded border border-gray-300 flex flex-col justify-between px-3 pt-2 pb-2 overflow-visible"
+            className="rounded border border-gray-300 flex flex-col justify-between px-3 py-2 overflow-visible"
             style={{ 
               flex: `${(correction / percentageBase) * 100} 0 0`,
-              minHeight: '60px',
+              minHeight: '70px',
               background: 'repeating-linear-gradient(45deg, transparent, transparent 4px, rgba(156, 163, 175, 0.15) 4px, rgba(156, 163, 175, 0.15) 5px)'
             }}
           >
-            <span className="text-xs font-medium text-gray-500 leading-tight">
-              Reservering vakantiedagen en feestdagen
+            <span className="text-[10px] font-medium text-gray-500 leading-tight">
+              Reservering vakantie- en feestdagen
             </span>
-            <div className="flex items-center justify-between shrink-0">
-              <Receipt className="w-4 h-4 text-gray-400 shrink-0" />
-              <span className="text-sm font-bold text-gray-500">
+            <div className="flex items-center justify-between shrink-0 mt-auto">
+              <Receipt className="w-3 h-3 text-gray-400 shrink-0" />
+              <span className="text-xs font-bold text-gray-500">
                 - {formatCurrency(correction)}
               </span>
             </div>
