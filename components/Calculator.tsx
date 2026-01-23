@@ -1171,7 +1171,7 @@ export default function Calculator() {
                 </div>
 
                 {/* Step 2: Company Share - Match Marge color from bar chart */}
-                <div className="bg-marge-100 p-6 rounded-xl border border-marge-400/20 flex flex-col relative flex-1">
+                <div className="bg-marge-100 p-6 rounded-xl border border-marge-400/20 flex flex-col relative flex-[0.67]">
                     <div className="text-xs font-bold uppercase tracking-wider text-marge-text whitespace-nowrap">MARGE CREATENEW</div>
                     <div className="flex flex-col mt-2">
                          <div className="flex flex-col mb-2">
@@ -1571,7 +1571,7 @@ export default function Calculator() {
             </div>
 
             {/* Step 2: Costs - Match Marge color from bar chart */}
-            <div className="bg-marge-100 p-6 rounded-xl border border-marge-400/20 flex flex-col relative flex-1">
+            <div className="bg-marge-100 p-6 rounded-xl border border-marge-400/20 flex flex-col relative flex-[0.67]">
               <div className="text-xs font-bold uppercase tracking-wider text-marge-text whitespace-nowrap">KOSTEN & RISICO</div>
               <div className="flex flex-col mt-2">
                 <div className="flex flex-col mb-2">
@@ -1599,7 +1599,7 @@ export default function Calculator() {
             <div className="grid grid-cols-3 gap-3 mt-auto pt-4 border-t border-gray-200">
               <div className="bg-netto-100 rounded-lg p-3 border border-netto-400/20">
                 <div className="text-base font-bold text-netto-text">{formatCurrency(zzpNetAfterTaxIndicative)}</div>
-                <div className="text-[10px] text-netto-text/80 font-medium uppercase tracking-wide">OP REKENING (INDICATIEF)</div>
+                <div className="text-[10px] text-netto-text/80 font-medium uppercase tracking-wide md:whitespace-nowrap">besteedbaar inkomen</div>
                 <div className="text-[10px] text-netto-text/60">{formatHourly(zzpNetAfterTaxIndicative, zzpResult.monthlyHours)}/u</div>
               </div>
               <div className="bg-kosten-100 rounded-lg p-3 border border-kosten-400/20">

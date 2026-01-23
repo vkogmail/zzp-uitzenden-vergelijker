@@ -103,7 +103,9 @@
   --font-fallback-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", "Inter", "Roboto", "Helvetica", Arial, "Apple Color Emoji", "Segoe UI Emoji";
   /* Actual font name from font files: "Rebond Grotesque" */
   --font-rebond-stack: "Rebond Grotesque", rebondGrotesque, var(--font-rebond), var(--font-fallback-sans);
-  --font-sans: var(--font-rebond-stack);
+  /* Geist as default font stack */
+  --font-geist-stack: var(--font-geist-sans), "Geist Variable", "Geist", var(--font-fallback-sans);
+  --font-sans: var(--font-geist-stack);
   --font-mono: var(--font-geist-mono);
 
   /* Background and foreground */
@@ -188,7 +190,7 @@
   --color-foreground: var(--foreground);
 
   /* Fonts */
-  --font-sans: var(--font-rebond-stack);
+  --font-sans: var(--font-geist-stack);
   --font-mono: var(--font-geist-mono);
 
   /* Cool gray */
@@ -370,7 +372,7 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 @utility ty-h2 {
-  font-family: var(--font-rebond-stack);
+  font-family: var(--font-geist-stack);
   font-weight: 600;
   letter-spacing: -0.02em;
   line-height: 1;
@@ -412,29 +414,33 @@ body {
   text-decoration-thickness: 1px;
 }
 
-/* 6) Force Rebond Grotesque on large currency numbers */
+/* 6) Force Rebond Grotesque on H1 and large currency numbers (text-2xl and larger) */
 h1,
 h1.font-extrabold,
 h1.text-4xl.font-extrabold,
 h1.text-5xl.font-extrabold,
 h1.text-4xl.md\:text-5xl.font-extrabold,
-.text-4xl.font-bold {
+.text-4xl.font-bold,
+.text-3xl.font-bold,
+.text-2xl.font-bold {
   font-family: "Rebond Grotesque", rebondGrotesque, var(--font-rebond), var(--font-fallback-sans) !important;
   font-weight: 600 !important; /* Force Semibold (600) instead of Extrabold (800) */
 }
 
-/* Medium currency numbers - need to handle responsive classes */
-/* Exclude h2 elements from Rebond Grotesque */
-.text-lg.font-bold:not(h2),
-.text-xl.font-bold:not(h2) {
-  font-family: "Rebond Grotesque", rebondGrotesque, var(--font-rebond), var(--font-fallback-sans) !important;
+@media (min-width: 768px) {
+  .text-2xl.md\:text-3xl.font-bold,
+  .md\:text-3xl.font-bold {
+    font-family: "Rebond Grotesque", rebondGrotesque, var(--font-rebond), var(--font-fallback-sans) !important;
+    font-weight: 600 !important; /* Force Semibold (600) for currency numbers */
+  }
 }
 
-@media (min-width: 768px) {
-  .text-lg.md\:text-xl.font-bold:not(h2),
-  .md\:text-xl.font-bold:not(h2) {
-    font-family: "Rebond Grotesque", rebondGrotesque, var(--font-rebond), var(--font-fallback-sans) !important;
-  }
+/* 7) Force Geist Semibold on smaller currency numbers (text-base and smaller) */
+.text-base.font-bold,
+.text-sm.font-bold,
+.text-sm.font-semibold {
+  font-family: var(--font-geist-stack) !important;
+  font-weight: 600 !important; /* Geist Semibold for smaller currency */
 }
 
 /* Force Geist on h2 elements - must be after the Rebond rules */
