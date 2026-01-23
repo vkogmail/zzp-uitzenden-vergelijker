@@ -175,14 +175,11 @@ function ValueBlock({
             <div className="text-xs font-semibold uppercase tracking-wider text-gray-500">{totalLabel}</div>
             <div className="text-xs text-gray-400">
               {variant === 'detacheren' 
-                ? 'Inclusief vakantie & feestdagen' 
-                : 'Factureerbare omzet (excl. vakantie/feestdagen)'}
+                ? 'Inclusief vakantiedagen en feestdagen' 
+                : 'Exclusief vakantiedagen en feestdagen'}
             </div>
           </div>
           <div className="text-2xl font-bold text-gray-900 leading-none">{formatCurrency(displayTotal)}</div>
-        </div>
-        <div className="mt-2 pt-2 border-t border-transparent h-8">
-          {/* Spacer for alignment - correction moved to hatched section */}
         </div>
       </div>
       
@@ -199,16 +196,24 @@ function ValueBlock({
           // Use center alignment for small bars, top alignment for larger ones
           const isSmallBar = percentage < 15;
           const Icon = VALUE_ICONS[k];
+          
           return (
             <div
               key={k}
               className={`${bgColor} flex justify-between ${isSmallBar ? 'items-center' : 'items-start pt-3'} px-4 transition-all duration-500 rounded-lg`}
               style={{ height: `${percentage}%`, minHeight: '40px' }}
             >
-              <span className={`text-sm font-semibold ${textColor} flex items-center gap-1.5`}>
-                <Icon className="w-4 h-4" />
-                {VALUE_LABELS[k]}
-              </span>
+              <div className="flex flex-col">
+                <span className={`text-sm font-semibold ${textColor} flex items-center gap-1.5`}>
+                  <Icon className="w-4 h-4" />
+                  {VALUE_LABELS[k]}
+                </span>
+                {k === 'netto' && variant === 'detacheren' && (
+                  <span className={`text-xs ${textColor} opacity-75 mt-0.5`}>
+                    inclusief reservering voor vakantiedagen en feestdagen
+                  </span>
+                )}
+              </div>
               <span className={`text-sm font-bold ${textColor}`}>
                 {formatCurrency(v)}
               </span>
@@ -225,7 +230,7 @@ function ValueBlock({
               background: 'repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(156, 163, 175, 0.1) 10px, rgba(156, 163, 175, 0.1) 12px)'
             }}
           >
-            <span className="text-sm font-semibold text-gray-500">Onbetaalde vakantie en feestdagen {unworkableRate ? `${(unworkableRate * 100).toFixed(0)}%` : '14%'}</span>
+            <span className="text-sm font-semibold text-gray-500">Reservering vakantiedagen en feestdagen</span>
             <span className="text-sm font-bold text-gray-600">- {formatCurrency(correction)}</span>
           </div>
         )}
@@ -1025,22 +1030,6 @@ export default function Calculator() {
 
           {/* Controls */}
           <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-200 max-w-5xl mx-auto">
-            {/* CAO Indicator */}
-            <div className="mb-6 flex items-center justify-between bg-blue-50 p-3 rounded-lg border border-blue-200">
-              <div className="flex items-center gap-2">
-                <Briefcase className="w-4 h-4 text-blue-600" />
-                <span className="text-sm font-medium text-blue-900">Actieve CAO:</span>
-                <span className="text-sm font-bold text-blue-700">{selectedCAO}</span>
-              </div>
-              {settingsEnabled && (
-                <button
-                  onClick={() => setShowConfig(true)}
-                  className="text-xs text-blue-600 hover:text-blue-800 underline"
-                >
-                  Wijzig CAO
-                </button>
-              )}
-            </div>
             
             <div className="grid mobile:grid-cols-2 mobile:gap-6 gap-6">
               <div className="space-y-3 flex flex-col">
@@ -1259,9 +1248,9 @@ export default function Calculator() {
                 {/* Detacheren – Waarde-blok */}
                 <ValueBlock
                   title="Detacheren"
-                  subtitle="Loondienst + Benefits"
+                  subtitle="Flexwerk"
                   total={detacherenValueBreakdown.total}
-                  totalLabel="TOTALE WAARDE"
+                  totalLabel="Factuurbedrag"
                   breakdown={detacherenValueBreakdown}
                   formatCurrency={formatCurrency}
                   variant="detacheren"
@@ -1271,7 +1260,7 @@ export default function Calculator() {
                   title="ZZP / Freelance"
                   subtitle="Ondernemerschap"
                   total={zzpValueBreakdown.total}
-                  totalLabel="TOTALE OMZET"
+                  totalLabel="Factuurbedrag"
                   breakdown={zzpValueBreakdown}
                   formatCurrency={formatCurrency}
                   variant="zzp"
