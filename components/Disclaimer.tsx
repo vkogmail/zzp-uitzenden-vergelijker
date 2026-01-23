@@ -3,7 +3,7 @@ import React from 'react';
 export function Disclaimer() {
   return (
     <section className="pb-8 mt-3">
-      <div className="bg-amber-50 p-4 rounded-lg" style={{ borderWidth: '1px 1px 1px 4px', borderStyle: 'solid', borderColor: 'rgba(251, 191, 36, 1)' }}>
+      <div className="bg-amber-50 p-4 rounded-2xl" style={{ borderWidth: '1px 1px 1px 4px', borderStyle: 'solid', borderColor: 'rgba(251, 191, 36, 1)' }}>
         <div className="flex items-start gap-3">
           <div className="flex-shrink-0">
             <svg className="w-5 h-5 text-amber-600 mt-0.5" fill="currentColor" viewBox="0 0 20 20">

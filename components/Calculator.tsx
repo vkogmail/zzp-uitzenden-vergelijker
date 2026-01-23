@@ -1189,9 +1189,9 @@ export default function Calculator() {
 
             {/* Step 3: Candidate Total */}
             <div className="bg-white p-6 rounded-xl border border-gray-200 flex flex-col gap-2 relative flex-[2]">
-                <div className="text-xs font-bold uppercase tracking-wider text-gray-400">JOUW TOTALE BELONING</div>
-                <div className="flex items-end justify-between mb-2 gap-4">
+                <div className="flex items-start justify-between mb-2 gap-4">
                      <div className="flex flex-col">
+                          <div className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">JOUW TOTALE BELONING</div>
                           <span className="text-3xl font-bold text-gray-900">{formatCurrency(candidateTotal)}</span>
                           <span className="text-sm font-medium text-gray-500">{formatHourly(candidateTotal)} /uur</span>
                      </div>
@@ -1589,9 +1589,9 @@ export default function Calculator() {
 
           {/* Step 3: Revenue After Costs */}
           <div className="bg-white p-6 rounded-xl border border-gray-200 flex flex-col gap-2 relative flex-[2]">
-            <div className="text-xs font-bold uppercase tracking-wider text-gray-400">JOUW TOTALE BELONING</div>
-            <div className="flex items-end justify-between mb-2 gap-4">
+            <div className="flex items-start justify-between mb-2 gap-4">
               <div className="flex flex-col">
+                <div className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">JOUW TOTALE BELONING</div>
                 <span className="text-3xl font-bold text-gray-900">{formatCurrency(zzpResult.revenueAfterCosts)}</span>
                 <span className="text-sm font-medium text-gray-500">{formatHourly(zzpResult.revenueAfterCosts, zzpResult.monthlyHours)} /uur</span>
               </div>

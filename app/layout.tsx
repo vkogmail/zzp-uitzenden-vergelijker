@@ -31,7 +31,7 @@ const rebondGrotesque = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "ZZP vs Detacheren Vergelijker",
+  title: "Detacheren vs Freelance Vergelijker",
   description: "Vergelijk netto inkomen per maand tussen ZZP en detacheren met reële aannames (2026)",
   icons: {
     icon: [
