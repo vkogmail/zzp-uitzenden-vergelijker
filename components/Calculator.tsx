@@ -157,7 +157,7 @@ function ValueBlock({
   const displayTotal = baseTotal ?? total;
   
   return (
-    <div>
+    <div className="flex flex-col h-full">
       {/* Header - compact on mobile */}
       <div className="flex items-start gap-2 mb-2 mobile:mb-4">
         {variant === 'detacheren' ? (
@@ -182,12 +182,12 @@ function ValueBlock({
                 : 'Exclusief vakantiedagen en feestdagen'}
             </div>
           </div>
-          <div className="text-lg mobile:text-2xl font-bold text-gray-900 leading-none">{formatCurrency(displayTotal)}</div>
+          <div className="text-2xl mobile:text-2xl font-bold text-gray-900 leading-none">{formatCurrency(displayTotal)}</div>
         </div>
       </div>
       
-      {/* Mobile: Vertical Stacked Bar Chart (compact, icon + amount only) */}
-      <div className="mobile:hidden flex flex-col gap-0.5" style={{ height: 280 }}>
+      {/* Mobile: Vertical Stacked Bar Chart (label top, icon+amount bottom) */}
+      <div className="mobile:hidden flex flex-col gap-0.5 flex-1">
         {keys.map((k) => {
           const v = breakdown[k];
           if (v <= 0) return null;
@@ -200,29 +200,39 @@ function ValueBlock({
           return (
             <div
               key={k}
-              className={`${bgColor} flex items-start justify-between px-2 pt-1 transition-all duration-500 rounded`}
-              style={{ height: `${percentage}%`, minHeight: '24px' }}
+              className={`${bgColor} flex flex-col justify-between px-3 pt-2 pb-2 transition-all duration-500 rounded`}
+              style={{ flex: `${percentage} 0 0`, minHeight: '60px' }}
             >
-              <Icon className={`w-3 h-3 ${textColor} shrink-0`} />
-              <span className={`text-[10px] font-bold ${textColor}`}>
-                {formatCurrency(v)}
+              <span className={`text-[10px] font-medium ${textColor} leading-tight`}>
+                {VALUE_LABELS[k]}
               </span>
+              <div className="flex items-center justify-between shrink-0">
+                <Icon className={`w-4 h-4 ${textColor} shrink-0`} />
+                <span className={`text-sm font-bold ${textColor}`}>
+                  {formatCurrency(v)}
+                </span>
+              </div>
             </div>
           );
         })}
         {correction !== undefined && correction > 0 && (
           <div
-            className="rounded border border-gray-300 flex items-start justify-between px-2 pt-1"
+            className="rounded border border-gray-300 flex flex-col justify-between px-3 pt-2 pb-2"
             style={{ 
-              height: `${(correction / percentageBase) * 100}%`,
-              minHeight: '24px',
+              flex: `${(correction / percentageBase) * 100} 0 0`,
+              minHeight: '60px',
               background: 'repeating-linear-gradient(45deg, transparent, transparent 4px, rgba(156, 163, 175, 0.15) 4px, rgba(156, 163, 175, 0.15) 5px)'
             }}
           >
-            <Receipt className="w-3 h-3 text-gray-400 shrink-0" />
-            <span className="text-[10px] font-bold text-gray-500">
-              - {formatCurrency(correction)}
+            <span className="text-[10px] font-medium text-gray-500 leading-tight">
+              Reservering
             </span>
+            <div className="flex items-center justify-between shrink-0">
+              <Receipt className="w-4 h-4 text-gray-400 shrink-0" />
+              <span className="text-sm font-bold text-gray-500">
+                - {formatCurrency(correction)}
+              </span>
+            </div>
           </div>
         )}
       </div>
@@ -1095,7 +1105,116 @@ export default function Calculator() {
           </Card>
         </div> */}
 
-      {/* SECTION 2: Tab Navigation */}
+      {/* SECTION 2: Controls (shared across all tabs) */}
+      <div className="max-w-5xl mx-auto px-4 mt-3">
+        <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-200">
+          <div className="grid mobile:grid-cols-2 mobile:gap-6 gap-6">
+            <div className="space-y-3 flex flex-col">
+              <div className="flex flex-col gap-1">
+                <label className="text-xs font-bold uppercase tracking-wider text-gray-500">
+                  Uurtarief Opdrachtgever
+                </label>
+                <div className="flex items-center gap-2 min-h-[2.5rem] pt-3">
+                  <div className="relative inline-block">
+                    <span
+                      ref={hourlyRateMeasureRef}
+                      className="text-3xl font-bold whitespace-pre opacity-0 pointer-events-none absolute"
+                      aria-hidden="true"
+                      style={{ visibility: 'hidden', position: 'absolute' }}
+                    >
+                      {hourlyRateInput || '0'}
+                    </span>
+                    <input
+                      type="number"
+                      value={hourlyRateInput}
+                      onChange={(e) => {
+                        setHourlyRateInput(e.target.value);
+                      }}
+                      onBlur={(e) => {
+                        const value = parseFloat(e.target.value);
+                        if (isNaN(value) || value < 30) {
+                          setHourlyRate([30]);
+                        } else if (value > 200) {
+                          setHourlyRate([200]);
+                        } else {
+                          setHourlyRate([value]);
+                        }
+                      }}
+                      style={{ width: `${hourlyRateWidth}px` }}
+                      className="text-3xl font-bold text-gray-900 bg-gray-50 border border-gray-300 rounded-md px-4 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      min={30}
+                      max={200}
+                      step={0.5}
+                    />
+                  </div>
+                  <span className="text-gray-400 font-medium text-base whitespace-nowrap">€/uur</span>
+                </div>
+              </div>
+              <Slider
+                value={hourlyRate}
+                onValueChange={setHourlyRate}
+                min={30}
+                max={200}
+                step={0.5}
+                className="w-full pt-4 pb-0"
+              />
+            </div>
+
+            <div className="space-y-3 flex flex-col">
+              <div className="flex flex-col gap-1">
+                <label className="text-xs font-bold uppercase tracking-wider text-gray-500">
+                  Uren Per Week
+                </label>
+                <div className="flex items-center gap-2 min-h-[2.5rem] pt-3">
+                  <div className="relative inline-block">
+                    <span
+                      ref={hoursPerWeekMeasureRef}
+                      className="text-3xl font-bold whitespace-pre opacity-0 pointer-events-none absolute"
+                      aria-hidden="true"
+                      style={{ visibility: 'hidden', position: 'absolute' }}
+                    >
+                      {hoursPerWeekInput || '0'}
+                    </span>
+                    <input
+                      type="number"
+                      value={hoursPerWeekInput}
+                      onChange={(e) => {
+                        setHoursPerWeekInput(e.target.value);
+                      }}
+                      onBlur={(e) => {
+                        const value = parseInt(e.target.value);
+                        if (isNaN(value) || value < 16) {
+                          setHoursPerWeek([16]);
+                        } else if (value > 40) {
+                          setHoursPerWeek([40]);
+                        } else {
+                          setHoursPerWeek([value]);
+                        }
+                      }}
+                      style={{ width: `${hoursPerWeekWidth}px` }}
+                      className="text-3xl font-bold text-gray-900 bg-gray-50 border border-gray-300 rounded-md px-4 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      min={16}
+                      max={40}
+                      step={1}
+                    />
+                  </div>
+                  <span className="text-gray-400 font-medium text-base whitespace-nowrap">uren</span>
+                </div>
+              </div>
+              <Slider
+                value={hoursPerWeek}
+                onValueChange={setHoursPerWeek}
+                min={16}
+                max={40}
+                step={1}
+                className="w-full pt-4 pb-0"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* SECTION 3: Tab Navigation */}
       <section className="py-8 px-4 max-w-5xl mx-auto">
         <div className="flex justify-center border-b border-gray-200">
           <div className="flex gap-2">
@@ -1136,122 +1255,10 @@ export default function Calculator() {
         </div>
       </section>
 
-      {/* SECTION 3: Comparison View (when activeTab === 'comparison') */}
+      {/* SECTION 4: Comparison View (when activeTab === 'comparison') */}
       {activeTab === 'comparison' && (
         <div className="max-w-5xl mx-auto" style={{ paddingLeft: '1rem', paddingRight: '1rem' }}>
         <section className="space-y-3">
-          {/* <div className="text-center space-y-2">
-            <h2 className="text-3xl font-bold text-gray-900">Detacheren vs ZZP</h2>
-            <p className="text-gray-500">Pas je uurtarief en uren aan en zie direct wat je overhoudt.</p>
-          </div> */}
-
-          {/* Controls */}
-          <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-200 max-w-5xl mx-auto">
-            
-            <div className="grid mobile:grid-cols-2 mobile:gap-6 gap-6">
-              <div className="space-y-3 flex flex-col">
-                <div className="flex flex-col gap-1">
-                  <label className="text-xs font-bold uppercase tracking-wider text-gray-500">
-                    Uurtarief Opdrachtgever
-                  </label>
-                  <div className="flex items-center gap-2 min-h-[2.5rem] pt-3">
-                    <div className="relative inline-block">
-                      <span
-                        ref={hourlyRateMeasureRef}
-                        className="text-3xl font-bold whitespace-pre opacity-0 pointer-events-none absolute"
-                        aria-hidden="true"
-                        style={{ visibility: 'hidden', position: 'absolute' }}
-                      >
-                        {hourlyRateInput || '0'}
-                      </span>
-                      <input
-                        type="number"
-                        value={hourlyRateInput}
-                        onChange={(e) => {
-                          setHourlyRateInput(e.target.value);
-                        }}
-                        onBlur={(e) => {
-                          const value = parseFloat(e.target.value);
-                          if (isNaN(value) || value < 30) {
-                            setHourlyRate([30]);
-                          } else if (value > 200) {
-                            setHourlyRate([200]);
-                          } else {
-                            setHourlyRate([value]);
-                          }
-                        }}
-                        style={{ width: `${hourlyRateWidth}px` }}
-                        className="text-3xl font-bold text-gray-900 bg-gray-50 border border-gray-300 rounded-md px-4 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        min={30}
-                        max={200}
-                        step={0.5}
-                      />
-                    </div>
-                    <span className="text-gray-400 font-medium text-base whitespace-nowrap">€/uur</span>
-                  </div>
-                </div>
-                <Slider
-                  value={hourlyRate}
-                  onValueChange={setHourlyRate}
-                  min={30}
-                  max={200}
-                  step={0.5}
-                  className="w-full pt-4 pb-0"
-                />
-              </div>
-
-              <div className="space-y-3 flex flex-col">
-                <div className="flex flex-col gap-1">
-                  <label className="text-xs font-bold uppercase tracking-wider text-gray-500">
-                    Uren Per Week
-                  </label>
-                  <div className="flex items-center gap-2 min-h-[2.5rem] pt-3">
-                    <div className="relative inline-block">
-                      <span
-                        ref={hoursPerWeekMeasureRef}
-                        className="text-3xl font-bold whitespace-pre opacity-0 pointer-events-none absolute"
-                        aria-hidden="true"
-                        style={{ visibility: 'hidden', position: 'absolute' }}
-                      >
-                        {hoursPerWeekInput || '0'}
-                      </span>
-                      <input
-                        type="number"
-                        value={hoursPerWeekInput}
-                        onChange={(e) => {
-                          setHoursPerWeekInput(e.target.value);
-                        }}
-                        onBlur={(e) => {
-                          const value = parseInt(e.target.value);
-                          if (isNaN(value) || value < 16) {
-                            setHoursPerWeek([16]);
-                          } else if (value > 40) {
-                            setHoursPerWeek([40]);
-                          } else {
-                            setHoursPerWeek([value]);
-                          }
-                        }}
-                        style={{ width: `${hoursPerWeekWidth}px` }}
-                        className="text-3xl font-bold text-gray-900 bg-gray-50 border border-gray-300 rounded-md px-4 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        min={16}
-                        max={40}
-                        step={1}
-                      />
-                    </div>
-                    <span className="text-gray-400 font-medium text-base whitespace-nowrap">uren</span>
-                  </div>
-                </div>
-                <Slider
-                  value={hoursPerWeek}
-                  onValueChange={setHoursPerWeek}
-                  min={16}
-                  max={40}
-                  step={1}
-                  className="w-full pt-4 pb-0"
-                />
-              </div>
-            </div>
-          </div>
 
           {/* Comparison Blocks - Detailed Netto Loon Blocks - COMMENTED OUT */}
           {false && (
@@ -1421,7 +1428,7 @@ export default function Calculator() {
           <div className="max-w-5xl mx-auto space-y-6">
 
             <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 mobile:p-10 space-y-6">
-              <div className="grid grid-cols-2 gap-4 mobile:gap-10">
+              <div className="grid grid-cols-2 gap-4 mobile:gap-10 min-h-[70vh] mobile:min-h-0">
                 {/* Detacheren – Waarde-blok */}
                 <ValueBlock
                   title="Detacheren"
@@ -1447,7 +1454,7 @@ export default function Calculator() {
                 />
               </div>
 
-              <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-gray-500">
+              <div className="hidden mobile:flex flex-wrap items-center justify-center gap-4 text-xs text-gray-500">
                 <span className="flex items-center gap-2">
                   <span className="w-4 h-4 rounded-sm bg-[#88B228] flex-shrink-0 border border-[#4E6517]/20" />
                   {VALUE_LABELS.marge}
