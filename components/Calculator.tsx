@@ -1246,7 +1246,7 @@ export default function Calculator() {
                         <div className="p-6 space-y-4 bg-gray-50">
                             <div className="flex items-center justify-between">
                                 <h3 className="font-semibold text-gray-900">Marge CreateNew (15%)</h3>
-                                <span className="text-[10px] text-gray-500 max-w-[50%] text-right leading-tight">
+                                <span className="text-xs text-gray-500 max-w-[50%] text-right leading-tight">
                                     Dit deel gaat naar kosten, risico en het draaiend houden van het platform
                                 </span>
                             </div>
@@ -1272,7 +1272,7 @@ export default function Calculator() {
                         <div className="p-6 bg-white space-y-4">
                              <div className="flex items-center justify-between">
                                 <h3 className="font-semibold text-gray-900">Van kandidaat tarief naar bruto loon</h3>
-                                <span className="text-[10px] text-gray-500 max-w-[50%] text-right leading-tight">
+                                <span className="text-xs text-gray-500 max-w-[50%] text-right leading-tight">
                                     Van uurtarief naar salaris, inclusief wettelijke werkgeverslasten
                                 </span>
                             </div>
@@ -1304,7 +1304,7 @@ export default function Calculator() {
                         <div className="p-6 bg-white space-y-4">
                              <div className="flex items-center justify-between">
                                 <h3 className="font-semibold text-gray-900">Van bruto naar netto</h3>
-                                <span className="text-[10px] text-gray-500 max-w-[50%] text-right leading-tight">
+                                <span className="text-xs text-gray-500 max-w-[50%] text-right leading-tight">
                                     Net als op je loonstrook: wat er van je bruto salaris afgaat
                                 </span>
                             </div>
@@ -1634,7 +1634,7 @@ export default function Calculator() {
                   <div className="p-6 space-y-4 bg-gray-50">
                     <div className="flex items-center justify-between">
                       <h3 className="font-semibold text-gray-900">Bruto omzet</h3>
-                      <span className="text-[10px] text-gray-500 max-w-[50%] text-right leading-tight">
+                      <span className="text-xs text-gray-500 max-w-[50%] text-right leading-tight">
                         Het totale bedrag dat je factureert op basis van je uurtarief en uren
                       </span>
                     </div>
@@ -1653,7 +1653,7 @@ export default function Calculator() {
                   <div className="p-6 bg-white space-y-4">
                     <div className="flex items-center justify-between">
                       <h3 className="font-semibold text-gray-900">Kosten & Risico</h3>
-                      <span className="text-[10px] text-gray-500 max-w-[50%] text-right leading-tight">
+                      <span className="text-xs text-gray-500 max-w-[50%] text-right leading-tight">
                         Kosten die worden ingehouden van je bruto omzet
                       </span>
                     </div>
@@ -1679,7 +1679,7 @@ export default function Calculator() {
                   <div className="p-6 bg-white space-y-4">
                     <div className="flex items-center justify-between">
                       <h3 className="font-semibold text-gray-900">Omzet na kosten</h3>
-                      <span className="text-[10px] text-gray-500 max-w-[50%] text-right leading-tight">
+                      <span className="text-xs text-gray-500 max-w-[50%] text-right leading-tight">
                         Het bedrag dat overblijft na aftrek van alle kosten
                       </span>
                     </div>
@@ -1694,7 +1694,7 @@ export default function Calculator() {
                   <div className="p-6 bg-white space-y-4">
                     <div className="flex items-center justify-between">
                       <h3 className="font-semibold text-gray-900">Pensioenopbouw</h3>
-                      <span className="text-[10px] text-gray-500 max-w-[50%] text-right leading-tight">
+                      <span className="text-xs text-gray-500 max-w-[50%] text-right leading-tight">
                         Zelfde pensioen als bij detacheren
                       </span>
                     </div>
@@ -1739,7 +1739,7 @@ export default function Calculator() {
                   <div className="p-6 bg-white space-y-4">
                     <div className="flex items-center justify-between">
                       <h3 className="font-semibold text-gray-900">Winst vóór belasting</h3>
-                      <span className="text-[10px] text-gray-500 max-w-[50%] text-right leading-tight">
+                      <span className="text-xs text-gray-500 max-w-[50%] text-right leading-tight">
                         Het bedrag dat overblijft na kosten en pensioen, vóór belasting
                       </span>
                     </div>
