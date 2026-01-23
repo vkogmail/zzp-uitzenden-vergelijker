@@ -1769,7 +1769,7 @@ export default function Calculator() {
                                             <span className="font-medium text-gray-700">Pensioengevend loon (na franchise)</span>
                                             <span className="font-bold text-gray-900">{formatCurrency(pensionableWage)}</span>
                                         </div>
-                                        <p className="text-[10px] leading-relaxed text-gray-500">
+                                        <p className="text-xs leading-relaxed text-gray-500">
                                             Niet je volledige salaris telt mee voor pensioenopbouw. We trekken een vast bedrag (franchise) af van je bruto salaris.
                                         </p>
                                     </div>
@@ -1781,7 +1781,7 @@ export default function Calculator() {
                                         monthlyHours={monthlyHours}
                                         tooltip={`Dit is jouw eigen bijdrage aan je pensioen (${(config.employeePensionRate * 100).toFixed(1)}% van je pensioengevend loon). Deze wordt ingehouden vóór belasting, dus je bespaart belasting over dit bedrag. Samen met het werkgeversdeel (${(config.employerPensionRate * 100).toFixed(1)}%) bouw je zo ${((config.employerPensionRate + config.employeePensionRate) * 100).toFixed(1)}% pensioen op.`}
                                     />
-                                    <p className="text-[10px] text-gray-500 leading-tight pl-4 -mt-2">
+                                    <p className="text-xs text-gray-500 leading-tight pl-4 -mt-2">
                                         Werknemersdeel wordt voor jou apart gezet, vóór belasting
                                     </p>
                                     {config.hasAZV && reservationBreakdown.azv > 0 && (
@@ -1826,7 +1826,7 @@ export default function Calculator() {
                                             <span className="font-medium">− Heffingskortingen</span>
                                             <span className="font-bold">− {formatCurrency(taxBreakdown.taxCredits)}</span>
                                         </div>
-                                        <p className="text-[10px] leading-relaxed text-gray-500">
+                                        <p className="text-xs leading-relaxed text-gray-500">
                                             Heffingskortingen verlagen de belasting die je betaalt
                                         </p>
                                     </div>
@@ -2165,10 +2165,10 @@ export default function Calculator() {
                         <span className="font-medium text-gray-700">Pensioengevend loon (na franchise)</span>
                         <span className="font-bold text-gray-900">{formatCurrency(zzpResult.pensionableWage)}</span>
                       </div>
-                      <p className="text-[10px] leading-relaxed text-gray-500">
+                      <p className="text-xs leading-relaxed text-gray-500">
                         Niet je volledige omzet telt mee voor pensioenopbouw. We trekken een vast bedrag (franchise) af van je omzet na kosten.
                       </p>
-                      <p className="text-[10px] leading-relaxed text-gray-600 font-medium mt-2">
+                      <p className="text-xs leading-relaxed text-gray-600 font-medium mt-2">
                         Dit pensioen is vergelijkbaar gemaakt met de wettelijke pensioenverplichting voor flexwerkers volgens de ABU CAO. Dit is een aan te raden bedrag voor zzp'ers.
                       </p>
                     </div>
@@ -2180,7 +2180,7 @@ export default function Calculator() {
                       monthlyHours={zzpResult.monthlyHours}
                       tooltip={`Dit is jouw eigen bijdrage aan je pensioen (${(config.employeePensionRate * 100).toFixed(1)}% van je pensioengevend loon). Deze wordt ingehouden vóór belasting, dus je bespaart belasting over dit bedrag.`}
                     />
-                    <p className="text-[10px] text-gray-500 leading-tight pl-4 -mt-2">
+                    <p className="text-xs text-gray-500 leading-tight pl-4 -mt-2">
                       Werknemersdeel wordt voor jou apart gezet, vóór belasting
                     </p>
                     <BreakdownRow 
@@ -2229,7 +2229,7 @@ export default function Calculator() {
                               <span className="font-medium">− MKB-vrijstelling ({(config.zzpMkbVrijstellingRate * 100).toFixed(2)}%)</span>
                               <span className="font-bold">− {formatCurrency(zzpResult.taxBreakdown.mkbVrijstelling / 12)}</span>
                             </div>
-                            <p className="text-[10px] leading-relaxed text-gray-500">
+                            <p className="text-xs leading-relaxed text-gray-500">
                               Als zelfstandige heb je recht op aftrekposten die je belastbaar inkomen verlagen
                             </p>
                           </div>
@@ -2261,7 +2261,7 @@ export default function Calculator() {
                                 <span className="font-medium">− Arbeidskorting</span>
                                 <span className="font-bold">− {formatCurrency(zzpResult.taxBreakdown.arbeidskorting / 12)}</span>
                               </div>
-                              <p className="text-[10px] leading-relaxed text-gray-500">
+                              <p className="text-xs leading-relaxed text-gray-500">
                                 Heffingskortingen verlagen de belasting die je betaalt
                               </p>
                             </div>
