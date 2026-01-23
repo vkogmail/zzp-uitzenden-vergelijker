@@ -31,9 +31,8 @@ function Slider({
       min={min}
       max={max}
       className={cn(
-        // Add horizontal padding equal to half thumb width (thumb is size-5 = 20px, so px-2.5 = 10px each side).
-        // This makes the range's 0-100% align with the thumb center's travel distance.
-        "relative flex w-full touch-none items-center select-none data-[disabled]:opacity-50 data-[orientation=vertical]:h-full data-[orientation=vertical]:min-h-44 data-[orientation=vertical]:w-auto data-[orientation=vertical]:flex-col px-2.5",
+        // Add right padding only (half thumb width) so range ends at thumb center, but track starts flush left.
+        "relative flex w-full touch-none items-center select-none data-[disabled]:opacity-50 data-[orientation=vertical]:h-full data-[orientation=vertical]:min-h-44 data-[orientation=vertical]:w-auto data-[orientation=vertical]:flex-col pr-2.5",
         className,
       )}
       {...props}

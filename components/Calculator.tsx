@@ -158,20 +158,23 @@ function ValueBlock({
   
   return (
     <div>
-      <div className="flex items-start gap-2 mb-4">
+      {/* Header - compact on mobile */}
+      <div className="flex items-start gap-2 mb-2 mobile:mb-4">
         {variant === 'detacheren' ? (
-          <Briefcase className="w-5 h-5 text-blue-600 mt-1" />
+          <Briefcase className="w-4 h-4 mobile:w-5 mobile:h-5 text-blue-600 mt-0.5 mobile:mt-1" />
         ) : (
-          <CalculatorIcon className="w-5 h-5 text-green-600 mt-1" />
+          <CalculatorIcon className="w-4 h-4 mobile:w-5 mobile:h-5 text-green-600 mt-0.5 mobile:mt-1" />
         )}
         <div>
-          <h3 className="text-lg font-bold text-gray-900">{title}</h3>
-          <p className="text-sm text-gray-500">{subtitle}</p>
+          <h3 className="text-sm mobile:text-lg font-bold text-gray-900">{title}</h3>
+          <p className="text-xs mobile:text-sm text-gray-500 hidden mobile:block">{subtitle}</p>
         </div>
       </div>
-      <div className="mb-4">
-        <div className="flex justify-between items-start">
-          <div>
+      
+      {/* Total - compact on mobile */}
+      <div className="mb-2 mobile:mb-4">
+        <div className="flex flex-col mobile:flex-row mobile:justify-between mobile:items-start">
+          <div className="hidden mobile:block">
             <div className="text-xs font-semibold uppercase tracking-wider text-gray-500">{totalLabel}</div>
             <div className="text-xs text-gray-400">
               {variant === 'detacheren' 
@@ -179,12 +182,53 @@ function ValueBlock({
                 : 'Exclusief vakantiedagen en feestdagen'}
             </div>
           </div>
-          <div className="text-2xl font-bold text-gray-900 leading-none">{formatCurrency(displayTotal)}</div>
+          <div className="text-lg mobile:text-2xl font-bold text-gray-900 leading-none">{formatCurrency(displayTotal)}</div>
         </div>
       </div>
       
-      {/* Vertical Stacked Bar Chart */}
-      <div className="flex flex-col gap-1" style={{ height: CHART_HEIGHT }}>
+      {/* Mobile: Vertical Stacked Bar Chart (compact, icon + amount only) */}
+      <div className="mobile:hidden flex flex-col gap-0.5" style={{ height: 280 }}>
+        {keys.map((k) => {
+          const v = breakdown[k];
+          if (v <= 0) return null;
+          const percentage = (v / percentageBase) * 100;
+          const colorSet = variant === 'detacheren' ? VALUE_COLORS_DETACHEREN : VALUE_COLORS_ZZP;
+          const bgColor = colorSet[k].split(' ')[0];
+          const textColor = colorSet[k].split(' ')[1];
+          const Icon = VALUE_ICONS[k];
+          
+          return (
+            <div
+              key={k}
+              className={`${bgColor} flex items-start justify-between px-2 pt-1 transition-all duration-500 rounded`}
+              style={{ height: `${percentage}%`, minHeight: '24px' }}
+            >
+              <Icon className={`w-3 h-3 ${textColor} shrink-0`} />
+              <span className={`text-[10px] font-bold ${textColor}`}>
+                {formatCurrency(v)}
+              </span>
+            </div>
+          );
+        })}
+        {correction !== undefined && correction > 0 && (
+          <div
+            className="rounded border border-gray-300 flex items-start justify-between px-2 pt-1"
+            style={{ 
+              height: `${(correction / percentageBase) * 100}%`,
+              minHeight: '24px',
+              background: 'repeating-linear-gradient(45deg, transparent, transparent 4px, rgba(156, 163, 175, 0.15) 4px, rgba(156, 163, 175, 0.15) 5px)'
+            }}
+          >
+            <Receipt className="w-3 h-3 text-gray-400 shrink-0" />
+            <span className="text-[10px] font-bold text-gray-500">
+              - {formatCurrency(correction)}
+            </span>
+          </div>
+        )}
+      </div>
+
+      {/* Desktop: Vertical Stacked Bar Chart */}
+      <div className="hidden mobile:flex flex-col gap-1" style={{ height: CHART_HEIGHT }}>
         {keys.map((k) => {
           const v = breakdown[k];
           if (v <= 0) return null;
@@ -1376,8 +1420,8 @@ export default function Calculator() {
           {/* Vergelijk de Waarde – Verdeling marge, kosten, belasting, pensioen, netto */}
           <div className="max-w-5xl mx-auto space-y-6">
 
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-10 space-y-6">
-              <div className="grid mobile:grid-cols-2 gap-10">
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 mobile:p-10 space-y-6">
+              <div className="grid grid-cols-2 gap-4 mobile:gap-10">
                 {/* Detacheren – Waarde-blok */}
                 <ValueBlock
                   title="Detacheren"
