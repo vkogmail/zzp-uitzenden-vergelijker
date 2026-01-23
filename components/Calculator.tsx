@@ -1078,7 +1078,7 @@ export default function Calculator() {
               className={clsx(
                 "px-3 py-2 text-sm font-medium transition-colors",
                 activeTab === 'comparison'
-                  ? "border-b-2 border-blue-600 text-blue-600"
+                  ? "border-b-2 border-gray-900 text-gray-900"
                   : "text-gray-500 hover:text-gray-700"
               )}
             >
@@ -1089,7 +1089,7 @@ export default function Calculator() {
               className={clsx(
                 "px-3 py-2 text-sm font-medium transition-colors",
                 activeTab === 'detacheren'
-                  ? "border-b-2 border-blue-600 text-blue-600"
+                  ? "border-b-2 border-gray-900 text-gray-900"
                   : "text-gray-500 hover:text-gray-700"
               )}
             >
@@ -1100,7 +1100,7 @@ export default function Calculator() {
               className={clsx(
                 "px-3 py-2 text-sm font-medium transition-colors",
                 activeTab === 'zzp'
-                  ? "border-b-2 border-blue-600 text-blue-600"
+                  ? "border-b-2 border-gray-900 text-gray-900"
                   : "text-gray-500 hover:text-gray-700"
               )}
             >
@@ -1157,30 +1157,30 @@ export default function Calculator() {
       <div className="max-w-5xl mx-auto" style={{ paddingLeft: '1rem', paddingRight: '1rem' }}>
       <section className="space-y-3">
         {/* Visual Flow */}
-        <div className="flex flex-col md:flex-row gap-4 items-stretch">
+        <div className="flex flex-col md:flex-row gap-2 items-stretch">
             {/* First two cards side by side on mobile */}
-            <div className="flex flex-row gap-4 items-stretch">
+            <div className="flex flex-row gap-2 items-stretch flex-[2]">
                 {/* Step 1: Client Pays */}
-                <div className="bg-white p-6 rounded-xl border border-gray-200 flex flex-col gap-2 relative group flex-1">
+                <div className="bg-white p-6 rounded-xl border border-gray-200 flex flex-col relative group flex-1">
                     <div className="text-xs font-bold uppercase tracking-wider text-gray-400">WAT DE KLANT BETAALT</div>
-                    <div className="flex flex-col">
+                    <div className="flex flex-col mt-2">
                          <span className="text-2xl font-bold text-gray-900">{formatCurrency(clientTotal)}</span>
                          <span className="text-sm font-medium text-gray-400">{formatHourly(clientTotal)} /uur</span>
                     </div>
-                    <div className="text-sm text-gray-500 mt-1">Het volledige maandbedrag</div>
+                    <div className="text-sm text-gray-500 mt-3">Het volledige maandbedrag</div>
                 </div>
 
                 {/* Step 2: Company Share - Match Marge color from bar chart */}
-                <div className="bg-marge-100 p-6 rounded-xl border border-marge-400/20 flex flex-col gap-2 relative flex-1">
-                    <div className="text-xs font-bold uppercase tracking-wider text-marge-text">MARGE CREATENEW</div>
-                    <div className="flex flex-col mb-3">
-                         <div className="flex items-baseline gap-2 mb-1">
-                              <span className="text-xs text-marge-text">Winst (5%)</span>
+                <div className="bg-marge-100 p-6 rounded-xl border border-marge-400/20 flex flex-col relative flex-1">
+                    <div className="text-xs font-bold uppercase tracking-wider text-marge-text whitespace-nowrap">MARGE CREATENEW</div>
+                    <div className="flex flex-col mt-2">
+                         <div className="flex flex-col mb-2">
                               <span className="text-2xl font-bold text-marge-text">{formatCurrency(marginBreakdown.profit)}</span>
+                              <span className="text-xs text-marge-text">Winst (5%)</span>
                          </div>
-                         <div className="flex items-baseline gap-2">
-                              <span className="text-[10px] text-marge-text/70">Kosten (10%)</span>
+                         <div className="flex flex-col">
                               <span className="text-sm font-medium text-marge-text">{formatCurrency(marginBreakdown.admin)}</span>
+                              <span className="text-[10px] text-marge-text/70">Kosten (10%)</span>
                          </div>
                     </div>
                     <div className="text-xs text-marge-text mt-auto">Totaal: {formatCurrency(companyTotal)}</div>
@@ -1188,16 +1188,16 @@ export default function Calculator() {
             </div>
 
             {/* Step 3: Candidate Total */}
-            <div className="bg-white p-6 rounded-xl border border-gray-200 flex flex-col gap-2 relative flex-[2]">
-                <div className="flex items-start justify-between mb-2 gap-4">
+            <div className="bg-white p-6 rounded-xl border border-gray-200 flex flex-col relative flex-[2]">
+                <div className="flex items-start justify-between gap-4">
                      <div className="flex flex-col">
-                          <div className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">JOUW TOTALE BELONING</div>
-                          <span className="text-3xl font-bold text-gray-900">{formatCurrency(candidateTotal)}</span>
+                          <div className="text-xs font-bold uppercase tracking-wider text-gray-400">JOUW TOTALE BELONING</div>
+                          <span className="text-2xl font-bold text-gray-900 mt-2">{formatCurrency(candidateTotal)}</span>
                           <span className="text-sm font-medium text-gray-500">{formatHourly(candidateTotal)} /uur</span>
                      </div>
                      <div className="flex flex-col items-end">
-                          <span className="text-xs text-gray-500 uppercase tracking-wide mb-1">JOUW TOTALE OPBRENGST</span>
-                          <span className="text-2xl font-bold text-gray-900">{formatCurrency(netTotal + additionalBenefits.totalAdditionalBenefits + employerPension + reservationBreakdown.employeePension)}</span>
+                          <span className="text-xs text-gray-500 uppercase tracking-wide">JOUW TOTALE OPBRENGST</span>
+                          <span className="text-2xl font-bold text-gray-900 mt-2">{formatCurrency(netTotal + additionalBenefits.totalAdditionalBenefits + employerPension + reservationBreakdown.employeePension)}</span>
                           <span className="text-xs text-gray-500">Direct + later</span>
                      </div>
                 </div>
@@ -1557,30 +1557,30 @@ export default function Calculator() {
       <div className="max-w-5xl mx-auto" style={{ paddingLeft: '1rem', paddingRight: '1rem' }}>
       <section className="space-y-3">
         {/* Visual Flow for ZZP */}
-        <div className="flex flex-col md:flex-row gap-4 items-stretch">
+        <div className="flex flex-col md:flex-row gap-2 items-stretch">
           {/* First two cards side by side on mobile */}
-          <div className="flex flex-row gap-4 items-stretch">
+          <div className="flex flex-row gap-2 items-stretch flex-[2]">
             {/* Step 1: Revenue */}
-            <div className="bg-white p-6 rounded-xl border border-gray-200 flex flex-col gap-2 relative group flex-1">
+            <div className="bg-white p-6 rounded-xl border border-gray-200 flex flex-col relative group flex-1">
               <div className="text-xs font-bold uppercase tracking-wider text-gray-400">BRUTO OMZET</div>
-              <div className="flex flex-col">
+              <div className="flex flex-col mt-2">
                 <span className="text-2xl font-bold text-gray-900">{formatCurrency(zzpResult.revenueTotal)}</span>
                 <span className="text-sm font-medium text-gray-400">{formatHourly(zzpResult.revenueTotal, zzpResult.monthlyHours)} /uur</span>
               </div>
-              <div className="text-sm text-gray-500 mt-1">Uurtarief × uren</div>
+              <div className="text-sm text-gray-500 mt-3">Uurtarief × uren</div>
             </div>
 
             {/* Step 2: Costs - Match Marge color from bar chart */}
-            <div className="bg-marge-100 p-6 rounded-xl border border-marge-400/20 flex flex-col gap-2 relative flex-1">
-              <div className="text-xs font-bold uppercase tracking-wider text-marge-text">KOSTEN & RISICO</div>
-              <div className="flex flex-col mb-3">
-                <div className="flex items-baseline gap-2 mb-1">
-                  <span className="text-xs text-marge-text">Marge CreateNew ({(config.zzpCompanyMarginRate * 100).toFixed(0)}%)</span>
+            <div className="bg-marge-100 p-6 rounded-xl border border-marge-400/20 flex flex-col relative flex-1">
+              <div className="text-xs font-bold uppercase tracking-wider text-marge-text whitespace-nowrap">KOSTEN & RISICO</div>
+              <div className="flex flex-col mt-2">
+                <div className="flex flex-col mb-2">
                   <span className="text-2xl font-bold text-marge-text">{formatCurrency(zzpResult.costsBreakdown.entrepreneurRisk)}</span>
+                  <span className="text-xs text-marge-text">Marge CreateNew ({(config.zzpCompanyMarginRate * 100).toFixed(0)}%)</span>
                 </div>
-                <div className="flex items-baseline gap-2">
-                  <span className="text-[10px] text-marge-text/70">Kosten</span>
+                <div className="flex flex-col">
                   <span className="text-sm font-medium text-marge-text">{formatCurrency(zzpResult.costsBreakdown.overheadCosts)}</span>
+                  <span className="text-[10px] text-marge-text/70">Kosten</span>
                 </div>
               </div>
               <div className="text-xs text-marge-text mt-auto">Totaal: {formatCurrency(zzpResult.costsTotal)}</div>
@@ -1588,16 +1588,16 @@ export default function Calculator() {
           </div>
 
           {/* Step 3: Revenue After Costs */}
-          <div className="bg-white p-6 rounded-xl border border-gray-200 flex flex-col gap-2 relative flex-[2]">
-            <div className="flex items-start justify-between mb-2 gap-4">
+          <div className="bg-white p-6 rounded-xl border border-gray-200 flex flex-col relative flex-[2]">
+            <div className="flex items-start justify-between gap-4">
               <div className="flex flex-col">
-                <div className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">JOUW TOTALE BELONING</div>
-                <span className="text-3xl font-bold text-gray-900">{formatCurrency(zzpResult.revenueAfterCosts)}</span>
+                <div className="text-xs font-bold uppercase tracking-wider text-gray-400">JOUW TOTALE BELONING</div>
+                <span className="text-2xl font-bold text-gray-900 mt-2">{formatCurrency(zzpResult.revenueAfterCosts)}</span>
                 <span className="text-sm font-medium text-gray-500">{formatHourly(zzpResult.revenueAfterCosts, zzpResult.monthlyHours)} /uur</span>
               </div>
               <div className="flex flex-col items-end">
-                <span className="text-xs text-gray-500 uppercase tracking-wide mb-1">JOUW TOTALE OPBRENGST</span>
-                <span className="text-2xl font-bold text-gray-900">{formatCurrency(zzpNetAfterTaxIndicative + zzpResult.employerPension + zzpResult.reservationBreakdown.employeePension)}</span>
+                <span className="text-xs text-gray-500 uppercase tracking-wide">JOUW TOTALE OPBRENGST</span>
+                <span className="text-2xl font-bold text-gray-900 mt-2">{formatCurrency(zzpNetAfterTaxIndicative + zzpResult.employerPension + zzpResult.reservationBreakdown.employeePension)}</span>
                 <span className="text-xs text-gray-500">Direct + later</span>
               </div>
             </div>
