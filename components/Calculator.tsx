@@ -890,7 +890,7 @@ export default function Calculator() {
           <div className="grid mobile:grid-cols-2 mobile:gap-6 gap-4">
             {/* Hourly Rate */}
             <div className="space-y-2 mobile:space-y-3">
-              <label className="text-xs font-bold uppercase tracking-wider text-gray-500">
+              <label className="text-xs font-bold uppercase tracking-wider text-gray-500 pb-1 block">
                 Uurtarief Opdrachtgever
               </label>
               {/* Mobile: input + slider inline */}
@@ -979,7 +979,7 @@ export default function Calculator() {
 
             {/* Hours Per Week */}
             <div className="space-y-2 mobile:space-y-3">
-              <label className="text-xs font-bold uppercase tracking-wider text-gray-500">
+              <label className="text-xs font-bold uppercase tracking-wider text-gray-500 pb-1 block">
                 Uren Per Week
               </label>
               {/* Mobile: input + slider inline */}
