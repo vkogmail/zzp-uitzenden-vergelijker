@@ -63,7 +63,7 @@ export function ConfigInput({
             min={min}
             max={max}
             step={step}
-            className="w-36 px-4 py-2.5 text-right text-sm font-bold border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-colors"
+            className="w-36 px-4 py-2.5 text-right text-sm font-bold border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-colors cursor-text disabled:cursor-not-allowed"
           />
           {suffix && <span className="text-xs text-gray-500">{suffix}</span>}
         </div>

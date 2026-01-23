@@ -255,7 +255,7 @@ export default function Calculator() {
           {/* Fixed Configuration Button */}
           <button
             onClick={() => setShowConfig(!showConfig)}
-            className="fixed bottom-8 right-8 bg-gray-800 hover:bg-gray-700 text-white p-4 rounded-full shadow-lg transition-all z-50 flex items-center gap-2"
+            className="fixed bottom-8 right-8 bg-gray-800 hover:bg-gray-700 text-white p-4 rounded-full shadow-lg transition-all z-50 flex items-center gap-2 cursor-pointer"
             title="Configuratie aanpassen"
           >
             <Settings className="w-6 h-6" />
@@ -274,7 +274,7 @@ export default function Calculator() {
                 </div>
                 <button
                   onClick={() => setConfig(defaultConfig)}
-                  className="text-sm bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-lg transition-colors"
+                  className="text-sm bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-lg transition-colors cursor-pointer"
                 >
                   Reset naar standaard
                 </button>
@@ -469,7 +469,7 @@ export default function Calculator() {
                     <button
                       key={cao}
                       onClick={() => applyCAOPreset(cao)}
-                      className={`p-3 rounded-lg border-2 font-medium transition-all ${
+                      className={`p-3 rounded-lg border-2 font-medium transition-all cursor-pointer ${
                         selectedCAO === cao
                           ? 'border-blue-600 bg-blue-600 text-white'
                           : 'border-gray-300 bg-white text-gray-700 hover:border-blue-400'
@@ -921,7 +921,7 @@ export default function Calculator() {
                       }
                     }}
                     style={{ width: `${hourlyRateWidth}px` }}
-                    className="text-2xl font-bold text-gray-900 bg-gray-50 border border-gray-300 rounded-md px-3 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="text-2xl font-bold text-gray-900 bg-gray-50 border border-gray-300 rounded-md px-3 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 cursor-text"
                   />
                 </div>
                 <Slider
@@ -961,7 +961,7 @@ export default function Calculator() {
                         }
                       }}
                       style={{ width: `${hourlyRateWidth}px` }}
-                      className="text-3xl font-bold text-gray-900 bg-gray-50 border border-gray-300 rounded-md px-4 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="text-3xl font-bold text-gray-900 bg-gray-50 border border-gray-300 rounded-md px-4 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 cursor-text"
                     />
                   </div>
                   <span className="text-gray-400 font-medium text-base whitespace-nowrap">€/uur</span>
@@ -1010,7 +1010,7 @@ export default function Calculator() {
                       }
                     }}
                     style={{ width: `${hoursPerWeekWidth}px` }}
-                    className="text-2xl font-bold text-gray-900 bg-gray-50 border border-gray-300 rounded-md px-3 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="text-2xl font-bold text-gray-900 bg-gray-50 border border-gray-300 rounded-md px-3 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 cursor-text"
                   />
                 </div>
                 <Slider
@@ -1050,7 +1050,7 @@ export default function Calculator() {
                         }
                       }}
                       style={{ width: `${hoursPerWeekWidth}px` }}
-                      className="text-3xl font-bold text-gray-900 bg-gray-50 border border-gray-300 rounded-md px-4 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="text-3xl font-bold text-gray-900 bg-gray-50 border border-gray-300 rounded-md px-4 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 cursor-text"
                     />
                   </div>
                   <span className="text-gray-400 font-medium text-base whitespace-nowrap">uren</span>
@@ -1076,7 +1076,7 @@ export default function Calculator() {
             <button
               onClick={() => setActiveTab('comparison')}
               className={clsx(
-                "px-3 py-2 text-sm font-medium transition-colors",
+                "px-3 py-2 text-sm font-medium transition-colors cursor-pointer",
                 activeTab === 'comparison'
                   ? "border-b-[3px] border-gray-900 text-gray-900"
                   : "text-gray-500 hover:text-gray-700"
@@ -1087,7 +1087,7 @@ export default function Calculator() {
             <button
               onClick={() => setActiveTab('detacheren')}
               className={clsx(
-                "px-3 py-2 text-sm font-medium transition-colors",
+                "px-3 py-2 text-sm font-medium transition-colors cursor-pointer",
                 activeTab === 'detacheren'
                   ? "border-b-[3px] border-gray-900 text-gray-900"
                   : "text-gray-500 hover:text-gray-700"
@@ -1098,7 +1098,7 @@ export default function Calculator() {
             <button
               onClick={() => setActiveTab('zzp')}
               className={clsx(
-                "px-3 py-2 text-sm font-medium transition-colors",
+                "px-3 py-2 text-sm font-medium transition-colors cursor-pointer",
                 activeTab === 'zzp'
                   ? "border-b-[3px] border-gray-900 text-gray-900"
                   : "text-gray-500 hover:text-gray-700"
@@ -1529,7 +1529,7 @@ export default function Calculator() {
                               {settingsEnabled && (
                                 <button
                                   onClick={() => setShowConfig(true)}
-                                  className="text-xs text-netto-text hover:text-netto-text/80 underline"
+                                  className="text-xs text-netto-text hover:text-netto-text/80 underline cursor-pointer"
                                 >
                                   Wijzig CAO
                                 </button>
