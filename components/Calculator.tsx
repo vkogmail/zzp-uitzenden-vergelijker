@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { clsx } from 'clsx';
 import { 
   Calculator as CalculatorIcon, 
@@ -247,6 +247,79 @@ export default function Calculator() {
   const [selectedCAO, setSelectedCAO] = useState<CAOPreset>('ABU');
   const [settingsEnabled, setSettingsEnabled] = useState(false);
   const [activeTab, setActiveTab] = useState<'comparison' | 'detacheren' | 'zzp'>('comparison');
+  
+  // Local state for input values to allow free typing
+  const [hourlyRateInput, setHourlyRateInput] = useState('100');
+  const [hoursPerWeekInput, setHoursPerWeekInput] = useState('40');
+  
+  // Refs for measuring text width
+  const hourlyRateMeasureRef = useRef<HTMLSpanElement>(null);
+  const hoursPerWeekMeasureRef = useRef<HTMLSpanElement>(null);
+  const [hourlyRateWidth, setHourlyRateWidth] = useState(144);
+  const [hoursPerWeekWidth, setHoursPerWeekWidth] = useState(80);
+  
+  // Measure text width for hourly rate
+  useEffect(() => {
+    const measure = () => {
+      if (hourlyRateMeasureRef.current) {
+        const width = hourlyRateMeasureRef.current.offsetWidth;
+        // px-4 = 1rem = 16px on each side = 32px total padding
+        if (width > 0) {
+          setHourlyRateWidth(width + 32);
+        }
+      }
+    };
+    // Use requestAnimationFrame to ensure DOM has updated
+    const rafId = requestAnimationFrame(measure);
+    return () => cancelAnimationFrame(rafId);
+  }, [hourlyRateInput]);
+  
+  // Measure text width for hours per week
+  useEffect(() => {
+    const measure = () => {
+      if (hoursPerWeekMeasureRef.current) {
+        const width = hoursPerWeekMeasureRef.current.offsetWidth;
+        // px-4 = 1rem = 16px on each side = 32px total padding
+        if (width > 0) {
+          setHoursPerWeekWidth(width + 32);
+        }
+      }
+    };
+    // Use requestAnimationFrame to ensure DOM has updated
+    const rafId = requestAnimationFrame(measure);
+    return () => cancelAnimationFrame(rafId);
+  }, [hoursPerWeekInput]);
+  
+  // Initial measurement on mount
+  useEffect(() => {
+    const measureBoth = () => {
+      if (hourlyRateMeasureRef.current) {
+        const width = hourlyRateMeasureRef.current.offsetWidth;
+        if (width > 0) {
+          setHourlyRateWidth(width + 32);
+        }
+      }
+      if (hoursPerWeekMeasureRef.current) {
+        const width = hoursPerWeekMeasureRef.current.offsetWidth;
+        if (width > 0) {
+          setHoursPerWeekWidth(width + 32);
+        }
+      }
+    };
+    // Small delay to ensure DOM is ready
+    setTimeout(() => {
+      requestAnimationFrame(measureBoth);
+    }, 0);
+  }, []);
+  
+  // Sync local input state with actual state
+  useEffect(() => {
+    setHourlyRateInput(hourlyRate[0].toString());
+  }, [hourlyRate]);
+  
+  useEffect(() => {
+    setHoursPerWeekInput(hoursPerWeek[0].toString());
+  }, [hoursPerWeek]);
   
   const applyCAOPreset = (cao: CAOPreset) => {
     setSelectedCAO(cao);
@@ -930,7 +1003,7 @@ export default function Calculator() {
         <section className="bg-white border-b border-gray-100 pt-12 pb-12 rounded-2xl" style={{ boxShadow: 'rgba(13, 13, 18, 0.05) 0px 2px 4px 0px' }}>
           <div className="text-center space-y-6 px-6">
             <h1 className="text-4xl mobile:text-5xl font-extrabold tracking-tight text-gray-900">
-              Je inkomen is meer dan je maandbedrag
+              Je inkomen is meer<br />dan je maandbedrag
             </h1>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
               Zie wat je direct ontvangt en wat je opbouwt voor later.
@@ -1037,11 +1110,40 @@ export default function Calculator() {
                   <label className="text-xs font-bold uppercase tracking-wider text-gray-500">
                     Uurtarief Opdrachtgever
                   </label>
-                  <div className="flex items-baseline gap-1 min-h-[2.5rem]">
-                    <span className="text-3xl font-bold text-gray-900">
-                      € {hourlyRate[0].toLocaleString('nl-NL', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
-                    </span>
-                    <span className="text-gray-400 font-medium text-base whitespace-nowrap">/ uur</span>
+                  <div className="flex items-center gap-2 min-h-[2.5rem] pt-3">
+                    <div className="relative inline-block">
+                      <span
+                        ref={hourlyRateMeasureRef}
+                        className="text-3xl font-bold whitespace-pre opacity-0 pointer-events-none absolute"
+                        aria-hidden="true"
+                        style={{ visibility: 'hidden', position: 'absolute' }}
+                      >
+                        {hourlyRateInput || '0'}
+                      </span>
+                      <input
+                        type="number"
+                        value={hourlyRateInput}
+                        onChange={(e) => {
+                          setHourlyRateInput(e.target.value);
+                        }}
+                        onBlur={(e) => {
+                          const value = parseFloat(e.target.value);
+                          if (isNaN(value) || value < 30) {
+                            setHourlyRate([30]);
+                          } else if (value > 200) {
+                            setHourlyRate([200]);
+                          } else {
+                            setHourlyRate([value]);
+                          }
+                        }}
+                        style={{ width: `${hourlyRateWidth}px` }}
+                        className="text-3xl font-bold text-gray-900 bg-gray-50 border border-gray-300 rounded-md px-4 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        min={30}
+                        max={200}
+                        step={0.5}
+                      />
+                    </div>
+                    <span className="text-gray-400 font-medium text-base whitespace-nowrap">€/uur</span>
                   </div>
                 </div>
                 <Slider
@@ -1050,7 +1152,7 @@ export default function Calculator() {
                   min={30}
                   max={200}
                   step={0.5}
-                  className="w-full py-4"
+                  className="w-full pt-4 pb-0"
                 />
               </div>
 
@@ -1059,8 +1161,39 @@ export default function Calculator() {
                   <label className="text-xs font-bold uppercase tracking-wider text-gray-500">
                     Uren Per Week
                   </label>
-                  <div className="flex items-baseline gap-1 min-h-[2.5rem]">
-                    <span className="text-3xl font-bold text-gray-900">{hoursPerWeek[0]}</span>
+                  <div className="flex items-center gap-2 min-h-[2.5rem] pt-3">
+                    <div className="relative inline-block">
+                      <span
+                        ref={hoursPerWeekMeasureRef}
+                        className="text-3xl font-bold whitespace-pre opacity-0 pointer-events-none absolute"
+                        aria-hidden="true"
+                        style={{ visibility: 'hidden', position: 'absolute' }}
+                      >
+                        {hoursPerWeekInput || '0'}
+                      </span>
+                      <input
+                        type="number"
+                        value={hoursPerWeekInput}
+                        onChange={(e) => {
+                          setHoursPerWeekInput(e.target.value);
+                        }}
+                        onBlur={(e) => {
+                          const value = parseInt(e.target.value);
+                          if (isNaN(value) || value < 16) {
+                            setHoursPerWeek([16]);
+                          } else if (value > 40) {
+                            setHoursPerWeek([40]);
+                          } else {
+                            setHoursPerWeek([value]);
+                          }
+                        }}
+                        style={{ width: `${hoursPerWeekWidth}px` }}
+                        className="text-3xl font-bold text-gray-900 bg-gray-50 border border-gray-300 rounded-md px-4 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        min={16}
+                        max={40}
+                        step={1}
+                      />
+                    </div>
                     <span className="text-gray-400 font-medium text-base whitespace-nowrap">uren</span>
                   </div>
                 </div>
@@ -1070,7 +1203,7 @@ export default function Calculator() {
                   min={16}
                   max={40}
                   step={1}
-                  className="w-full py-4"
+                  className="w-full pt-4 pb-0"
                 />
               </div>
             </div>
@@ -1372,7 +1505,7 @@ export default function Calculator() {
                       max={150}
                       step={0.5}
                       onValueChange={setHourlyRate}
-                      className="w-full py-4"
+                      className="w-full pt-4 pb-0"
                     />
                   </div>
                   
@@ -1394,7 +1527,7 @@ export default function Calculator() {
                       max={40}
                       step={1}
                       onValueChange={setHoursPerWeek}
-                      className="w-full py-4"
+                      className="w-full pt-4 pb-0"
                     />
                   </div>
              </div>

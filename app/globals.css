@@ -430,6 +430,17 @@ h2.text-lg.font-bold {
   animation: accordion-up 0.2s ease-out;
 }
 
+/* 9) Hide number input spinner arrows */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
 /* 8) Notes:
    - You can now use native Tailwind utilities instead of custom color classes:
      bg-blue-50, border-blue-200, text-blue-900/800/700/600/500,
