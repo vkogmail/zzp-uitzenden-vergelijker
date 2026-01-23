@@ -979,7 +979,7 @@ export default function Calculator() {
 
             {/* Hours Per Week */}
             <div className="space-y-2 mobile:space-y-3">
-              <label className="text-xs font-bold uppercase tracking-wider text-gray-500 pb-1 block">
+              <label className="text-xs font-bold uppercase tracking-wider text-gray-500 pb-0 block">
                 Uren Per Week
               </label>
               {/* Mobile: input + slider inline */}
