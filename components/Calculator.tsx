@@ -309,17 +309,17 @@ export default function Calculator() {
   // Refs for measuring text width
   const hourlyRateMeasureRef = useRef<HTMLSpanElement>(null);
   const hoursPerWeekMeasureRef = useRef<HTMLSpanElement>(null);
-  const [hourlyRateWidth, setHourlyRateWidth] = useState(144);
-  const [hoursPerWeekWidth, setHoursPerWeekWidth] = useState(80);
+  const [hourlyRateWidth, setHourlyRateWidth] = useState(120);
+  const [hoursPerWeekWidth, setHoursPerWeekWidth] = useState(90);
   
   // Measure text width for hourly rate
   useEffect(() => {
     const measure = () => {
       if (hourlyRateMeasureRef.current) {
         const width = hourlyRateMeasureRef.current.offsetWidth;
-        // px-4 = 1rem = 16px on each side = 32px total padding
+        // px-4 = 1rem = 16px on each side = 32px total padding + extra buffer for number input arrows
         if (width > 0) {
-          setHourlyRateWidth(width + 32);
+          setHourlyRateWidth(Math.max(width + 40, 90));
         }
       }
     };
@@ -333,9 +333,9 @@ export default function Calculator() {
     const measure = () => {
       if (hoursPerWeekMeasureRef.current) {
         const width = hoursPerWeekMeasureRef.current.offsetWidth;
-        // px-4 = 1rem = 16px on each side = 32px total padding
+        // px-4 = 1rem = 16px on each side = 32px total padding + extra buffer for number input arrows
         if (width > 0) {
-          setHoursPerWeekWidth(width + 32);
+          setHoursPerWeekWidth(Math.max(width + 40, 70));
         }
       }
     };
@@ -1568,29 +1568,27 @@ export default function Calculator() {
         </section>
 
         {/* Disclaimer (Comparison Tab) */}
-        <div className="max-w-5xl mx-auto mt-3">
-          <section className="pb-8">
-            <div className="bg-amber-50 p-4 rounded-lg" style={{ borderWidth: '1px 1px 1px 4px', borderStyle: 'solid', borderColor: 'rgba(251, 191, 36, 1)' }}>
-              <div className="flex items-start gap-3">
-                <div className="flex-shrink-0">
-                  <svg className="w-5 h-5 text-amber-600 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                  </svg>
-                </div>
-                <div className="text-left">
-                  <h3 className="text-sm font-bold text-amber-900 mb-1">Indicatieve berekening</h3>
-                  <p className="text-xs text-amber-800 leading-relaxed">
-                    Deze calculator geeft een <strong>realistische indicatie</strong> van je netto inkomen en arbeidsvoorwaarden. 
-                    De exacte bedragen op je loonstrook kunnen afwijken door individuele omstandigheden, 
-                    verschillende CAO-afspraken, loonheffingskortingen, en andere persoonlijke factoren. 
-                    Gebruik deze tool als richtlijn, niet als definitieve berekening. 
-                    <strong> En er kunnen geen rechten aan worden ontleend.</strong>
-                  </p>
-                </div>
+        <section className="pb-8 mt-3">
+          <div className="bg-amber-50 p-4 rounded-lg" style={{ borderWidth: '1px 1px 1px 4px', borderStyle: 'solid', borderColor: 'rgba(251, 191, 36, 1)' }}>
+            <div className="flex items-start gap-3">
+              <div className="flex-shrink-0">
+                <svg className="w-5 h-5 text-amber-600 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="text-left">
+                <h3 className="text-sm font-bold text-amber-900 mb-1">Indicatieve berekening</h3>
+                <p className="text-xs text-amber-800 leading-relaxed">
+                  Deze calculator geeft een <strong>realistische indicatie</strong> van je netto inkomen en arbeidsvoorwaarden. 
+                  De exacte bedragen op je loonstrook kunnen afwijken door individuele omstandigheden, 
+                  verschillende CAO-afspraken, loonheffingskortingen, en andere persoonlijke factoren. 
+                  Gebruik deze tool als richtlijn, niet als definitieve berekening. 
+                  <strong> En er kunnen geen rechten aan worden ontleend.</strong>
+                </p>
               </div>
             </div>
-          </section>
-        </div>
+          </div>
+        </section>
         </div>
       )}
 
@@ -1673,7 +1671,7 @@ export default function Calculator() {
       {activeTab === 'detacheren' && (
       <div className="max-w-5xl mx-auto mt-3" style={{ paddingLeft: '1rem', paddingRight: '1rem' }}>
       <section>
-        <Accordion type="single" collapsible defaultValue="breakdown" className="w-full">
+        <Accordion type="single" collapsible defaultValue="" className="w-full">
             <AccordionItem value="breakdown" className="border border-gray-200 rounded-xl overflow-hidden bg-white shadow-sm">
                 <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-gray-50 transition-colors">
                     <div className="flex flex-col items-start text-left">
@@ -1989,28 +1987,28 @@ export default function Calculator() {
 
       {/* Disclaimer (Detacheren Tab) */}
       {activeTab === 'detacheren' && (
-      <div className="max-w-5xl mx-auto mt-3">
-      <section className="pb-8">
-        <div className="bg-amber-50 p-4 rounded-lg" style={{ borderWidth: '1px 1px 1px 4px', borderStyle: 'solid', borderColor: 'rgba(251, 191, 36, 1)' }}>
-          <div className="flex items-start gap-3">
-            <div className="flex-shrink-0">
-              <svg className="w-5 h-5 text-amber-600 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-              </svg>
-            </div>
-            <div className="text-left">
-              <h3 className="text-sm font-bold text-amber-900 mb-1">Indicatieve berekening</h3>
-              <p className="text-xs text-amber-800 leading-relaxed">
-                Deze calculator geeft een <strong>realistische indicatie</strong> van je netto inkomen en arbeidsvoorwaarden. 
-                De exacte bedragen op je loonstrook kunnen afwijken door individuele omstandigheden, 
-                verschillende CAO-afspraken, loonheffingskortingen, en andere persoonlijke factoren. 
-                Gebruik deze tool als richtlijn, niet als definitieve berekening. 
-                <strong> En er kunnen geen rechten aan worden ontleend.</strong>
-              </p>
+      <div className="max-w-5xl mx-auto px-4 mt-3">
+        <section className="pb-8">
+          <div className="bg-amber-50 p-4 rounded-lg" style={{ borderWidth: '1px 1px 1px 4px', borderStyle: 'solid', borderColor: 'rgba(251, 191, 36, 1)' }}>
+            <div className="flex items-start gap-3">
+              <div className="flex-shrink-0">
+                <svg className="w-5 h-5 text-amber-600 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="text-left">
+                <h3 className="text-sm font-bold text-amber-900 mb-1">Indicatieve berekening</h3>
+                <p className="text-xs text-amber-800 leading-relaxed">
+                  Deze calculator geeft een <strong>realistische indicatie</strong> van je netto inkomen en arbeidsvoorwaarden. 
+                  De exacte bedragen op je loonstrook kunnen afwijken door individuele omstandigheden, 
+                  verschillende CAO-afspraken, loonheffingskortingen, en andere persoonlijke factoren. 
+                  Gebruik deze tool als richtlijn, niet als definitieve berekening. 
+                  <strong> En er kunnen geen rechten aan worden ontleend.</strong>
+                </p>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
       </div>
       )}
 
@@ -2018,53 +2016,6 @@ export default function Calculator() {
       {activeTab === 'zzp' && (
       <div className="max-w-5xl mx-auto" style={{ paddingLeft: '1rem', paddingRight: '1rem' }}>
       <section className="space-y-3">
-        {/* Controls */}
-        <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-200">
-          <div className="grid mobile:grid-cols-2 mobile:gap-6 gap-6">
-            <div className="space-y-3 flex flex-col">
-              <div className="flex flex-col gap-1">
-                <label className="text-xs font-bold uppercase tracking-wider text-gray-500">
-                  Uurtarief
-                </label>
-                <div className="flex items-baseline gap-1 min-h-[2.5rem]">
-                  <span className="text-3xl font-bold text-gray-900">
-                    € {hourlyRate[0].toLocaleString('nl-NL', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
-                  </span>
-                  <span className="text-gray-400 font-medium text-base whitespace-nowrap">/ uur</span>
-                </div>
-              </div>
-              <Slider
-                value={hourlyRate}
-                onValueChange={setHourlyRate}
-                min={30}
-                max={200}
-                step={0.5}
-                className="w-full"
-              />
-            </div>
-
-            <div className="space-y-3 flex flex-col">
-              <div className="flex flex-col gap-1">
-                <label className="text-xs font-bold uppercase tracking-wider text-gray-500">
-                  Uren Per Week
-                </label>
-                <div className="flex items-baseline gap-1 min-h-[2.5rem]">
-                  <span className="text-3xl font-bold text-gray-900">{hoursPerWeek[0]}</span>
-                  <span className="text-gray-400 font-medium text-base whitespace-nowrap">uren</span>
-                </div>
-              </div>
-              <Slider
-                value={hoursPerWeek}
-                onValueChange={setHoursPerWeek}
-                min={16}
-                max={60}
-                step={1}
-                className="w-full"
-              />
-            </div>
-          </div>
-        </div>
-
         {/* Visual Flow for ZZP */}
         <div className="flex flex-col md:flex-row gap-4 items-stretch">
           {/* First two cards side by side on mobile */}
@@ -2129,7 +2080,7 @@ export default function Calculator() {
 
         {/* Detailed Breakdown for ZZP */}
         <section>
-          <Accordion type="single" collapsible defaultValue="breakdown" className="w-full">
+          <Accordion type="single" collapsible defaultValue="" className="w-full">
             <AccordionItem value="breakdown" className="border border-gray-200 rounded-xl overflow-hidden bg-white shadow-sm">
               <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-gray-50 transition-colors">
                 <div className="flex flex-col items-start text-left">
@@ -2400,29 +2351,27 @@ export default function Calculator() {
       </section>
 
       {/* Disclaimer (ZZP Tab) */}
-      <div className="max-w-5xl mx-auto mt-3">
-        <section className="pb-8">
-          <div className="bg-amber-50 p-4 rounded-lg" style={{ borderWidth: '1px 1px 1px 4px', borderStyle: 'solid', borderColor: 'rgba(251, 191, 36, 1)' }}>
-            <div className="flex items-start gap-3">
-              <div className="flex-shrink-0">
-                <svg className="w-5 h-5 text-amber-600 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                </svg>
-              </div>
-              <div className="text-left">
-                <h3 className="text-sm font-bold text-amber-900 mb-1">Indicatieve berekening</h3>
-                <p className="text-xs text-amber-800 leading-relaxed">
-                  Deze calculator geeft een <strong>realistische indicatie</strong> van je netto inkomen en arbeidsvoorwaarden. 
-                  De exacte bedragen op je loonstrook kunnen afwijken door individuele omstandigheden, 
-                  verschillende CAO-afspraken, loonheffingskortingen, en andere persoonlijke factoren. 
-                  Gebruik deze tool als richtlijn, niet als definitieve berekening. 
-                  <strong> En er kunnen geen rechten aan worden ontleend.</strong>
-                </p>
-              </div>
+      <section className="pb-8 mt-3">
+        <div className="bg-amber-50 p-4 rounded-lg" style={{ borderWidth: '1px 1px 1px 4px', borderStyle: 'solid', borderColor: 'rgba(251, 191, 36, 1)' }}>
+          <div className="flex items-start gap-3">
+            <div className="flex-shrink-0">
+              <svg className="w-5 h-5 text-amber-600 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="text-left">
+              <h3 className="text-sm font-bold text-amber-900 mb-1">Indicatieve berekening</h3>
+              <p className="text-xs text-amber-800 leading-relaxed">
+                Deze calculator geeft een <strong>realistische indicatie</strong> van je netto inkomen en arbeidsvoorwaarden. 
+                De exacte bedragen op je loonstrook kunnen afwijken door individuele omstandigheden, 
+                verschillende CAO-afspraken, loonheffingskortingen, en andere persoonlijke factoren. 
+                Gebruik deze tool als richtlijn, niet als definitieve berekening. 
+                <strong> En er kunnen geen rechten aan worden ontleend.</strong>
+              </p>
             </div>
           </div>
-        </section>
-      </div>
+        </div>
+      </section>
       </div>
       )}
 
