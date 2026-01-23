@@ -1534,7 +1534,7 @@ export default function Calculator() {
                 />
               </div>
 
-              <div className="hidden mobile:flex flex-wrap items-center justify-center gap-4 text-xs text-gray-500 pt-4">
+              <div className="hidden mobile:flex flex-wrap items-center justify-center gap-4 text-xs text-gray-500 pt-6">
                 <span className="flex items-center gap-2">
                   <span className="w-4 h-4 rounded-sm bg-[#88B228] flex-shrink-0 border border-[#4E6517]/20" />
                   {VALUE_LABELS.marge}
