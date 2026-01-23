@@ -890,7 +890,7 @@ export default function Calculator() {
           <div className="grid mobile:grid-cols-2 mobile:gap-6 gap-4">
             {/* Hourly Rate */}
             <div className="space-y-2 mobile:space-y-3">
-              <label className="text-xs font-bold uppercase tracking-wider text-gray-500 pb-1 block">
+              <label className="text-xs font-bold uppercase tracking-wider text-gray-500 pb-0 block">
                 Uurtarief Opdrachtgever
               </label>
               {/* Mobile: input + slider inline */}
@@ -1578,12 +1578,7 @@ export default function Calculator() {
                   <span className="text-2xl font-bold text-marge-text">{formatCurrency(zzpResult.costsBreakdown.entrepreneurRisk)}</span>
                   <span className="text-xs text-marge-text">Marge CreateNew ({(config.zzpCompanyMarginRate * 100).toFixed(0)}%)</span>
                 </div>
-                <div className="flex flex-col">
-                  <span className="text-sm font-medium text-marge-text">{formatCurrency(zzpResult.costsBreakdown.overheadCosts)}</span>
-                  <span className="text-[10px] text-marge-text/70">Kosten</span>
-                </div>
               </div>
-              <div className="text-xs text-marge-text mt-auto">Totaal: {formatCurrency(zzpResult.costsTotal)}</div>
             </div>
           </div>
 
@@ -1601,16 +1596,21 @@ export default function Calculator() {
                 <span className="text-xs text-gray-500">Direct + later</span>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-3 mt-auto pt-4 border-t border-gray-200">
+            <div className="grid grid-cols-3 gap-3 mt-auto pt-4 border-t border-gray-200">
               <div className="bg-netto-100 rounded-lg p-3 border border-netto-400/20">
                 <div className="text-base font-bold text-netto-text">{formatCurrency(zzpNetAfterTaxIndicative)}</div>
                 <div className="text-[10px] text-netto-text/80 font-medium uppercase tracking-wide">OP REKENING (INDICATIEF)</div>
                 <div className="text-[10px] text-netto-text/60">{formatHourly(zzpNetAfterTaxIndicative, zzpResult.monthlyHours)}/u</div>
               </div>
+              <div className="bg-kosten-100 rounded-lg p-3 border border-kosten-400/20">
+                <div className="text-base font-bold text-kosten-text">{formatCurrency(zzpResult.costsBreakdown.overheadCosts)}</div>
+                <div className="text-[10px] text-kosten-text/80 font-medium uppercase tracking-wide">BEDRIJFSKOSTEN</div>
+                <div className="text-[10px] text-kosten-text/60">{formatHourly(zzpResult.costsBreakdown.overheadCosts, zzpResult.monthlyHours)}/u</div>
+              </div>
               <div className="bg-pensioen-100 rounded-lg p-3 border border-pensioen-400/20">
                 <div className="text-base font-bold text-pensioen-text">{formatCurrency(zzpResult.employerPension + zzpResult.reservationBreakdown.employeePension)}</div>
-                <div className="text-[10px] text-pensioen-text font-medium uppercase tracking-wide flex items-center gap-1">
-                  <PiggyBank className="w-3 h-3" /> PENSIOEN INLEG
+                <div className="text-[10px] text-pensioen-text font-medium uppercase tracking-wide">
+                  PENSIOEN INLEG
                 </div>
                 <div className="text-[10px] text-pensioen-text/70">Voor later</div>
               </div>
