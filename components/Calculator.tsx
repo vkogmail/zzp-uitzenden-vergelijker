@@ -4,27 +4,21 @@ import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { clsx } from 'clsx';
 import { 
   Calculator as CalculatorIcon, 
-  ShieldCheck, 
   Briefcase, 
-  ChevronDown, 
   PiggyBank, 
   ArrowRight,
-  CheckCircle2,
-  XCircle,
-  Palmtree,
   Coins,
   Settings,
-  TrendingUp,
-  Building2,
-  Receipt,
-  Wallet
 } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { InfoTooltip } from '@/components/InfoTooltip';
 import { ConfigInput } from '@/components/ConfigInput';
+import { ValueBlock } from '@/components/ValueBlock';
+import { BreakdownRow } from '@/components/BreakdownRow';
+import { Disclaimer } from '@/components/Disclaimer';
+import { formatCurrencyWhole, formatHourlyRate } from '@/lib/formatters';
 import { 
   calculateEmployeeDetailed,
   calculateZZPDetailed,
@@ -35,13 +29,7 @@ import {
   getZZPValueBreakdown,
   defaultCalculatorConfig, 
   type CalculatorConfig,
-  type EmployeeResult,
-  type ZZPResult,
-  type ComparableOutcome,
-  type ValueBreakdown
 } from '@/lib/calculations';
-
-// CalculatorConfig is imported from lib/calculations.ts
 
 // CAO Presets
 type CAOPreset = 'ABU' | 'NBBU' | 'Custom';
@@ -87,211 +75,6 @@ const CAOPresets: Record<CAOPreset, Partial<CalculatorConfig>> = {
 };
 
 const defaultConfig: CalculatorConfig = defaultCalculatorConfig;
-
-const VALUE_LABELS: Record<keyof Omit<ValueBreakdown, 'total'>, string> = {
-  marge: 'Marge',
-  kosten: 'Bedrijfskosten',
-  belasting: 'Belastingen Premies en afdrachten',
-  pensioen: 'Pensioen',
-  netto: 'Totaal te Ontvangen / te Besteden',
-};
-
-// Icons for each value type
-const VALUE_ICONS: Record<keyof Omit<ValueBreakdown, 'total'>, React.ComponentType<{ className?: string }>> = {
-  marge: TrendingUp,
-  kosten: Building2,
-  pensioen: PiggyBank,
-  belasting: Receipt,
-  netto: Wallet,
-};
-
-// Colors for both Detacheren and ZZP (light shades)
-const VALUE_COLORS_ZZP = {
-  marge: 'bg-[#E8F4D9] text-[#4A6B0F]',      // Light green
-  kosten: 'bg-[#E0F7FA] text-[#0097A7]',     // Light cyan
-  pensioen: 'bg-[#FFF8E1] text-[#947100]',   // Light yellow/amber
-  belasting: 'bg-[#FFF3E0] text-[#E65100]',  // Light orange
-  netto: 'bg-[#E3F2FD] text-[#1565C0]',      // Light blue
-} as const;
-
-// Use same light shades for Detacheren
-const VALUE_COLORS_DETACHEREN = VALUE_COLORS_ZZP;
-
-// Keep for backwards compatibility / legend
-const VALUE_COLORS = VALUE_COLORS_ZZP;
-
-function ValueBlock({
-  title,
-  subtitle,
-  total,
-  totalLabel,
-  breakdown,
-  formatCurrency,
-  variant,
-  baseTotal,
-  correction,
-  unworkableRate,
-}: {
-  title: string;
-  subtitle: string;
-  total: number;
-  totalLabel: string;
-  breakdown: ValueBreakdown;
-  formatCurrency: (n: number) => string;
-  variant: 'detacheren' | 'zzp';
-  baseTotal?: number;
-  correction?: number;
-  unworkableRate?: number;
-}) {
-  const keys: (keyof Omit<ValueBreakdown, 'total'>)[] = ['marge', 'kosten', 'pensioen', 'belasting', 'netto'];
-  
-  // Calculate percentages for vertical bar chart
-  // Use baseTotal for percentage calculation if provided (to align charts)
-  const totalValue = keys.reduce((sum, k) => sum + Math.max(0, breakdown[k]), 0);
-  const percentageBase = baseTotal ?? totalValue;
-  
-  // Total height for the vertical bar chart (in pixels)
-  const CHART_HEIGHT = 500;
-  
-  // Use baseTotal if provided, otherwise use total
-  const displayTotal = baseTotal ?? total;
-  
-  return (
-    <div className="flex flex-col h-full">
-      {/* Header - compact on mobile */}
-      <div className="flex items-start gap-2 mb-2 mobile:mb-4">
-        {variant === 'detacheren' ? (
-          <Briefcase className="w-4 h-4 mobile:w-5 mobile:h-5 text-blue-600 mt-0.5 mobile:mt-1" />
-        ) : (
-          <CalculatorIcon className="w-4 h-4 mobile:w-5 mobile:h-5 text-green-600 mt-0.5 mobile:mt-1" />
-        )}
-        <div>
-          <h3 className="text-sm mobile:text-lg font-bold text-gray-900">{title}</h3>
-          <p className="text-xs mobile:text-sm text-gray-500 hidden mobile:block">{subtitle}</p>
-        </div>
-      </div>
-      
-      {/* Total - compact on mobile */}
-      <div className="mb-2 mobile:mb-4">
-        <div className="flex flex-col mobile:flex-row mobile:justify-between mobile:items-start">
-          <div className="hidden mobile:block">
-            <div className="text-xs font-semibold uppercase tracking-wider text-gray-500">{totalLabel}</div>
-            <div className="text-xs text-gray-400">
-              {variant === 'detacheren' 
-                ? 'Inclusief vakantiedagen en feestdagen' 
-                : 'Exclusief vakantiedagen en feestdagen'}
-            </div>
-          </div>
-          <div className="text-2xl mobile:text-2xl font-bold text-gray-900 leading-none">{formatCurrency(displayTotal)}</div>
-        </div>
-      </div>
-      
-      {/* Mobile: Vertical Stacked Bar Chart (label top, icon+amount bottom) */}
-      <div className="mobile:hidden flex flex-col gap-0.5 flex-1">
-        {keys.map((k) => {
-          const v = breakdown[k];
-          if (v <= 0) return null;
-          const percentage = (v / percentageBase) * 100;
-          const colorSet = variant === 'detacheren' ? VALUE_COLORS_DETACHEREN : VALUE_COLORS_ZZP;
-          const bgColor = colorSet[k].split(' ')[0];
-          const textColor = colorSet[k].split(' ')[1];
-          const Icon = VALUE_ICONS[k];
-          
-          return (
-            <div
-              key={k}
-              className={`${bgColor} flex flex-col justify-between px-3 pt-2 pb-2 transition-all duration-500 rounded`}
-              style={{ flex: `${percentage} 0 0`, minHeight: '60px' }}
-            >
-              <span className={`text-xs font-medium ${textColor} leading-tight`}>
-                {VALUE_LABELS[k]}
-              </span>
-              <div className="flex items-center justify-between shrink-0">
-                <Icon className={`w-4 h-4 ${textColor} shrink-0`} />
-                <span className={`text-sm font-bold ${textColor}`}>
-                  {formatCurrency(v)}
-                </span>
-              </div>
-            </div>
-          );
-        })}
-        {correction !== undefined && correction > 0 && (
-          <div
-            className="rounded border border-gray-300 flex flex-col justify-between px-3 py-2 overflow-visible"
-            style={{ 
-              flex: `${(correction / percentageBase) * 100} 0 0`,
-              minHeight: '70px',
-              background: 'repeating-linear-gradient(45deg, transparent, transparent 4px, rgba(156, 163, 175, 0.15) 4px, rgba(156, 163, 175, 0.15) 5px)'
-            }}
-          >
-            <span className="text-[10px] font-medium text-gray-500 leading-tight">
-              Reservering vakantie- en feestdagen
-            </span>
-            <div className="flex items-center justify-between shrink-0 mt-auto">
-              <Receipt className="w-3 h-3 text-gray-400 shrink-0" />
-              <span className="text-xs font-bold text-gray-500">
-                - {formatCurrency(correction)}
-              </span>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Desktop: Vertical Stacked Bar Chart */}
-      <div className="hidden mobile:flex flex-col gap-1" style={{ height: CHART_HEIGHT }}>
-        {keys.map((k) => {
-          const v = breakdown[k];
-          if (v <= 0) return null;
-          const percentage = (v / percentageBase) * 100;
-          const colorSet = variant === 'detacheren' ? VALUE_COLORS_DETACHEREN : VALUE_COLORS_ZZP;
-          const bgColor = colorSet[k].split(' ')[0]; // Get just the bg color
-          const textColor = colorSet[k].split(' ')[1]; // Get the text color
-          
-          // Use center alignment for small bars, top alignment for larger ones
-          const isSmallBar = percentage < 15;
-          const Icon = VALUE_ICONS[k];
-          
-          return (
-            <div
-              key={k}
-              className={`${bgColor} flex justify-between ${isSmallBar ? 'items-center' : 'items-start pt-3'} px-4 transition-all duration-500 rounded-lg`}
-              style={{ height: `${percentage}%`, minHeight: '40px' }}
-            >
-              <div className="flex flex-col">
-                <span className={`text-sm font-semibold ${textColor} flex items-center gap-1.5`}>
-                  <Icon className="w-4 h-4" />
-                  {VALUE_LABELS[k]}
-                </span>
-                {k === 'netto' && variant === 'detacheren' && (
-                  <span className={`text-xs ${textColor} opacity-75 mt-0.5`}>
-                    inclusief reservering voor vakantiedagen en feestdagen
-                  </span>
-                )}
-              </div>
-              <span className={`text-sm font-bold ${textColor}`}>
-                {formatCurrency(v)}
-              </span>
-            </div>
-          );
-        })}
-        {/* Hatched empty section for ZZP to show the correction difference */}
-        {correction !== undefined && correction > 0 && (
-          <div
-            className="rounded-lg border border-gray-300 flex justify-between items-center px-4"
-            style={{ 
-              height: `${(correction / percentageBase) * 100}%`,
-              minHeight: '40px',
-              background: 'repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(156, 163, 175, 0.1) 10px, rgba(156, 163, 175, 0.1) 12px)'
-            }}
-          >
-            <span className="text-sm font-semibold text-gray-500">Reservering vakantiedagen en feestdagen</span>
-            <span className="text-sm font-bold text-gray-600">- {formatCurrency(correction)}</span>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
 
 export default function Calculator() {
   const [hourlyRate, setHourlyRate] = useState([100]);
@@ -458,13 +241,9 @@ export default function Calculator() {
     additionalBenefits
   } = result;
 
-  const formatCurrency = (val: number) => {
-    return new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(val);
-  };
+  const formatCurrency = formatCurrencyWhole;
   
-  const formatHourly = (val: number, hours: number = monthlyHours) => {
-     return new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(val / hours);
-  };
+  const formatHourly = (val: number, hours: number = monthlyHours) => formatHourlyRate(val, hours);
 
   return (
       <TooltipProvider>
@@ -1126,11 +905,13 @@ export default function Calculator() {
                     {hourlyRateInput || '0'}
                   </span>
                   <input
-                    type="number"
+                    type="text"
+                    inputMode="decimal"
                     value={hourlyRateInput}
-                    onChange={(e) => setHourlyRateInput(e.target.value)}
+                    onChange={(e) => setHourlyRateInput(e.target.value.replace(',', '.'))}
+                    onKeyDown={(e) => { if (e.key === 'Enter') e.currentTarget.blur(); }}
                     onBlur={(e) => {
-                      const value = parseFloat(e.target.value);
+                      const value = parseFloat(e.target.value.replace(',', '.'));
                       if (isNaN(value) || value < 30) {
                         setHourlyRate([30]);
                       } else if (value > 200) {
@@ -1141,9 +922,6 @@ export default function Calculator() {
                     }}
                     style={{ width: `${hourlyRateWidth}px` }}
                     className="text-2xl font-bold text-gray-900 bg-gray-50 border border-gray-300 rounded-md px-3 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    min={30}
-                    max={200}
-                    step={0.5}
                   />
                 </div>
                 <Slider
@@ -1167,11 +945,13 @@ export default function Calculator() {
                       {hourlyRateInput || '0'}
                     </span>
                     <input
-                      type="number"
+                      type="text"
+                      inputMode="decimal"
                       value={hourlyRateInput}
-                      onChange={(e) => setHourlyRateInput(e.target.value)}
+                      onChange={(e) => setHourlyRateInput(e.target.value.replace(',', '.'))}
+                      onKeyDown={(e) => { if (e.key === 'Enter') e.currentTarget.blur(); }}
                       onBlur={(e) => {
-                        const value = parseFloat(e.target.value);
+                        const value = parseFloat(e.target.value.replace(',', '.'));
                         if (isNaN(value) || value < 30) {
                           setHourlyRate([30]);
                         } else if (value > 200) {
@@ -1182,9 +962,6 @@ export default function Calculator() {
                       }}
                       style={{ width: `${hourlyRateWidth}px` }}
                       className="text-3xl font-bold text-gray-900 bg-gray-50 border border-gray-300 rounded-md px-4 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      min={30}
-                      max={200}
-                      step={0.5}
                     />
                   </div>
                   <span className="text-gray-400 font-medium text-base whitespace-nowrap">€/uur</span>
@@ -1217,9 +994,11 @@ export default function Calculator() {
                     {hoursPerWeekInput || '0'}
                   </span>
                   <input
-                    type="number"
+                    type="text"
+                    inputMode="numeric"
                     value={hoursPerWeekInput}
                     onChange={(e) => setHoursPerWeekInput(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === 'Enter') e.currentTarget.blur(); }}
                     onBlur={(e) => {
                       const value = parseInt(e.target.value);
                       if (isNaN(value) || value < 16) {
@@ -1232,9 +1011,6 @@ export default function Calculator() {
                     }}
                     style={{ width: `${hoursPerWeekWidth}px` }}
                     className="text-2xl font-bold text-gray-900 bg-gray-50 border border-gray-300 rounded-md px-3 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    min={16}
-                    max={40}
-                    step={1}
                   />
                 </div>
                 <Slider
@@ -1258,9 +1034,11 @@ export default function Calculator() {
                       {hoursPerWeekInput || '0'}
                     </span>
                     <input
-                      type="number"
+                      type="text"
+                      inputMode="numeric"
                       value={hoursPerWeekInput}
                       onChange={(e) => setHoursPerWeekInput(e.target.value)}
+                      onKeyDown={(e) => { if (e.key === 'Enter') e.currentTarget.blur(); }}
                       onBlur={(e) => {
                         const value = parseInt(e.target.value);
                         if (isNaN(value) || value < 16) {
@@ -1273,9 +1051,6 @@ export default function Calculator() {
                       }}
                       style={{ width: `${hoursPerWeekWidth}px` }}
                       className="text-3xl font-bold text-gray-900 bg-gray-50 border border-gray-300 rounded-md px-4 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      min={16}
-                      max={40}
-                      step={1}
                     />
                   </div>
                   <span className="text-gray-400 font-medium text-base whitespace-nowrap">uren</span>
@@ -1340,170 +1115,6 @@ export default function Calculator() {
         <div className="max-w-5xl mx-auto" style={{ paddingLeft: '1rem', paddingRight: '1rem' }}>
         <section className="space-y-3">
 
-          {/* Comparison Blocks - Detailed Netto Loon Blocks - COMMENTED OUT */}
-          {false && (
-          <div className="grid mobile:grid-cols-2 gap-6 max-w-5xl mx-auto">
-            {/* Detacheren Block */}
-            <div className="p-8 bg-blue-600 text-white space-y-6 rounded-2xl">
-              <div className="flex flex-col mobile:flex-row justify-between items-start mobile:items-center gap-4">
-                <div>
-                  <h3 className="text-xl font-bold flex items-center gap-2 mb-2">
-                    <Briefcase className="w-5 h-5" />
-                    Detacheren
-                  </h3>
-                  <p className="text-white/90 text-sm">Dit ontvang je elke maand op je rekening</p>
-                  <p className="text-white/80 text-xs mt-2 max-w-md">
-                    Dit bedrag kan iets afwijken van je echte loonstrook, maar geeft een realistische indicatie
-                  </p>
-                </div>
-                <div className="text-left mobile:text-right">
-                  <div className="text-3xl font-bold">
-                    {formatCurrency(result.netTotal)}
-                  </div>
-                  <div className="text-white/80 text-sm font-medium">
-                    {formatHourly(result.netTotal)} per uur
-                  </div>
-                </div>
-              </div>
-              
-              {/* Additional Benefits Box */}
-              <div className="bg-[rgba(56,155,239,0.3)] rounded-lg p-4 border border-[rgba(37,102,163,0.3)]">
-                <div className="flex items-center gap-2 mb-3">
-                  <Coins className="w-5 h-5 text-amber-300" />
-                  <div>
-                    <h4 className="font-bold text-white text-sm">Plus: Extra uitkeringen die je ontvangt</h4>
-                    <p className="text-white/80 text-[10px] mt-0.5">Deze extra's zijn in je loonstructuur verwerkt</p>
-                  </div>
-                </div>
-                <div className="grid mobile:grid-cols-2 gap-3">
-                  <div className="bg-white/10 rounded p-3">
-                    <div className="flex justify-between items-baseline mb-1">
-                      <span className="text-xs text-white/90">Vakantiedagen ({(config.holidayHoursRate * 100).toFixed(2)}%)</span>
-                    </div>
-                    <div className="text-lg font-bold text-white">{formatCurrency(additionalBenefits.holidayDaysEquivalent)}</div>
-                  </div>
-                  <div className="bg-white/10 rounded p-3">
-                    <div className="flex justify-between items-baseline mb-1">
-                      <span className="text-xs text-white/90">Vakantiegeld ({(config.holidayAllowanceRate * 100).toFixed(0)}%)</span>
-                    </div>
-                    <div className="text-lg font-bold text-white">{formatCurrency(additionalBenefits.holidayAllowance)}</div>
-                  </div>
-                  {config.hasYearEndBonus && additionalBenefits.yearEndBonus > 0 && (
-                    <div className="bg-white/10 rounded p-3">
-                      <div className="flex justify-between items-baseline mb-1">
-                        <span className="text-xs text-white/90">Eindejaarsuitkering ({(config.yearEndBonusRate * 100).toFixed(1)}%)</span>
-                      </div>
-                      <div className="text-lg font-bold text-white">{formatCurrency(additionalBenefits.yearEndBonus)}</div>
-                    </div>
-                  )}
-                  {config.hasIKB && additionalBenefits.ikbContribution > 0 && (
-                    <div className="bg-white/10 rounded p-3">
-                      <div className="flex justify-between items-baseline mb-1">
-                        <span className="text-xs text-white/90">IKB bijdrage ({(config.ikbRate * 100).toFixed(1)}%)</span>
-                      </div>
-                      <div className="text-lg font-bold text-white">{formatCurrency(additionalBenefits.ikbContribution)}</div>
-                    </div>
-                  )}
-                </div>
-                <div className="mt-4 pt-3 border-t border-[rgba(37,102,163,0.3)] flex justify-between items-center">
-                  <span className="text-sm text-white/90">Totaal extra per maand</span>
-                  <span className="text-xl font-bold text-amber-300">{formatCurrency(additionalBenefits.totalAdditionalBenefits)}</span>
-                </div>
-                
-                {/* Pension */}
-                <div className="mt-4 pt-4 border-t border-[rgba(37,102,163,0.3)]">
-                  <div className="flex items-center gap-2 mb-2">
-                    <PiggyBank className="w-4 h-4 text-violet-300" />
-                    <h5 className="font-bold text-white text-xs">Opbouw voor later (pensioen)</h5>
-                  </div>
-                  <div className="bg-violet-900/30 rounded p-3 border border-violet-400/30">
-                    <div className="flex justify-between items-baseline mb-1">
-                      <span className="text-xs text-white/90">Totale pensioen inleg ({((config.employerPensionRate + config.employeePensionRate) * 100).toFixed(1)}%)</span>
-                    </div>
-                    <div className="text-lg font-bold text-white">{formatCurrency(employerPension + reservationBreakdown.employeePension)}</div>
-                    <div className="text-[10px] text-violet-200 mt-1">wordt elke maand voor je opgebouwd</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* ZZP Block */}
-            <div className="p-8 bg-green-600 text-white space-y-6 rounded-2xl">
-              <div className="flex flex-col mobile:flex-row justify-between items-start mobile:items-center gap-4">
-                <div>
-                  <h3 className="text-xl font-bold flex items-center gap-2 mb-2">
-                    <CalculatorIcon className="w-5 h-5" />
-                    ZZP
-                  </h3>
-                  <p className="text-green-100 text-sm">Dit ontvang je elke maand op je rekening (indicatief)</p>
-                  <p className="text-green-200 text-xs mt-2 max-w-md">
-                    We reserveren tijdelijk 40% voor belasting, exacte belasting hangt af van je situatie
-                  </p>
-                </div>
-                <div className="text-left mobile:text-right">
-                  <div className="text-3xl font-bold">
-                    {formatCurrency(zzpNetAfterTaxIndicative)}
-                  </div>
-                  <div className="text-green-200 text-sm font-medium">
-                    {formatHourly(zzpNetAfterTaxIndicative, zzpResult.monthlyHours)} per uur
-                  </div>
-                </div>
-              </div>
-              
-              {/* Costs & Pension Box */}
-              <div className="bg-green-700/50 rounded-lg p-4 border border-green-400/30">
-                <div className="space-y-3">
-                  <div className="bg-white/10 rounded p-3">
-                    <div className="flex justify-between items-baseline mb-1">
-                      <span className="text-xs text-green-100">Belastingreservering ({(config.zzpTaxReserveRate * 100).toFixed(0)}%)</span>
-                    </div>
-                    <div className="text-lg font-bold text-white">{formatCurrency(zzpTaxReserve)}</div>
-                    <div className="text-[10px] text-green-200 mt-1">
-                      Dit zetten veel zzp'ers apart om belasting te betalen
-                    </div>
-                  </div>
-                  
-                  {/* Kosten & onzekerheid ZZP - Clustered */}
-                  <div className="bg-white/10 rounded p-3">
-                    <div className="flex justify-between items-baseline mb-1">
-                      <span className="text-xs text-green-100 font-semibold">Kosten & onzekerheid ZZP</span>
-                    </div>
-                    <div className="text-lg font-bold text-white">{formatCurrency(zzpResult.costsTotal)}</div>
-                    <div className="text-[10px] text-green-200 mt-1">
-                      Ondernemersrisico, overhead, buffer. Meer tariefvrijheid, meer eigen verantwoordelijkheid.
-                    </div>
-                    <details className="mt-2">
-                      <summary className="text-[10px] text-green-300 cursor-pointer hover:text-green-200">
-                        Bekijk uitsplitsing
-                      </summary>
-                      <div className="mt-2 space-y-1.5 text-[10px] text-green-200/80 pl-2 border-l border-green-400/30">
-                        <div>• Marge CreateNew ({(config.zzpCompanyMarginRate * 100).toFixed(0)}%): {formatCurrency(zzpResult.costsBreakdown.entrepreneurRisk)}</div>
-                        <div>• Kosten freelance bv ({(config.zzpBusinessCostsRate * 100).toFixed(0)}%): {formatCurrency(zzpResult.costsBreakdown.overheadCosts)}</div>
-                      </div>
-                    </details>
-                  </div>
-                  
-                  {/* Pension - Less dominant, labeled as voluntary/own build-up */}
-                  <div className="mt-3 pt-3 border-t border-green-400/30">
-                    <div className="flex items-center gap-2 mb-2">
-                      <PiggyBank className="w-3 h-3 text-violet-300 opacity-75" />
-                      <h5 className="font-medium text-white text-xs">Eigen pensioenopbouw (vrijwillig)</h5>
-                    </div>
-                    <div className="bg-violet-900/20 rounded p-2.5 border border-violet-400/20">
-                      <div className="flex justify-between items-baseline mb-1">
-                        <span className="text-xs text-green-200">Pensioen inleg ({((config.employerPensionRate + config.employeePensionRate) * 100).toFixed(1)}%)</span>
-                      </div>
-                      <div className="text-base font-semibold text-white">{formatCurrency(zzpResult.employerPension + zzpResult.reservationBreakdown.employeePension)}</div>
-                      <div className="text-[10px] text-violet-200/80 mt-1">Je bepaalt zelf hoeveel je opbouwt</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          )}
-          {/* END COMMENTED OUT */}
-
           {/* Vergelijk de Waarde – Verdeling marge, kosten, belasting, pensioen, netto */}
           <div className="max-w-5xl mx-auto space-y-6">
 
@@ -1530,65 +1141,14 @@ export default function Calculator() {
                   variant="zzp"
                   baseTotal={detacherenValueBreakdown.total}
                   correction={detacherenValueBreakdown.total - zzpValueBreakdown.total}
-                  unworkableRate={config.zzpUnworkableRate}
                 />
               </div>
 
-              <div className="hidden mobile:flex flex-wrap items-center justify-center gap-4 text-xs text-gray-500 pt-6">
-                <span className="flex items-center gap-2">
-                  <span className="w-4 h-4 rounded-sm bg-[#88B228] flex-shrink-0 border border-[#4E6517]/20" />
-                  {VALUE_LABELS.marge}
-                </span>
-                <span className="flex items-center gap-2">
-                  <span className="w-4 h-4 rounded-sm bg-[#24B0D5] flex-shrink-0 border border-[#1A6C80]/20" />
-                  {VALUE_LABELS.kosten}
-                </span>
-                <span className="flex items-center gap-2">
-                  <span className="w-4 h-4 rounded-sm bg-[#DDA600] flex-shrink-0 border border-[#7E620B]/20" />
-                  {VALUE_LABELS.pensioen}
-                </span>
-                <span className="flex items-center gap-2">
-                  <span className="w-4 h-4 rounded-sm bg-[#F47C2F] flex-shrink-0 border border-[#8D471E]/20" />
-                  {VALUE_LABELS.belasting}
-                </span>
-                <span className="flex items-center gap-2">
-                  <span className="w-4 h-4 rounded-sm bg-[#389BEF] flex-shrink-0 border border-[#2566A3]/20" />
-                  {VALUE_LABELS.netto}
-                </span>
-                <span className="flex items-center gap-2">
-                  <span 
-                    className="w-3 h-3 rounded-sm border border-gray-300" 
-                    style={{ background: 'repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(156, 163, 175, 0.15) 2px, rgba(156, 163, 175, 0.15) 3px)' }}
-                  />
-                  Verschil
-                </span>
-              </div>
             </div>
           </div>
         </section>
 
-        {/* Disclaimer (Comparison Tab) */}
-        <section className="pb-8 mt-3">
-          <div className="bg-amber-50 p-4 rounded-lg" style={{ borderWidth: '1px 1px 1px 4px', borderStyle: 'solid', borderColor: 'rgba(251, 191, 36, 1)' }}>
-            <div className="flex items-start gap-3">
-              <div className="flex-shrink-0">
-                <svg className="w-5 h-5 text-amber-600 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                </svg>
-              </div>
-              <div className="text-left">
-                <h3 className="text-sm font-bold text-amber-900 mb-1">Indicatieve berekening</h3>
-                <p className="text-xs text-amber-800 leading-relaxed">
-                  Deze calculator geeft een <strong>realistische indicatie</strong> van je netto inkomen en arbeidsvoorwaarden. 
-                  De exacte bedragen op je loonstrook kunnen afwijken door individuele omstandigheden, 
-                  verschillende CAO-afspraken, loonheffingskortingen, en andere persoonlijke factoren. 
-                  Gebruik deze tool als richtlijn, niet als definitieve berekening. 
-                  <strong> En er kunnen geen rechten aan worden ontleend.</strong>
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
+        <Disclaimer />
         </div>
       )}
 
@@ -1611,19 +1171,19 @@ export default function Calculator() {
                 </div>
 
                 {/* Step 2: Company Share - Match Marge color from bar chart */}
-                <div className="bg-[#E8F4D9] p-6 rounded-xl border border-[#4E6517]/20 flex flex-col gap-2 relative flex-1">
-                    <div className="text-xs font-bold uppercase tracking-wider text-[#4A6B0F]">MARGE CREATENEW</div>
+                <div className="bg-marge-100 p-6 rounded-xl border border-marge-400/20 flex flex-col gap-2 relative flex-1">
+                    <div className="text-xs font-bold uppercase tracking-wider text-marge-text">MARGE CREATENEW</div>
                     <div className="flex flex-col mb-3">
                          <div className="flex items-baseline gap-2 mb-1">
-                              <span className="text-xs text-[#4A6B0F]">Winst (5%)</span>
-                              <span className="text-2xl font-bold text-[#4A6B0F]">{formatCurrency(marginBreakdown.profit)}</span>
+                              <span className="text-xs text-marge-text">Winst (5%)</span>
+                              <span className="text-2xl font-bold text-marge-text">{formatCurrency(marginBreakdown.profit)}</span>
                          </div>
                          <div className="flex items-baseline gap-2">
-                              <span className="text-[10px] text-[#4A6B0F]/70">Kosten (10%)</span>
-                              <span className="text-sm font-medium text-[#4A6B0F]">{formatCurrency(marginBreakdown.admin)}</span>
+                              <span className="text-[10px] text-marge-text/70">Kosten (10%)</span>
+                              <span className="text-sm font-medium text-marge-text">{formatCurrency(marginBreakdown.admin)}</span>
                          </div>
                     </div>
-                    <div className="text-xs text-[#4A6B0F] mt-auto">Totaal: {formatCurrency(companyTotal)}</div>
+                    <div className="text-xs text-marge-text mt-auto">Totaal: {formatCurrency(companyTotal)}</div>
                 </div>
             </div>
 
@@ -1642,22 +1202,22 @@ export default function Calculator() {
                      </div>
                 </div>
                 <div className="grid grid-cols-3 gap-3 mt-auto pt-4 border-t border-gray-200">
-                    <div className="bg-[#E3F2FD] rounded-lg p-3 border border-[#2566A3]/20">
-                        <div className="text-base font-bold text-[#1565C0]">{formatCurrency(netTotal)}</div>
-                        <div className="text-[10px] text-[#1565C0]/80 font-medium uppercase tracking-wide">NETTO LOON</div>
-                        <div className="text-[10px] text-[#1565C0]/60">{formatHourly(netTotal)}/u</div>
+                    <div className="bg-netto-100 rounded-lg p-3 border border-netto-400/20">
+                        <div className="text-base font-bold text-netto-text">{formatCurrency(netTotal)}</div>
+                        <div className="text-[10px] text-netto-text/80 font-medium uppercase tracking-wide">NETTO LOON</div>
+                        <div className="text-[10px] text-netto-text/60">{formatHourly(netTotal)}/u</div>
                     </div>
                     <div className="bg-white rounded-lg p-3 border border-gray-200">
                         <div className="text-base font-bold text-gray-900">{formatCurrency(additionalBenefits.totalAdditionalBenefits)}</div>
                         <div className="text-[10px] text-gray-500 font-medium uppercase tracking-wide">EXTRA PER MAAND</div>
                         <div className="text-[10px] text-gray-400">Uitkeringen</div>
                     </div>
-                    <div className="bg-[#FFF8E1] rounded-lg p-3 border border-[#7E620B]/20">
-                        <div className="text-base font-bold text-[#947100]">{formatCurrency(employerPension + reservationBreakdown.employeePension)}</div>
-                        <div className="text-[10px] text-[#947100] font-medium uppercase tracking-wide flex items-center gap-1">
+                    <div className="bg-pensioen-100 rounded-lg p-3 border border-pensioen-400/20">
+                        <div className="text-base font-bold text-pensioen-text">{formatCurrency(employerPension + reservationBreakdown.employeePension)}</div>
+                        <div className="text-[10px] text-pensioen-text font-medium uppercase tracking-wide flex items-center gap-1">
                              <PiggyBank className="w-3 h-3" /> PENSIOEN INLEG
                         </div>
-                        <div className="text-[10px] text-[#947100]/70">Voor later</div>
+                        <div className="text-[10px] text-pensioen-text/70">Voor later</div>
                     </div>
                 </div>
             </div>
@@ -1854,38 +1414,38 @@ export default function Calculator() {
                         </div>
 
                         {/* Group E: Netto Result */}
-                        <div className="p-8 bg-[#E3F2FD] text-[#1565C0] space-y-6 rounded-b-lg">
+                        <div className="p-8 bg-netto-100 text-netto-text space-y-6 rounded-b-lg">
                             <div className="flex flex-col mobile:flex-row justify-between items-start mobile:items-center gap-4">
                                 <div>
-                                    <h3 className="text-xl font-bold text-[#1565C0]">Netto loon</h3>
-                                    <p className="text-[#1565C0]/80 text-sm">Dit ontvang je elke maand op je rekening</p>
-                                    <p className="text-[#1565C0]/60 text-xs mt-2 max-w-md">
+                                    <h3 className="text-xl font-bold text-netto-text">Netto loon</h3>
+                                    <p className="text-netto-text/80 text-sm">Dit ontvang je elke maand op je rekening</p>
+                                    <p className="text-netto-text/60 text-xs mt-2 max-w-md">
                                         Dit bedrag kan iets afwijken van je echte loonstrook, maar geeft een realistische indicatie
                                     </p>
                                 </div>
                                 <div className="text-left mobile:text-right">
-                                    <div className="text-3xl font-bold text-[#1565C0]">
+                                    <div className="text-3xl font-bold text-netto-text">
                                         {formatCurrency(netTotal)}
                                     </div>
-                                    <div className="text-[#1565C0]/70 text-sm font-medium">
+                                    <div className="text-netto-text/70 text-sm font-medium">
                                         {formatHourly(netTotal)} per uur
                                     </div>
                                 </div>
                             </div>
                             
                             {/* Additional Benefits Box */}
-                            <div className="rounded-lg p-4 border bg-white/50 border-[#2566A3]/30">
+                            <div className="rounded-lg p-4 border bg-white/50 border-netto-400/30">
                                 <div className="flex items-center gap-2 mb-3">
-                                    <Coins className="w-5 h-5 text-[#1565C0]/80" />
+                                    <Coins className="w-5 h-5 text-netto-text/80" />
                                     <div>
-                                      <h4 className="font-bold text-[#1565C0] text-sm">Plus: Extra uitkeringen die je ontvangt</h4>
-                                      <p className="text-[#1565C0]/60 text-[10px] mt-0.5">Deze extra's zijn in je loonstructuur verwerkt</p>
+                                      <h4 className="font-bold text-netto-text text-sm">Plus: Extra uitkeringen die je ontvangt</h4>
+                                      <p className="text-netto-text/60 text-[10px] mt-0.5">Deze extra's zijn in je loonstructuur verwerkt</p>
                                     </div>
                                 </div>
                                 <div className="grid mobile:grid-cols-2 gap-3">
-                                    <div className="bg-white rounded p-3 border border-[#2566A3]/20">
+                                    <div className="bg-white rounded p-3 border border-netto-400/20">
                                         <div className="flex justify-between items-baseline mb-1">
-                                            <span className="text-xs text-[#1565C0]/80">Vakantiedagen ({(config.holidayHoursRate * 100).toFixed(2)}%)</span>
+                                            <span className="text-xs text-netto-text/80">Vakantiedagen ({(config.holidayHoursRate * 100).toFixed(2)}%)</span>
                                             <InfoTooltip content={
                                                 <div>
                                                     <p className="mb-1">Dit is de geldelijke waarde van je wettelijke vakantiedagen.</p>
@@ -1894,49 +1454,49 @@ export default function Calculator() {
                                                 </div>
                                             } side="left" />
                                         </div>
-                                        <div className="text-lg font-bold text-[#1565C0]">{formatCurrency(additionalBenefits.holidayDaysEquivalent)}</div>
-                                        <div className="text-[10px] text-[#1565C0]/60 mt-1">{(monthlyHours * config.holidayHoursRate).toFixed(1)} uur/maand</div>
+                                        <div className="text-lg font-bold text-netto-text">{formatCurrency(additionalBenefits.holidayDaysEquivalent)}</div>
+                                        <div className="text-[10px] text-netto-text/60 mt-1">{(monthlyHours * config.holidayHoursRate).toFixed(1)} uur/maand</div>
                                     </div>
-                                    <div className="bg-white rounded p-3 border border-[#2566A3]/20">
+                                    <div className="bg-white rounded p-3 border border-netto-400/20">
                                         <div className="flex justify-between items-baseline mb-1">
-                                            <span className="text-xs text-[#1565C0]/80">Vakantiegeld ({(config.holidayAllowanceRate * 100).toFixed(0)}%)</span>
+                                            <span className="text-xs text-netto-text/80">Vakantiegeld ({(config.holidayAllowanceRate * 100).toFixed(0)}%)</span>
                                             <InfoTooltip content="Ieder jaar in mei of juni ontvang je 8% van je jaarsalaris als vakantiegeld. Dit is wettelijk verplicht en staat los van je normale maandloon. Perfect voor een mooie vakantie!" side="left" />
                                         </div>
-                                        <div className="text-lg font-bold text-[#1565C0]">{formatCurrency(additionalBenefits.holidayAllowance)}</div>
+                                        <div className="text-lg font-bold text-netto-text">{formatCurrency(additionalBenefits.holidayAllowance)}</div>
                                     </div>
                                     {config.hasYearEndBonus && additionalBenefits.yearEndBonus > 0 && (
-                                        <div className="bg-white rounded p-3 border border-[#2566A3]/20">
+                                        <div className="bg-white rounded p-3 border border-netto-400/20">
                                             <div className="flex justify-between items-baseline mb-1">
-                                                <span className="text-xs text-[#1565C0]/80">Eindejaarsuitkering ({(config.yearEndBonusRate * 100).toFixed(1)}%)</span>
+                                                <span className="text-xs text-netto-text/80">Eindejaarsuitkering ({(config.yearEndBonusRate * 100).toFixed(1)}%)</span>
                                                 <InfoTooltip content="Ook wel '13e maand' genoemd. Dit is een extra uitkering van 4.5% van je jaarsalaris die je vaak in december ontvangt. Dit is geen wettelijke verplichting, maar een veel voorkomende arbeidsvoorwaarde." side="left" />
                                             </div>
-                                            <div className="text-lg font-bold text-[#1565C0]">{formatCurrency(additionalBenefits.yearEndBonus)}</div>
+                                            <div className="text-lg font-bold text-netto-text">{formatCurrency(additionalBenefits.yearEndBonus)}</div>
                                         </div>
                                     )}
                                     {config.hasIKB && additionalBenefits.ikbContribution > 0 && (
-                                        <div className="bg-white rounded p-3 border border-[#2566A3]/20">
+                                        <div className="bg-white rounded p-3 border border-netto-400/20">
                                             <div className="flex justify-between items-baseline mb-1">
-                                                <span className="text-xs text-[#1565C0]/80">IKB bijdrage ({(config.ikbRate * 100).toFixed(1)}%)</span>
+                                                <span className="text-xs text-netto-text/80">IKB bijdrage ({(config.ikbRate * 100).toFixed(1)}%)</span>
                                                 <InfoTooltip content="Individueel Keuze Budget. Dit is een flexibel budget dat je kunt inzetten voor extra verlof, extra pensioen, of uitbetaling. Jij kiest zelf waar je het voor gebruikt!" side="left" />
                                             </div>
-                                            <div className="text-lg font-bold text-[#1565C0]">{formatCurrency(additionalBenefits.ikbContribution)}</div>
+                                            <div className="text-lg font-bold text-netto-text">{formatCurrency(additionalBenefits.ikbContribution)}</div>
                                         </div>
                                     )}
                                 </div>
-                                <div className="mt-4 pt-3 border-t border-[#2566A3]/30 flex justify-between items-center">
-                                    <span className="text-sm text-[#1565C0]/80">Totaal extra per maand</span>
-                                    <span className="text-xl font-bold text-[#1565C0]">{formatCurrency(additionalBenefits.totalAdditionalBenefits)}</span>
+                                <div className="mt-4 pt-3 border-t border-netto-400/30 flex justify-between items-center">
+                                    <span className="text-sm text-netto-text/80">Totaal extra per maand</span>
+                                    <span className="text-xl font-bold text-netto-text">{formatCurrency(additionalBenefits.totalAdditionalBenefits)}</span>
                                 </div>
                                 
                                 {/* Pension - separate section for long-term */}
-                                <div className="mt-4 pt-4 border-t border-[#2566A3]/30">
+                                <div className="mt-4 pt-4 border-t border-netto-400/30">
                                     <div className="flex items-center gap-2 mb-2">
-                                        <PiggyBank className="w-4 h-4 text-[#1565C0]/70" />
-                                        <h5 className="font-bold text-[#1565C0] text-xs">Opbouw voor later (pensioen)</h5>
+                                        <PiggyBank className="w-4 h-4 text-netto-text/70" />
+                                        <h5 className="font-bold text-netto-text text-xs">Opbouw voor later (pensioen)</h5>
                                     </div>
-                                    <div className="bg-white rounded p-3 border border-[#2566A3]/20">
+                                    <div className="bg-white rounded p-3 border border-netto-400/20">
                                         <div className="flex justify-between items-baseline mb-1">
-                                            <span className="text-xs text-[#1565C0]/80">Totale pensioen inleg ({((config.employerPensionRate + config.employeePensionRate) * 100).toFixed(1)}%)</span>
+                                            <span className="text-xs text-netto-text/80">Totale pensioen inleg ({((config.employerPensionRate + config.employeePensionRate) * 100).toFixed(1)}%)</span>
                                             <InfoTooltip content={
                                                 <div>
                                                     <p className="mb-2">Dit is de totale pensioenbijdrage die elke maand voor jou wordt opgebouwd:</p>
@@ -1946,30 +1506,30 @@ export default function Calculator() {
                                                 </div>
                                             } side="left" />
                                         </div>
-                                        <div className="text-lg font-bold text-[#1565C0]">{formatCurrency(employerPension + reservationBreakdown.employeePension)}</div>
-                                        <div className="text-[10px] text-[#1565C0]/60 mt-1">wordt elke maand voor je opgebouwd</div>
+                                        <div className="text-lg font-bold text-netto-text">{formatCurrency(employerPension + reservationBreakdown.employeePension)}</div>
+                                        <div className="text-[10px] text-netto-text/60 mt-1">wordt elke maand voor je opgebouwd</div>
                                     </div>
                                 </div>
                                 
-                                <p className="text-xs text-[#1565C0]/70 mt-3 leading-relaxed">
-                                    Je echte inkomen is dus: {formatCurrency(netTotal)} + {formatCurrency(additionalBenefits.totalAdditionalBenefits)} = <span className="font-bold text-[#1565C0]">{formatCurrency(netTotal + additionalBenefits.totalAdditionalBenefits)}</span> per maand!
+                                <p className="text-xs text-netto-text/70 mt-3 leading-relaxed">
+                                    Je echte inkomen is dus: {formatCurrency(netTotal)} + {formatCurrency(additionalBenefits.totalAdditionalBenefits)} = <span className="font-bold text-netto-text">{formatCurrency(netTotal + additionalBenefits.totalAdditionalBenefits)}</span> per maand!
                                 </p>
-                                <p className="text-xs text-[#1565C0]/60 mt-2 leading-relaxed">
+                                <p className="text-xs text-netto-text/60 mt-2 leading-relaxed">
                                     Plus {formatCurrency(employerPension + reservationBreakdown.employeePension)} aan pensioen per maand voor later!
                                 </p>
                             </div>
 
                             {/* CAO Indicator */}
-                            <div className="flex items-center justify-between bg-white/50 p-3 rounded-lg border border-[#2566A3]/30 mt-4">
+                            <div className="flex items-center justify-between bg-white/50 p-3 rounded-lg border border-netto-400/30 mt-4">
                               <div className="flex items-center gap-2">
-                                <Briefcase className="w-4 h-4 text-[#1565C0]" />
-                                <span className="text-sm font-medium text-[#1565C0]">Actieve CAO:</span>
-                                <span className="text-sm font-bold text-[#1565C0]">{selectedCAO}</span>
+                                <Briefcase className="w-4 h-4 text-netto-text" />
+                                <span className="text-sm font-medium text-netto-text">Actieve CAO:</span>
+                                <span className="text-sm font-bold text-netto-text">{selectedCAO}</span>
                               </div>
                               {settingsEnabled && (
                                 <button
                                   onClick={() => setShowConfig(true)}
-                                  className="text-xs text-[#1565C0] hover:text-[#1565C0]/80 underline"
+                                  className="text-xs text-netto-text hover:text-netto-text/80 underline"
                                 >
                                   Wijzig CAO
                                 </button>
@@ -1987,28 +1547,8 @@ export default function Calculator() {
 
       {/* Disclaimer (Detacheren Tab) */}
       {activeTab === 'detacheren' && (
-      <div className="max-w-5xl mx-auto px-4 mt-3">
-        <section className="pb-8">
-          <div className="bg-amber-50 p-4 rounded-lg" style={{ borderWidth: '1px 1px 1px 4px', borderStyle: 'solid', borderColor: 'rgba(251, 191, 36, 1)' }}>
-            <div className="flex items-start gap-3">
-              <div className="flex-shrink-0">
-                <svg className="w-5 h-5 text-amber-600 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                </svg>
-              </div>
-              <div className="text-left">
-                <h3 className="text-sm font-bold text-amber-900 mb-1">Indicatieve berekening</h3>
-                <p className="text-xs text-amber-800 leading-relaxed">
-                  Deze calculator geeft een <strong>realistische indicatie</strong> van je netto inkomen en arbeidsvoorwaarden. 
-                  De exacte bedragen op je loonstrook kunnen afwijken door individuele omstandigheden, 
-                  verschillende CAO-afspraken, loonheffingskortingen, en andere persoonlijke factoren. 
-                  Gebruik deze tool als richtlijn, niet als definitieve berekening. 
-                  <strong> En er kunnen geen rechten aan worden ontleend.</strong>
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
+      <div className="max-w-5xl mx-auto px-4">
+        <Disclaimer />
       </div>
       )}
 
@@ -2031,19 +1571,19 @@ export default function Calculator() {
             </div>
 
             {/* Step 2: Costs - Match Marge color from bar chart */}
-            <div className="bg-[#E8F4D9] p-6 rounded-xl border border-[#4E6517]/20 flex flex-col gap-2 relative flex-1">
-              <div className="text-xs font-bold uppercase tracking-wider text-[#4A6B0F]">KOSTEN & RISICO</div>
+            <div className="bg-marge-100 p-6 rounded-xl border border-marge-400/20 flex flex-col gap-2 relative flex-1">
+              <div className="text-xs font-bold uppercase tracking-wider text-marge-text">KOSTEN & RISICO</div>
               <div className="flex flex-col mb-3">
                 <div className="flex items-baseline gap-2 mb-1">
-                  <span className="text-xs text-[#4A6B0F]">Marge CreateNew ({(config.zzpCompanyMarginRate * 100).toFixed(0)}%)</span>
-                  <span className="text-2xl font-bold text-[#4A6B0F]">{formatCurrency(zzpResult.costsBreakdown.entrepreneurRisk)}</span>
+                  <span className="text-xs text-marge-text">Marge CreateNew ({(config.zzpCompanyMarginRate * 100).toFixed(0)}%)</span>
+                  <span className="text-2xl font-bold text-marge-text">{formatCurrency(zzpResult.costsBreakdown.entrepreneurRisk)}</span>
                 </div>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-[10px] text-[#4A6B0F]/70">Kosten</span>
-                  <span className="text-sm font-medium text-[#4A6B0F]">{formatCurrency(zzpResult.costsBreakdown.overheadCosts)}</span>
+                  <span className="text-[10px] text-marge-text/70">Kosten</span>
+                  <span className="text-sm font-medium text-marge-text">{formatCurrency(zzpResult.costsBreakdown.overheadCosts)}</span>
                 </div>
               </div>
-              <div className="text-xs text-[#4A6B0F] mt-auto">Totaal: {formatCurrency(zzpResult.costsTotal)}</div>
+              <div className="text-xs text-marge-text mt-auto">Totaal: {formatCurrency(zzpResult.costsTotal)}</div>
             </div>
           </div>
 
@@ -2062,17 +1602,17 @@ export default function Calculator() {
               </div>
             </div>
             <div className="grid grid-cols-2 gap-3 mt-auto pt-4 border-t border-gray-200">
-              <div className="bg-[#E3F2FD] rounded-lg p-3 border border-[#2566A3]/20">
-                <div className="text-base font-bold text-[#1565C0]">{formatCurrency(zzpNetAfterTaxIndicative)}</div>
-                <div className="text-[10px] text-[#1565C0]/80 font-medium uppercase tracking-wide">OP REKENING (INDICATIEF)</div>
-                <div className="text-[10px] text-[#1565C0]/60">{formatHourly(zzpNetAfterTaxIndicative, zzpResult.monthlyHours)}/u</div>
+              <div className="bg-netto-100 rounded-lg p-3 border border-netto-400/20">
+                <div className="text-base font-bold text-netto-text">{formatCurrency(zzpNetAfterTaxIndicative)}</div>
+                <div className="text-[10px] text-netto-text/80 font-medium uppercase tracking-wide">OP REKENING (INDICATIEF)</div>
+                <div className="text-[10px] text-netto-text/60">{formatHourly(zzpNetAfterTaxIndicative, zzpResult.monthlyHours)}/u</div>
               </div>
-              <div className="bg-[#FFF8E1] rounded-lg p-3 border border-[#7E620B]/20">
-                <div className="text-base font-bold text-[#947100]">{formatCurrency(zzpResult.employerPension + zzpResult.reservationBreakdown.employeePension)}</div>
-                <div className="text-[10px] text-[#947100] font-medium uppercase tracking-wide flex items-center gap-1">
+              <div className="bg-pensioen-100 rounded-lg p-3 border border-pensioen-400/20">
+                <div className="text-base font-bold text-pensioen-text">{formatCurrency(zzpResult.employerPension + zzpResult.reservationBreakdown.employeePension)}</div>
+                <div className="text-[10px] text-pensioen-text font-medium uppercase tracking-wide flex items-center gap-1">
                   <PiggyBank className="w-3 h-3" /> PENSIOEN INLEG
                 </div>
-                <div className="text-[10px] text-[#947100]/70">Voor later</div>
+                <div className="text-[10px] text-pensioen-text/70">Voor later</div>
               </div>
             </div>
           </div>
@@ -2279,12 +1819,12 @@ export default function Calculator() {
                   </div>
 
                   {/* Group F: Net Result */}
-                  <div className="p-8 bg-[#E3F2FD] text-[#1565C0] space-y-6 rounded-b-lg">
+                  <div className="p-8 bg-netto-100 text-netto-text space-y-6 rounded-b-lg">
                     <div className="flex flex-col mobile:flex-row justify-between items-start mobile:items-center gap-4">
                       <div>
-                        <h3 className="text-xl font-bold text-[#1565C0]">Indicatief op rekening na belastingreservering</h3>
-                        <p className="text-[#1565C0]/80 text-sm">Dit ontvang je elke maand op je rekening (indicatief)</p>
-                        <p className="text-[#1565C0]/60 text-xs mt-2 max-w-md">
+                        <h3 className="text-xl font-bold text-netto-text">Indicatief op rekening na belastingreservering</h3>
+                        <p className="text-netto-text/80 text-sm">Dit ontvang je elke maand op je rekening (indicatief)</p>
+                        <p className="text-netto-text/60 text-xs mt-2 max-w-md">
                           {zzpResult.taxBreakdown 
                             ? `Exacte belasting berekend op basis van je situatie. Je betaalt ${formatCurrency(zzpResult.taxBreakdown.totalTax / 12)} per maand aan belasting.`
                             : `We reserveren tijdelijk ${(config.zzpTaxReserveRate * 100).toFixed(0)}% voor belasting, exacte belasting hangt af van je situatie`
@@ -2292,36 +1832,36 @@ export default function Calculator() {
                         </p>
                       </div>
                       <div className="text-left mobile:text-right">
-                        <div className="text-3xl font-bold text-[#1565C0]">
+                        <div className="text-3xl font-bold text-netto-text">
                           {formatCurrency(zzpNetAfterTaxIndicative)}
                         </div>
-                        <div className="text-[#1565C0]/70 text-sm font-medium">
+                        <div className="text-netto-text/70 text-sm font-medium">
                           {formatHourly(zzpNetAfterTaxIndicative, zzpResult.monthlyHours)} per uur
                         </div>
                       </div>
                     </div>
                     
                     {!zzpResult.taxBreakdown && (
-                      <div className="rounded-lg p-3 border bg-white/50 border-[#2566A3]/30">
+                      <div className="rounded-lg p-3 border bg-white/50 border-netto-400/30">
                         <div className="flex justify-between items-baseline mb-1">
-                          <span className="text-xs text-[#1565C0]/80">Belastingreservering ({(config.zzpTaxReserveRate * 100).toFixed(0)}%)</span>
+                          <span className="text-xs text-netto-text/80">Belastingreservering ({(config.zzpTaxReserveRate * 100).toFixed(0)}%)</span>
                         </div>
-                        <div className="text-lg font-bold text-[#1565C0]">{formatCurrency(zzpTaxReserve)}</div>
-                        <div className="text-[10px] text-[#1565C0]/60 mt-1">
+                        <div className="text-lg font-bold text-netto-text">{formatCurrency(zzpTaxReserve)}</div>
+                        <div className="text-[10px] text-netto-text/60 mt-1">
                           Dit zetten veel zzp'ers apart om belasting te betalen
                         </div>
                       </div>
                     )}
                     
                     {/* Pension - separate section for long-term */}
-                    <div className="mt-4 pt-4 border-t border-[#2566A3]/30">
+                    <div className="mt-4 pt-4 border-t border-netto-400/30">
                       <div className="flex items-center gap-2 mb-2">
-                        <PiggyBank className="w-4 h-4 text-[#1565C0]/70" />
-                        <h5 className="font-bold text-[#1565C0] text-xs">Opbouw voor later (pensioen)</h5>
+                        <PiggyBank className="w-4 h-4 text-netto-text/70" />
+                        <h5 className="font-bold text-netto-text text-xs">Opbouw voor later (pensioen)</h5>
                       </div>
-                      <div className="bg-white rounded p-3 border border-[#2566A3]/20">
+                      <div className="bg-white rounded p-3 border border-netto-400/20">
                         <div className="flex justify-between items-baseline mb-1">
-                          <span className="text-xs text-[#1565C0]/80">Totale pensioen inleg ({((config.employerPensionRate + config.employeePensionRate) * 100).toFixed(1)}%)</span>
+                          <span className="text-xs text-netto-text/80">Totale pensioen inleg ({((config.employerPensionRate + config.employeePensionRate) * 100).toFixed(1)}%)</span>
                           <InfoTooltip content={
                             <div>
                               <p className="mb-2">Dit is de totale pensioenbijdrage die elke maand voor jou wordt opgebouwd:</p>
@@ -2331,15 +1871,15 @@ export default function Calculator() {
                             </div>
                           } side="left" />
                         </div>
-                        <div className="text-lg font-bold text-[#1565C0]">{formatCurrency(zzpResult.employerPension + zzpResult.reservationBreakdown.employeePension)}</div>
-                        <div className="text-[10px] text-[#1565C0]/60 mt-1">wordt elke maand voor je opgebouwd</div>
+                        <div className="text-lg font-bold text-netto-text">{formatCurrency(zzpResult.employerPension + zzpResult.reservationBreakdown.employeePension)}</div>
+                        <div className="text-[10px] text-netto-text/60 mt-1">wordt elke maand voor je opgebouwd</div>
                       </div>
                     </div>
                     
-                    <p className="text-xs text-[#1565C0]/70 mt-3 leading-relaxed">
+                    <p className="text-xs text-netto-text/70 mt-3 leading-relaxed">
                       Je echte inkomen is dus: {formatCurrency(zzpNetAfterTaxIndicative)} per maand op je rekening!
                     </p>
-                    <p className="text-xs text-[#1565C0]/60 mt-2 leading-relaxed">
+                    <p className="text-xs text-netto-text/60 mt-2 leading-relaxed">
                       Plus {formatCurrency(zzpResult.employerPension + zzpResult.reservationBreakdown.employeePension)} aan pensioen per maand voor later!
                     </p>
                   </div>
@@ -2350,109 +1890,11 @@ export default function Calculator() {
         </section>
       </section>
 
-      {/* Disclaimer (ZZP Tab) */}
-      <section className="pb-8 mt-3">
-        <div className="bg-amber-50 p-4 rounded-lg" style={{ borderWidth: '1px 1px 1px 4px', borderStyle: 'solid', borderColor: 'rgba(251, 191, 36, 1)' }}>
-          <div className="flex items-start gap-3">
-            <div className="flex-shrink-0">
-              <svg className="w-5 h-5 text-amber-600 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-              </svg>
-            </div>
-            <div className="text-left">
-              <h3 className="text-sm font-bold text-amber-900 mb-1">Indicatieve berekening</h3>
-              <p className="text-xs text-amber-800 leading-relaxed">
-                Deze calculator geeft een <strong>realistische indicatie</strong> van je netto inkomen en arbeidsvoorwaarden. 
-                De exacte bedragen op je loonstrook kunnen afwijken door individuele omstandigheden, 
-                verschillende CAO-afspraken, loonheffingskortingen, en andere persoonlijke factoren. 
-                Gebruik deze tool als richtlijn, niet als definitieve berekening. 
-                <strong> En er kunnen geen rechten aan worden ontleend.</strong>
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
+      <Disclaimer />
       </div>
       )}
-
-      {/* SECTION 6: Detacheren vs ZZP (old comparison - can be removed or kept) */}
-      {/* <section className="max-w-5xl mx-auto px-4">
-        <div className="text-center mb-10">
-            <h2 className="text-3xl font-bold text-gray-900">Wat is het verschil met ZZP?</h2>
-        </div>
-
-        <div className="grid mobile:grid-cols-2 gap-8">
-            {/* Detacheren Column */}
-            {/* <div className="bg-white border border-blue-100 rounded-2xl p-8 shadow-sm relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-1 bg-blue-500"></div>
-                <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                    <Briefcase className="w-5 h-5 text-blue-500" /> Detacheren
-                </h3>
-                <ul className="space-y-4">
-                    <ComparisonPoint text="Voorspelbaar inkomen elke maand" check />
-                    <ComparisonPoint text="Altijd verzekerd bij ziekte" check />
-                    <ComparisonPoint text="Geen omkijken naar pensioen" check />
-                    <ComparisonPoint text="Geen administratieve zorgen" check />
-                </ul>
-            </div> */}
-
-            {/* ZZP Column */}
-            {/* <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-1 bg-gray-400"></div>
-                 <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                    <Briefcase className="w-5 h-5 text-gray-500" /> ZZP
-                </h3>
-                 <ul className="space-y-4">
-                    <ComparisonPoint text="Meer vrijheid in tarief" check />
-                    <ComparisonPoint text="Zelf risico dragen bij ziekte" cross />
-                    <ComparisonPoint text="Zelf pensioen regelen" cross />
-                    <ComparisonPoint text="Meer verantwoordelijkheid" cross />
-                </ul>
-            </div>
-        </div>
-        
-
-
-      </section> */}
 
     </div>
     </TooltipProvider>
   );
-}
-
-function BreakdownRow({ label, value, highlight = false, monthlyHours, tooltip }: { label: string, value: number, highlight?: boolean, monthlyHours: number, tooltip?: string | React.ReactNode }) {
-    const formatCurrency = (val: number) => {
-        return new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' }).format(val);
-    };
-    
-    const formatHourly = (val: number, hours: number = monthlyHours) => {
-        return new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(val / hours);
-    };
-
-    return (
-        <div className="flex justify-between items-center text-sm gap-2">
-            <span className="text-gray-600 flex items-center gap-1.5">
-                {label}
-                {tooltip && <InfoTooltip content={tooltip} side="right" />}
-            </span>
-            <div className="text-right">
-                <span className="font-medium block text-gray-900">
-                    {formatCurrency(value)}
-                </span>
-                 <span className="text-[10px] text-gray-400 block">
-                    {formatHourly(value, monthlyHours)} /u
-                </span>
-            </div>
-        </div>
-    )
-}
-
-function ComparisonPoint({ text, check, cross }: { text: string, check?: boolean, cross?: boolean }) {
-    return (
-        <li className="flex items-center gap-3">
-            {check && <CheckCircle2 className="w-5 h-5 text-green-500 shrink-0" />}
-            {cross && <XCircle className="w-5 h-5 text-amber-500 shrink-0" />}
-            <span className="text-gray-700">{text}</span>
-        </li>
-    )
 }
