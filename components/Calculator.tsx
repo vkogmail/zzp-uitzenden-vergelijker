@@ -1078,7 +1078,7 @@ export default function Calculator() {
               className={clsx(
                 "px-3 py-2 text-sm font-medium transition-colors",
                 activeTab === 'comparison'
-                  ? "border-b-2 border-gray-900 text-gray-900"
+                  ? "border-b-[3px] border-gray-900 text-gray-900"
                   : "text-gray-500 hover:text-gray-700"
               )}
             >
@@ -1089,7 +1089,7 @@ export default function Calculator() {
               className={clsx(
                 "px-3 py-2 text-sm font-medium transition-colors",
                 activeTab === 'detacheren'
-                  ? "border-b-2 border-gray-900 text-gray-900"
+                  ? "border-b-[3px] border-gray-900 text-gray-900"
                   : "text-gray-500 hover:text-gray-700"
               )}
             >
@@ -1100,7 +1100,7 @@ export default function Calculator() {
               className={clsx(
                 "px-3 py-2 text-sm font-medium transition-colors",
                 activeTab === 'zzp'
-                  ? "border-b-2 border-gray-900 text-gray-900"
+                  ? "border-b-[3px] border-gray-900 text-gray-900"
                   : "text-gray-500 hover:text-gray-700"
               )}
             >
