@@ -1070,7 +1070,7 @@ export default function Calculator() {
       </div>
 
       {/* SECTION 3: Tab Navigation */}
-      <section className="py-4 px-4 max-w-5xl mx-auto">
+      <section className="pt-8 pb-4 px-4 max-w-5xl mx-auto">
         <div className="flex justify-center border-b border-gray-200">
           <div className="flex gap-1">
             <button
