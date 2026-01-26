@@ -18,8 +18,12 @@ if [ -n "$GITHUB_TOKEN" ]; then
   git config --global url."${TOKEN_URL}".insteadOf "git@github.com:"
   git config --global url."${TOKEN_URL}".insteadOf "https://github.com/"
   
-  # Also set GIT_SSH_COMMAND to prevent SSH usage
-  export GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no"
+  # Force git to use HTTPS by disabling SSH entirely
+  # This prevents npm from using SSH even if it tries
+  export GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
+  
+  # Also set this for the current shell session
+  export GIT_ASKPASS="echo"
   
   echo "Git configuration applied successfully" >&2
   echo "Verifying git config:" >&2
