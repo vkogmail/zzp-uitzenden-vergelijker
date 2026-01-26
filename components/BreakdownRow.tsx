@@ -14,16 +14,22 @@ interface BreakdownRowProps {
 
 export function BreakdownRow({ label, value, highlight = false, monthlyHours, tooltip }: BreakdownRowProps) {
   return (
-    <div className="flex justify-between items-center text-sm gap-2">
-      <span className="text-gray-600 flex items-center gap-1.5">
+    <div className="flex justify-between items-center gap-2" style={{ fontSize: 'var(--font-size-sm)' }}>
+      <span className="flex items-center gap-1.5" style={{ color: 'var(--color-foreground-muted)' }}>
         {label}
         {tooltip && <InfoTooltip content={tooltip} side="right" />}
       </span>
       <div className="text-right">
-        <span className="font-medium block text-gray-900">
+        <span className="block" style={{ 
+          fontWeight: 'var(--font-weight-medium)', 
+          color: 'var(--color-foreground-default)' 
+        }}>
           {formatCurrencyDecimals(value)}
         </span>
-        <span className="text-[10px] text-gray-400 block">
+        <span className="block" style={{ 
+          fontSize: '10px', 
+          color: 'var(--color-foreground-muted-on-dark)' 
+        }}>
           {formatHourlyRate(value, monthlyHours)} /u
         </span>
       </div>
