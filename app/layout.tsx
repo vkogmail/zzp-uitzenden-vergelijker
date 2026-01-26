@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
+import { ThemeProvider } from "@/components/ThemeProvider";
 import "./globals.css";
 
 const rebondGrotesque = localFont({
@@ -73,9 +74,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${rebondGrotesque.variable} ${GeistSans.variable} ${GeistMono.variable}`}>
+    <html lang="en" className={`${rebondGrotesque.variable} ${GeistSans.variable} ${GeistMono.variable}`} suppressHydrationWarning>
       <body className={`${GeistSans.className} antialiased`}>
-        {children}
+        <ThemeProvider>
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

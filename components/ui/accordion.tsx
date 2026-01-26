@@ -45,6 +45,12 @@ function AccordionTrigger({
           color: 'var(--color-foreground-default)',
           borderRadius: 'var(--radius-m)',
         }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.backgroundColor = 'var(--color-gray-50)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.backgroundColor = 'transparent';
+        }}
         onFocus={(e) => {
           e.currentTarget.style.borderColor = 'var(--color-brand-blue)';
           e.currentTarget.style.boxShadow = '0 0 0 3px rgba(0, 133, 255, 0.5)';

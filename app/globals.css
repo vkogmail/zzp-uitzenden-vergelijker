@@ -17,15 +17,23 @@
   --neutral-white: rgb(255, 255, 255);
   --neutral-black: rgb(0, 0, 0);
 
-  /* Grey Cool */
-  --grey-cool-5: rgb(241, 244, 247);
-  --grey-cool-25: rgb(236, 239, 243);
-  --grey-cool-50: rgb(223, 225, 231);
-  --grey-cool-100-on-light: rgb(82, 88, 108);
-  --grey-cool-100-on-dark: rgb(118, 124, 143);
-  --grey-cool-200: rgb(54, 56, 74);
-  --grey-cool-300: rgb(39, 39, 53);
-  --grey-cool-400: rgb(13, 13, 18);
+  /* Grey Cool - from CNDS core.json */
+  --grey-cool-0: rgb(255, 255, 255);
+  --grey-cool-25: rgb(241, 244, 247);
+  --grey-cool-50: rgb(236, 239, 243);
+  --grey-cool-100: rgb(223, 225, 231);
+  --grey-cool-150: rgb(129, 136, 153); /* #818899 */
+  --grey-cool-200: rgb(102, 109, 128); /* #666d80 */
+  --grey-cool-300: rgb(54, 56, 74); /* #36384a */
+  --grey-cool-301: rgb(39, 39, 53); /* #272735 */
+  --grey-cool-301a: rgb(26, 26, 36); /* #1a1a24 */
+  --grey-cool-302: rgb(13, 13, 18); /* #0d0d12 */
+  
+  /* Legacy aliases for compatibility */
+  --grey-cool-5: var(--grey-cool-25);
+  --grey-cool-100-on-light: var(--grey-cool-200);
+  --grey-cool-100-on-dark: var(--grey-cool-150);
+  --grey-cool-400: var(--grey-cool-302);
 
   /* Grey Warm */
   --grey-warm-5: rgb(251, 250, 249);
@@ -117,6 +125,62 @@
   --background: var(--grey-cool-5);
   --foreground: var(--grey-cool-400);
 
+  /* Surface colors (light mode) */
+  --color-surface-default: rgb(255, 255, 255);
+  --color-surface-sunken: var(--grey-cool-5);
+  --color-surface-hero: rgb(255, 255, 255); /* same as default in light mode */
+  --color-surface-dark: var(--grey-cool-400);
+  --color-white: rgb(255, 255, 255);
+  --color-overlay: rgba(0, 0, 0, 0.5);
+
+  /* Border colors (light mode) */
+  --color-border-subtle: var(--grey-cool-50);
+  --color-border-default: var(--grey-cool-200);
+  --color-border-strong: var(--grey-cool-300);
+
+  /* Gray backgrounds (light mode) */
+  --color-gray-50: var(--grey-cool-5);
+  --color-gray-100: var(--grey-cool-25);
+
+  /* Foreground colors (light mode) */
+  --color-foreground-default: var(--grey-cool-400);
+  --color-foreground-muted: var(--grey-cool-100-on-light);
+  --color-foreground-muted-on-dark: var(--grey-cool-100-on-dark);
+
+  /* Shadows (light mode) */
+  --shadow-s: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-m: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-l: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+  /* Font sizes and weights */
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 1.875rem;
+  --font-size-4xl: 2.25rem;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* Spacing */
+  --spacing-xs: 0.5rem;
+  --spacing-s: 0.75rem;
+  --spacing-m: 1rem;
+  --spacing-l: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+
+  /* Radius */
+  --radius-s: 0.25rem;
+  --radius-m: 0.5rem;
+  --radius-l: 0.75rem;
+  --radius-xl: 1rem;
+
   /* Value Breakdown Color Palettes - Linked to bar charts */
   /* Marge (Lime Green Palette) - Source: Lime/Green */
   --color-marge-100: #F4FADC;
@@ -125,6 +189,14 @@
   --color-marge-400: #607A05;
   --color-marge-text: #607A05;
   --color-marge-500: #282D06;
+
+  /* Disclaimer colors - Light Mode */
+  --color-disclaimer-bg: #fffbeb; /* amber-50 */
+  --color-disclaimer-border: #fbbf24; /* amber-400 */
+  --color-disclaimer-icon: #d97706; /* amber-600 */
+  --color-disclaimer-heading: #92400e; /* amber-800 */
+  --color-disclaimer-text: #78350f; /* amber-900 */
+  --color-disclaimer-strong: #92400e; /* amber-800 */
 
   /* Bedrijfskosten (Cyan/Aqua Blue Palette) - Source: Cyan */
   --color-kosten-100: #E1F9FD;
@@ -186,6 +258,35 @@
   --color-emerald-300: #00CC74;
   --color-emerald-400: #008852;
   --color-emerald-500: #004D2D;
+}
+
+/* Global transitions for theme switching */
+* {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+/* Exclude certain elements from transitions */
+button, a, input, select, textarea {
+  transition-duration: 0ms;
+}
+
+/* Utility classes for surfaces and borders */
+@utility bg-surface-default {
+  background-color: var(--color-surface-default);
+}
+
+@utility bg-surface-sunken {
+  background-color: var(--color-surface-sunken);
+}
+
+@utility border-subtle {
+  border-color: var(--color-border-subtle);
+}
+
+@utility border-default {
+  border-color: var(--color-border-default);
 }
 
 /* 2) Tailwind theme bridge */
@@ -346,7 +447,102 @@
   --width-container-max: 1200px;
 }
 
-/* 3) Base */
+/* 3) Dark Mode Variables */
+.dark {
+  /* Surface colors (dark mode) - from CNDS $themes.json */
+  /* Main background (page level) - deepest dark */
+  --color-surface-sunken: var(--grey-cool-302); /* #0d0d12 - main page background */
+  --color-surface-default: var(--grey-cool-302); /* #0d0d12 - same as sunken */
+  
+  /* Content sections/cards - use surface.hero from CNDS */
+  --color-surface-hero: var(--grey-cool-301a); /* #1a1a24 - section/card background */
+  
+  /* Raised elements (hover states, nested cards) - lighter than sections */
+  --color-surface-raised: var(--grey-cool-300); /* #36384a - raised/hover background */
+  
+  /* Dark surface (buttons, accents) - inverted light color */
+  --color-surface-dark: var(--grey-cool-25); /* #f1f4f7 - inverted for dark mode */
+  
+  --color-white: var(--grey-cool-300); /* #36384a */
+  --color-overlay: rgba(0, 0, 0, 0.6); /* from CNDS dark theme */
+
+  /* Border colors (dark mode) - from CNDS $themes.json */
+  --color-border-subtle: var(--grey-cool-300); /* #36384a - no opacity! */
+  --color-border-default: var(--grey-cool-200); /* #666d80 */
+  --color-border-strong: var(--grey-cool-200); /* #666d80 */
+
+  /* Gray backgrounds (dark mode) - for nested elements, inputs, etc. */
+  --color-gray-50: var(--grey-cool-300); /* #36384a - for inputs, nested cards */
+  --color-gray-100: var(--grey-cool-301); /* #272735 - for deeper nested elements */
+
+  /* Foreground colors (dark mode) - from CNDS $themes.json */
+  --color-foreground-default: var(--grey-cool-0); /* #ffffff */
+  --color-foreground-muted: var(--grey-cool-150); /* #818899 */
+  --color-foreground-muted-on-dark: var(--grey-cool-200); /* #666d80 */
+
+  /* Shadows (dark mode) - from CNDS $themes.json */
+  --shadow-s: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+  --shadow-m: 0 1px 3px 0 rgb(0 0 0 / 0.4), 0 1px 2px -1px rgb(0 0 0 / 0.3);
+  --shadow-l: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.3);
+  --shadow-xl: 0 10px 15px -3px rgb(0 0 0 / 0.5), 0 4px 6px -4px rgb(0 0 0 / 0.4);
+
+  /* Background and foreground (dark mode) */
+  --background: var(--grey-cool-302);
+  --foreground: var(--grey-cool-0);
+
+  /* Value Breakdown Colors - Dark Mode (donkerdere, meer verzadigde versies) */
+  --color-marge-100: rgba(145, 186, 0, 0.35); /* Donkerder, meer verzadigd - vergelijkbaar met disclaimer */
+  --color-marge-200: rgba(145, 186, 0, 0.45);
+  --color-marge-300: #91BA00;
+  --color-marge-400: #607A05;
+  --color-marge-text: #C4E04D; /* Lichtere versie voor dark mode */
+  --color-marge-500: #282D06;
+
+  --color-kosten-100: rgba(51, 215, 242, 0.35); /* Donkerder, meer verzadigd - vergelijkbaar met disclaimer */
+  --color-kosten-200: rgba(51, 215, 242, 0.45);
+  --color-kosten-300: #33D7F2;
+  --color-kosten-400: #128194;
+  --color-kosten-text: #7AE0F5; /* Lichtere versie voor dark mode */
+  --color-kosten-500: #0A292E;
+
+  --color-pensioen-100: rgba(255, 196, 0, 0.35); /* Donkerder, meer verzadigd - vergelijkbaar met disclaimer */
+  --color-pensioen-200: rgba(255, 196, 0, 0.45);
+  --color-pensioen-300: #FFC400;
+  --color-pensioen-400: #664F00;
+  --color-pensioen-text: #FFD966; /* Lichtere versie voor dark mode */
+  --color-pensioen-500: #2E1700;
+
+  --color-belasting-100: rgba(255, 98, 0, 0.35); /* Donkerder, meer verzadigd - vergelijkbaar met disclaimer */
+  --color-belasting-200: rgba(255, 98, 0, 0.45);
+  --color-belasting-300: #FF6200;
+  --color-belasting-400: #662700;
+  --color-belasting-text: #FF9A4D; /* Lichtere versie voor dark mode */
+  --color-belasting-500: #331400;
+
+  --color-netto-100: rgba(0, 133, 255, 0.35); /* Donkerder, meer verzadigd - vergelijkbaar met disclaimer */
+  --color-netto-200: rgba(0, 133, 255, 0.45);
+  --color-netto-300: #0085FF;
+  --color-netto-400: #0075E0;
+  --color-netto-text: #4DA6FF; /* Lichtere versie voor dark mode */
+  --color-netto-500: #003566;
+
+  /* Disclaimer colors - Dark Mode */
+  --color-disclaimer-bg: rgba(251, 191, 36, 0.15); /* Amber with opacity for dark mode */
+  --color-disclaimer-border: #F59E0B; /* Amber-500, lichter voor dark mode */
+  --color-disclaimer-icon: #F59E0B; /* Amber-500 */
+  --color-disclaimer-heading: #FCD34D; /* Amber-300, lichter voor dark mode */
+  --color-disclaimer-text: #FDE68A; /* Amber-200, lichter voor dark mode */
+  --color-disclaimer-strong: #FCD34D; /* Amber-300 */
+}
+
+/* Logo dark mode - change text color from black to white, keep icon black */
+/* The logo has green background (#91BA00) which stays green */
+/* Only the text paths change from #0D0D12 to white, icon stays black */
+.dark {
+  --logo-text-fill: var(--grey-cool-0); /* #ffffff - white text in dark mode */
+}
+
+/* 4) Base */
 html:where(:not(.no-smooth)) { scroll-behavior: smooth; }
 :root { color-scheme: light dark; }
 * { -webkit-tap-highlight-color: transparent; }
@@ -363,6 +559,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
   margin: 0;
   padding: 0;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 /* 4) Variants */
@@ -544,8 +741,9 @@ input[type="number"] {
   font-weight: 600;
   letter-spacing: -0.02em;
   line-height: 1em;
-  color: rgb(13, 13, 18); /* Grey-Cool/400 */
+  color: var(--color-foreground-default);
   font-size: 64px;
+  transition: color 0.2s ease;
 }
 
 @media (min-width: 1200px) {
@@ -566,9 +764,10 @@ input[type="number"] {
   font-weight: 600;
   letter-spacing: -0.02em;
   line-height: 100%;
-  color: rgb(13, 13, 18); /* Grey-Cool/400 */
+  color: var(--color-foreground-default);
   font-size: 56px;
   margin-bottom: 40px;
+  transition: color 0.2s ease;
 }
 
 @media (min-width: 1200px) {
@@ -589,10 +788,11 @@ input[type="number"] {
   font-weight: 500;
   letter-spacing: -0.01em;
   line-height: 120%;
-  color: rgb(13, 13, 18); /* Grey-Cool/400 */
+  color: var(--color-foreground-default);
   font-size: 32px;
   margin-bottom: 40px;
   text-align: center;
+  transition: color 0.2s ease;
 }
 
 @media (min-width: 1200px) {
@@ -613,9 +813,10 @@ input[type="number"] {
   font-weight: 500;
   letter-spacing: -0.01em;
   line-height: 130%;
-  color: rgb(13, 13, 18); /* Grey-Cool/400 */
+  color: var(--color-foreground-default);
   font-size: 20px;
   margin-bottom: 40px;
+  transition: color 0.2s ease;
 }
 
 @media (min-width: 1200px) {
@@ -636,9 +837,10 @@ input[type="number"] {
   font-weight: 400;
   letter-spacing: -0.02em;
   line-height: 1.6em;
-  color: #666;
+  color: var(--color-foreground-muted);
   font-size: 16px;
   margin-bottom: 20px;
+  transition: color 0.2s ease;
 }
 
 /* Body Large - Responsive: 18px → 16px → 16px */
@@ -647,9 +849,10 @@ input[type="number"] {
   font-weight: 400;
   letter-spacing: 0px;
   line-height: 140%;
-  color: rgb(82, 88, 108); /* Grey-Cool/100 On Light */
+  color: var(--color-foreground-muted);
   font-size: 18px;
   margin-bottom: 20px;
+  transition: color 0.2s ease;
 }
 
 @media (min-width: 810px) {
@@ -664,9 +867,10 @@ input[type="number"] {
   font-weight: 400;
   letter-spacing: 0px;
   line-height: 140%;
-  color: rgb(82, 88, 108); /* Grey-Cool/100 On Light */
+  color: var(--color-foreground-muted);
   font-size: 16px;
   margin-bottom: 20px;
+  transition: color 0.2s ease;
 }
 
 @media (min-width: 810px) {
@@ -681,9 +885,10 @@ input[type="number"] {
   font-weight: 400;
   letter-spacing: 0px;
   line-height: 160%;
-  color: rgb(118, 124, 143); /* Grey-Cool/100 On Dark */
+  color: var(--color-foreground-muted);
   font-size: 12px;
   margin-bottom: 20px;
+  transition: color 0.2s ease;
 }
 
 /* Label Small - 14px */
@@ -692,9 +897,10 @@ input[type="number"] {
   font-weight: 500;
   letter-spacing: -0.02em;
   line-height: 20px;
-  color: rgb(13, 13, 18); /* Grey-Cool/400 */
+  color: var(--color-foreground-default);
   font-size: 14px;
   margin-bottom: 20px;
+  transition: color 0.2s ease;
 }
 
 /* Label Medium - Responsive: 16px → 14px → 14px */
@@ -739,9 +945,10 @@ input[type="number"] {
   font-weight: 500;
   letter-spacing: 0px;
   line-height: 16px;
-  color: rgb(13, 13, 18); /* Grey-Cool/400 */
+  color: var(--color-foreground-default);
   font-size: 15px;
   margin-bottom: 20px;
+  transition: color 0.2s ease;
 }
 
 /* Link - Responsive: 18px → 16px → 16px */
@@ -750,9 +957,10 @@ input[type="number"] {
   font-weight: 400;
   letter-spacing: -0.02em;
   line-height: 150%;
-  color: rgb(118, 124, 143); /* Grey-Cool/100 On Dark */
+  color: var(--color-foreground-muted);
   font-size: 18px;
   margin-bottom: 20px;
+  transition: color 0.2s ease;
 }
 
 @media (min-width: 810px) {
@@ -767,9 +975,10 @@ input[type="number"] {
   font-weight: 400;
   letter-spacing: 0.01em;
   line-height: 20px;
-  color: rgb(13, 13, 18); /* Grey-Cool/400 */
+  color: var(--color-foreground-default);
   font-size: 13px;
   margin-bottom: 20px;
+  transition: color 0.2s ease;
 }
 
 /* ButtonLabel - Responsive: 16px → 15px → 14px */

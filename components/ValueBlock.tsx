@@ -122,15 +122,20 @@ export function ValueBlock({
           return (
             <div
               key={k}
-              className={`${bgColor} flex flex-col justify-between px-3 pt-2 pb-2 transition-all duration-500 rounded`}
-              style={{ flex: `${percentage} 0 0`, minHeight: '60px' }}
+              className="flex flex-col justify-between px-3 pt-2 pb-2 transition-all duration-500 rounded"
+              style={{ 
+                flex: `${percentage} 0 0`, 
+                minHeight: '60px',
+                backgroundColor: `var(--color-${k}-100)`,
+                color: `var(--color-${k}-text)`
+              }}
             >
-              <span className={`text-xs font-medium ${textColor} leading-tight`}>
+              <span className="text-xs font-medium leading-tight transition-colors" style={{ color: `var(--color-${k}-text)` }}>
                 {VALUE_LABELS[k]}
               </span>
               <div className="flex items-center justify-between shrink-0">
-                <Icon className={`w-4 h-4 ${textColor} shrink-0`} />
-                <span className={`text-sm font-bold ${textColor}`}>
+                <Icon className="w-4 h-4 shrink-0 transition-colors" style={{ color: `var(--color-${k}-text)` }} />
+                <span className="text-sm font-bold transition-colors" style={{ color: `var(--color-${k}-text)` }}>
                   {formatCurrency(v)}
                 </span>
               </div>
@@ -177,21 +182,26 @@ export function ValueBlock({
           return (
             <div
               key={k}
-              className={`${bgColor} flex justify-between ${isSmallBar ? 'items-center' : 'items-start pt-3'} px-4 transition-all duration-500 rounded-lg`}
-              style={{ height: `${percentage}%`, minHeight: '40px' }}
+              className={`flex justify-between ${isSmallBar ? 'items-center' : 'items-start pt-3'} px-4 transition-all duration-500 rounded-lg`}
+              style={{ 
+                height: `${percentage}%`, 
+                minHeight: '40px',
+                backgroundColor: `var(--color-${k}-100)`,
+                color: `var(--color-${k}-text)`
+              }}
             >
               <div className="flex flex-col">
-                <span className={`text-sm font-semibold ${textColor} flex items-center gap-1.5`}>
-                  <Icon className="w-4 h-4" />
+                <span className="text-sm font-semibold flex items-center gap-1.5 transition-colors" style={{ color: `var(--color-${k}-text)` }}>
+                  <Icon className="w-4 h-4" style={{ color: `var(--color-${k}-text)` }} />
                   {VALUE_LABELS[k]}
                 </span>
                 {k === 'netto' && variant === 'detacheren' && (
-                  <span className={`text-xs ${textColor} opacity-75 mt-0.5`}>
+                  <span className="text-xs opacity-75 mt-0.5 transition-colors" style={{ color: `var(--color-${k}-text)` }}>
                     inclusief reservering voor vakantiedagen en feestdagen
                   </span>
                 )}
               </div>
-              <span className={`text-sm font-bold ${textColor}`}>
+              <span className="text-sm font-bold transition-colors" style={{ color: `var(--color-${k}-text)` }}>
                 {formatCurrency(v)}
               </span>
             </div>
