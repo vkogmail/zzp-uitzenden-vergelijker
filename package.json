@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "preinstall": "bash scripts/setup-git-auth.sh",
-    "postinstall": "npm install lightningcss-linux-x64-gnu || true",
+    "postinstall": "npm install lightningcss-linux-x64-gnu tailwindcss-oxide-linux-x64-gnu || true",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
@@ -34,6 +34,7 @@
     "eslint-config-next": "^16.0.7",
     "lightningcss": "^1.30.2",
     "tailwindcss": "^4",
+    "tailwindcss-oxide-linux-x64-gnu": "^4",
     "typescript": "^5"
   }
 }
