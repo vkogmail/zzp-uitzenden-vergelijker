@@ -4,10 +4,10 @@ import Calculator from "@/components/Calculator";
 
 export default function Home() {
   return (
-    <div className="min-h-screen text-gray-900 scroll-smooth pt-4">
+    <div className="min-h-screen text-[var(--color-foreground-default)] scroll-smooth pt-4" style={{ background: 'var(--color-surface-sunken)' }}>
       {/* Navigation - wrapper matches Calculator sections */}
-      <div className="max-w-5xl mx-auto" style={{ paddingLeft: '1rem', paddingRight: '1rem' }}>
-        <nav className="bg-white rounded-[20px] mb-3 py-2.5 flex items-center" style={{ boxShadow: 'rgba(13, 13, 18, 0.05) 0px 2px 4px 0px', height: '64px', paddingLeft: '20px', paddingRight: '24px' }}>
+      <div className="mx-auto" style={{ maxWidth: '1200px', paddingLeft: 'var(--spacing-l)', paddingRight: 'var(--spacing-l)' }}>
+        <nav className="bg-[var(--color-surface-default)] rounded-[20px] mb-3 py-2.5 flex items-center" style={{ boxShadow: 'var(--shadow-m)', height: '64px', paddingLeft: 'var(--spacing-xl)', paddingRight: 'var(--spacing-xl)' }}>
           <img src="/logo.svg" alt="Logo" className="h-8 w-auto" />
         </nav>
       </div>

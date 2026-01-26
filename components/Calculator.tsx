@@ -286,7 +286,7 @@ export default function Calculator() {
 
   return (
       <TooltipProvider>
-      <div className="min-h-screen bg-gray-50 font-[var(--font-geist-sans)] text-gray-900 pb-20">
+      <div className="min-h-screen pb-20" style={{ background: 'var(--color-surface-sunken)', fontFamily: 'var(--font-family-sans)', color: 'var(--color-foreground-default)' }}>
       
       {/* Settings Panel - Only visible when enabled via keyboard shortcut (Cmd+Option+S / Ctrl+Alt+S) */}
       {settingsEnabled && (
@@ -871,13 +871,13 @@ export default function Calculator() {
       )}
       
       {/* SECTION 1: Intro */}
-      <div className="max-w-5xl mx-auto" style={{ paddingLeft: '1rem', paddingRight: '1rem' }}>
-        <section className="bg-white border-b border-gray-100 pt-12 pb-12 rounded-2xl" style={{ boxShadow: 'rgba(13, 13, 18, 0.05) 0px 2px 4px 0px' }}>
+      <div className="mx-auto" style={{ maxWidth: '1200px', paddingLeft: 'var(--spacing-l)', paddingRight: 'var(--spacing-l)' }}>
+        <section className="border-b pt-12 pb-12 rounded-2xl" style={{ background: 'var(--color-surface-default)', borderColor: 'var(--color-border-subtle)', boxShadow: 'var(--shadow-m)' }}>
           <div className="text-center space-y-6 px-6">
-            <h1 className="text-4xl mobile:text-5xl font-extrabold tracking-tight text-gray-900">
+            <h1 className="cnds-heading-1" style={{ color: 'var(--color-foreground-default)' }}>
               Je inkomen is meer<br />dan je maandbedrag
             </h1>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
+            <p className="cnds-body-large max-w-2xl mx-auto" style={{ color: 'var(--color-foreground-muted)' }}>
               Zie wat je direct ontvangt en wat je opbouwt voor later.
             </p>
           </div>
@@ -924,12 +924,12 @@ export default function Calculator() {
         </div> */}
 
       {/* SECTION 2: Controls (shared across all tabs) */}
-      <div className="max-w-5xl mx-auto px-4 mt-3">
-        <div className="bg-white p-4 mobile:p-8 rounded-2xl shadow-sm border border-gray-200">
+      <div className="mx-auto px-4 mt-3" style={{ maxWidth: '1200px' }}>
+        <div className="p-4 mobile:p-8 rounded-2xl border" style={{ background: 'var(--color-surface-default)', borderColor: 'var(--color-border-subtle)', boxShadow: 'var(--shadow-sm)' }}>
           <div className="grid mobile:grid-cols-2 mobile:gap-6 gap-4">
             {/* Hourly Rate */}
             <div className="space-y-2 mobile:space-y-3">
-              <label className="text-xs font-bold uppercase tracking-wider text-gray-500 pb-0 block">
+              <label className="cnds-label-small uppercase tracking-wider pb-0 block" style={{ color: 'var(--color-foreground-muted)' }}>
                 Uurtarief Opdrachtgever
               </label>
               {/* Mobile: input + slider inline */}
@@ -1019,7 +1019,7 @@ export default function Calculator() {
 
             {/* Hours Per Week */}
             <div className="space-y-2 mobile:space-y-3">
-              <label className="text-xs font-bold uppercase tracking-wider text-gray-500 pb-0 block">
+              <label className="cnds-label-small uppercase tracking-wider text-gray-500 pb-0 block">
                 Uren Per Week
               </label>
               {/* Mobile: input + slider inline */}
@@ -1111,13 +1111,13 @@ export default function Calculator() {
       </div>
 
       {/* SECTION 3: Tab Navigation */}
-      <section className="pt-8 pb-4 px-4 max-w-5xl mx-auto">
+      <section className="pt-8 pb-4 px-4 mx-auto" style={{ maxWidth: '1200px' }}>
         <div className="flex justify-center border-b border-gray-200">
           <div className="flex gap-1">
             <button
               onClick={() => setActiveTab('comparison')}
               className={clsx(
-                "px-3 py-2 text-sm font-medium transition-colors cursor-pointer",
+                "px-3 py-2 cnds-nav-label transition-colors cursor-pointer",
                 activeTab === 'comparison'
                   ? "border-b-[3px] border-gray-900 text-gray-900"
                   : "text-gray-500 hover:text-gray-700"
@@ -1128,7 +1128,7 @@ export default function Calculator() {
             <button
               onClick={() => setActiveTab('detacheren')}
               className={clsx(
-                "px-3 py-2 text-sm font-medium transition-colors cursor-pointer",
+                "px-3 py-2 cnds-nav-label transition-colors cursor-pointer",
                 activeTab === 'detacheren'
                   ? "border-b-[3px] border-gray-900 text-gray-900"
                   : "text-gray-500 hover:text-gray-700"
@@ -1139,7 +1139,7 @@ export default function Calculator() {
             <button
               onClick={() => setActiveTab('zzp')}
               className={clsx(
-                "px-3 py-2 text-sm font-medium transition-colors cursor-pointer",
+                "px-3 py-2 cnds-nav-label transition-colors cursor-pointer",
                 activeTab === 'zzp'
                   ? "border-b-[3px] border-gray-900 text-gray-900"
                   : "text-gray-500 hover:text-gray-700"
@@ -1153,11 +1153,11 @@ export default function Calculator() {
 
       {/* SECTION 4: Comparison View (when activeTab === 'comparison') */}
       {activeTab === 'comparison' && (
-        <div className="max-w-5xl mx-auto" style={{ paddingLeft: '1rem', paddingRight: '1rem' }}>
+        <div className="mx-auto" style={{ maxWidth: '1200px', paddingLeft: 'var(--spacing-l)', paddingRight: 'var(--spacing-l)' }}>
         <section className="space-y-3">
 
           {/* Vergelijk de Waarde – Verdeling marge, kosten, belasting, pensioen, netto */}
-          <div className="max-w-5xl mx-auto space-y-6">
+          <div className="mx-auto space-y-6" style={{ maxWidth: '1200px' }}>
 
             <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 mobile:p-10 space-y-6">
               <div className="grid grid-cols-2 gap-4 mobile:gap-10 min-h-[70vh] mobile:min-h-0 mb-0">
@@ -1195,7 +1195,7 @@ export default function Calculator() {
 
       {/* SECTION 4: Calculator + Simple Flow (Detacheren Tab) */}
       {activeTab === 'detacheren' && (
-      <div className="max-w-5xl mx-auto" style={{ paddingLeft: '1rem', paddingRight: '1rem' }}>
+      <div className="mx-auto" style={{ maxWidth: '1200px', paddingLeft: 'var(--spacing-l)', paddingRight: 'var(--spacing-l)' }}>
       <section className="space-y-3">
         {/* Visual Flow */}
         <div className="flex flex-col md:flex-row gap-2 items-stretch">
@@ -1270,7 +1270,7 @@ export default function Calculator() {
 
       {/* SECTION 3: Detailed Breakdown (Detacheren Tab) */}
       {activeTab === 'detacheren' && (
-      <div className="max-w-5xl mx-auto mt-3" style={{ paddingLeft: '1rem', paddingRight: '1rem' }}>
+      <div className="mx-auto mt-3" style={{ maxWidth: 'var(--breakpoint-container-max)', paddingLeft: 'var(--spacing-l)', paddingRight: 'var(--spacing-l)' }}>
       <section>
         <Accordion type="single" collapsible defaultValue="" className="w-full">
             <AccordionItem value="breakdown" className="border border-gray-200 rounded-xl overflow-hidden bg-white shadow-sm">
@@ -1588,7 +1588,7 @@ export default function Calculator() {
 
       {/* Disclaimer (Detacheren Tab) */}
       {activeTab === 'detacheren' && (
-      <div className="max-w-5xl mx-auto px-4">
+      <div className="mx-auto px-4" style={{ maxWidth: '1200px' }}>
         <Disclaimer />
       </div>
       )}

@@ -1,5 +1,9 @@
+/* Import Google Fonts first (before any other rules) */
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;700&display=swap');
+
 @import "tailwindcss";
-@import "@createnew/tokens/tokens.css";
+/* Import CNDS tokens - but skip the @import inside it by importing the file differently */
+@import "@createnew/tokens/tokens.css" layer(tokens);
 
 /* === CreateNew Tailwind v4 globals (full replacement) ===
    - CNDS tokens are now available via CSS variables
@@ -329,7 +333,8 @@
   --breakpoint-mobile: 810px;
   --breakpoint-tablet: 1199px;
   --breakpoint-desktop: 1200px;
-  --breakpoint-containerMax: 1440px;
+  --breakpoint-containerMax: 1200px;
+  --breakpoint-container-max: 1200px; /* Alias for consistency */
 
   /* CNDS Breakpoints for Tailwind v4 utilities */
   --breakpoint-sm-mobile: 390px;
@@ -338,7 +343,7 @@
   --breakpoint-desktop: 1200px;
   
   /* Max widths */
-  --width-container-max: 1440px;
+  --width-container-max: 1200px;
 }
 
 /* 3) Base */
@@ -346,10 +351,13 @@ html:where(:not(.no-smooth)) { scroll-behavior: smooth; }
 :root { color-scheme: light dark; }
 * { -webkit-tap-highlight-color: transparent; }
 body {
-  background: var(--background);
-  color: var(--foreground);
-  /* Use Geist as default font for body text */
-  font-family: var(--font-geist-sans), "Geist Variable", "Geist", var(--font-fallback-sans);
+  background: var(--color-surface-sunken);
+  color: var(--color-foreground-default);
+  /* Use Geist as default font for body text - matches CNDS tokens */
+  font-family: var(--font-family-sans);
+  font-size: var(--text-body-font-size);
+  line-height: var(--text-body-line-height);
+  font-weight: var(--text-body-font-weight);
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -362,46 +370,80 @@ body {
 
 /* 5) Typography utilities (full remap of your .ty-* rules) */
 @utility ty-h1 {
-  /* Use actual font name from font files: "Rebond Grotesque" */
-  font-family: "Rebond Grotesque", rebondGrotesque, var(--font-rebond), var(--font-fallback-sans) !important;
-  font-weight: 600 !important;
+  /* Use CNDS tokens for display/heading-1 */
+  font-family: var(--text-display-font-family) !important;
+  font-weight: var(--text-display-font-weight) !important;
   letter-spacing: -0.02em;
-  line-height: 1;
-  color: var(--color-foreground);
+  line-height: var(--text-display-line-height);
+  color: var(--color-foreground-default);
   font-size: clamp(32px, 5vw, 48px);
   font-synthesis: none;
   -webkit-font-smoothing: antialiased;
 }
 @utility ty-h2 {
-  font-family: var(--font-geist-stack);
-  font-weight: 600;
+  /* Use CNDS tokens for heading-2 */
+  font-family: var(--text-heading-2-font-family);
+  font-weight: var(--text-heading-2-font-weight);
   letter-spacing: -0.02em;
-  line-height: 1;
-  color: var(--color-foreground);
+  line-height: var(--text-heading-2-line-height);
+  color: var(--color-foreground-default);
   font-size: clamp(36px, 5vw, 56px);
 }
 @utility ty-h3 {
-  font-family: "Geist Variable","Geist",var(--font-fallback-sans);
-  font-weight: 500;
+  /* Use CNDS tokens for heading-3 */
+  font-family: var(--text-heading-3-font-family);
+  font-weight: var(--text-heading-3-font-weight);
   letter-spacing: -0.01em;
-  line-height: 1.2;
-  color: var(--color-foreground);
+  line-height: var(--text-heading-3-line-height);
+  color: var(--color-foreground-default);
   font-size: clamp(22px, 3.2vw, 32px);
 }
 @utility ty-h4 {
-  font-family: "Geist Variable","Geist",var(--font-fallback-sans);
-  font-weight: 500;
+  /* Use CNDS tokens for title */
+  font-family: var(--text-title-font-family);
+  font-weight: var(--text-title-font-weight);
   letter-spacing: -0.01em;
-  line-height: 1.3;
-  color: var(--color-foreground);
+  line-height: var(--text-title-line-height);
+  color: var(--color-foreground-default);
   font-size: clamp(18px, 2.2vw, 20px);
 }
-@utility ty-body    { @apply text-gray-600 text-base leading-7 tracking-[-0.02em]; }
-@utility ty-body-lg { @apply text-gray-600 text-lg leading-[1.4] font-medium; }
-@utility ty-body-sm { @apply text-gray-600 text-xs leading-[1.6]; }
+@utility ty-body {
+  font-family: var(--text-body-font-family);
+  font-size: var(--text-body-font-size);
+  line-height: var(--text-body-line-height);
+  font-weight: var(--text-body-font-weight);
+  color: var(--color-foreground-muted);
+  letter-spacing: -0.02em;
+}
+@utility ty-body-lg {
+  font-family: var(--text-body-strong-font-family);
+  font-size: var(--text-body-strong-font-size);
+  line-height: var(--text-body-strong-line-height);
+  font-weight: var(--text-body-strong-font-weight);
+  color: var(--color-foreground-muted);
+}
+@utility ty-body-sm {
+  font-family: var(--text-caption-font-family);
+  font-size: var(--text-caption-font-size);
+  line-height: var(--text-caption-line-height);
+  font-weight: var(--text-caption-font-weight);
+  color: var(--color-foreground-muted);
+}
 
-@utility ty-nav   { @apply text-gray-900 text-[15px] leading-4 font-medium; }
-@utility ty-label { @apply text-gray-900 text-sm  leading-4 font-medium; }
+@utility ty-nav {
+  font-family: var(--text-nav-label-font-family);
+  font-size: var(--text-nav-label-font-size);
+  line-height: var(--text-nav-label-line-height);
+  font-weight: var(--text-nav-label-font-weight);
+  color: var(--color-foreground-default);
+}
+@utility ty-label {
+  font-family: var(--text-label-font-family);
+  font-size: var(--text-label-font-size);
+  line-height: var(--text-label-line-height);
+  font-weight: var(--text-label-font-weight);
+  color: var(--color-foreground-default);
+}
 
 /* Special label (keeps your tighter tracking) */
 @utility ty-label-special-sm {

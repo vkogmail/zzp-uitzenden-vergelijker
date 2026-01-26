@@ -81,15 +81,15 @@ export function ValueBlock({
   return (
     <div className="flex flex-col h-full">
       {/* Header - compact on mobile */}
-      <div className="flex items-start gap-2 mb-2 mobile:mb-4">
+      <div className="flex items-start gap-2 mb-2 mobile:mb-4" style={{ height: 'auto', minHeight: 'auto' }}>
         {variant === 'detacheren' ? (
-          <Briefcase className="w-4 h-4 mobile:w-5 mobile:h-5 text-blue-600 mt-0.5 mobile:mt-1" />
+          <Briefcase className="w-4 h-4 mobile:w-5 mobile:h-5 mt-0.5 mobile:mt-1 flex-shrink-0" style={{ color: 'var(--color-brand-blue)' }} />
         ) : (
-          <CalculatorIcon className="w-4 h-4 mobile:w-5 mobile:h-5 text-green-600 mt-0.5 mobile:mt-1" />
+          <CalculatorIcon className="w-4 h-4 mobile:w-5 mobile:h-5 mt-0.5 mobile:mt-1 flex-shrink-0" style={{ color: 'var(--color-brand-primary)' }} />
         )}
-        <div>
-          <h3 className="text-sm mobile:text-lg font-bold text-gray-900">{title}</h3>
-          <p className="text-xs mobile:text-sm text-gray-500 hidden mobile:block">{subtitle}</p>
+        <div style={{ height: 'auto', minHeight: 'auto', flex: '1 1 auto' }}>
+          <h3 className="cnds-heading-4 leading-tight text-sm mobile:text-lg" style={{ color: 'var(--color-foreground-default)', marginBottom: 0 }}>{title}</h3>
+          <p className="cnds-body-small hidden mobile:block" style={{ color: 'var(--color-foreground-muted)', marginBottom: 0 }}>{subtitle}</p>
         </div>
       </div>
       
@@ -97,14 +97,14 @@ export function ValueBlock({
       <div className="mb-2 mobile:mb-4">
         <div className="flex flex-col mobile:flex-row mobile:justify-between mobile:items-start">
           <div className="hidden mobile:block">
-            <div className="text-xs font-semibold uppercase tracking-wider text-gray-500">{totalLabel}</div>
-            <div className="text-xs text-gray-400">
+            <div className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--color-foreground-muted)' }}>{totalLabel}</div>
+            <div className="text-xs" style={{ color: 'var(--color-foreground-muted-on-dark)' }}>
               {variant === 'detacheren' 
                 ? 'Inclusief vakantiedagen en feestdagen' 
                 : 'Exclusief vakantiedagen en feestdagen'}
             </div>
           </div>
-          <div className="text-2xl mobile:text-2xl font-bold text-gray-900 leading-none">{formatCurrency(displayTotal)}</div>
+          <div className="text-2xl mobile:text-2xl font-bold leading-none" style={{ color: 'var(--color-foreground-default)' }}>{formatCurrency(displayTotal)}</div>
         </div>
       </div>
       
@@ -139,8 +139,9 @@ export function ValueBlock({
         })}
         {correction !== undefined && correction > 0 && (
           <div
-            className="rounded border border-gray-300 flex flex-col justify-between px-3 py-2 overflow-visible"
+            className="rounded flex flex-col justify-between px-3 py-2 overflow-visible"
             style={{ 
+              border: '1px solid var(--color-border-subtle)',
               flex: `${(correction / percentageBase) * 100} 0 0`,
               minHeight: '70px',
               background: 'repeating-linear-gradient(45deg, transparent, transparent 4px, rgba(156, 163, 175, 0.15) 4px, rgba(156, 163, 175, 0.15) 5px)'
@@ -199,8 +200,9 @@ export function ValueBlock({
         {/* Hatched empty section for ZZP to show the correction difference */}
         {correction !== undefined && correction > 0 && (
           <div
-            className="rounded-lg border border-gray-300 flex justify-between items-center px-4"
+            className="rounded-lg flex justify-between items-center px-4"
             style={{ 
+              border: '1px solid var(--color-border-subtle)',
               height: `${(correction / percentageBase) * 100}%`,
               minHeight: '40px',
               background: 'repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(156, 163, 175, 0.1) 10px, rgba(156, 163, 175, 0.1) 12px)'
