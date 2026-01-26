@@ -1,7 +1,8 @@
 @import "tailwindcss";
+@import "@createnew/tokens/tokens.css";
 
 /* === CreateNew Tailwind v4 globals (full replacement) ===
-   - Keeps your original token block
+   - CNDS tokens are now available via CSS variables
    - Maps tokens into Tailwind palette via @theme
    - Rebuilds legacy classes as @utility
 */
@@ -492,9 +493,271 @@ input[type="number"] {
   -moz-appearance: textfield;
 }
 
-/* 8) Notes:
+/* 8) CNDS Text Styles from styles.json (responsive) */
+/* These use CNDS tokens and match the styles.json definitions */
+
+/* Heading 1 - Responsive: 64px → 48px (desktop) → 40px (tablet) */
+.cnds-heading-1 {
+  font-family: "Rebond Grotesque", rebondGrotesque, var(--font-rebond), var(--font-fallback-sans);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1em;
+  color: rgb(13, 13, 18); /* Grey-Cool/400 */
+  font-size: 64px;
+}
+
+@media (min-width: 1200px) {
+  .cnds-heading-1 {
+    font-size: 48px;
+  }
+}
+
+@media (min-width: 810px) and (max-width: 1199px) {
+  .cnds-heading-1 {
+    font-size: 40px;
+  }
+}
+
+/* Heading 2 - Responsive: 56px → 48px (desktop) → 36px (tablet) */
+.cnds-heading-2 {
+  font-family: "Rebond Grotesque", rebondGrotesque, var(--font-rebond), var(--font-fallback-sans);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 100%;
+  color: rgb(13, 13, 18); /* Grey-Cool/400 */
+  font-size: 56px;
+  margin-bottom: 40px;
+}
+
+@media (min-width: 1200px) {
+  .cnds-heading-2 {
+    font-size: 48px;
+  }
+}
+
+@media (min-width: 810px) and (max-width: 1199px) {
+  .cnds-heading-2 {
+    font-size: 36px;
+  }
+}
+
+/* Heading 3 - Responsive: 32px → 24px (desktop) → 22px (tablet) */
+.cnds-heading-3 {
+  font-family: var(--font-geist-sans), "Geist Variable", "Geist", var(--font-fallback-sans);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 120%;
+  color: rgb(13, 13, 18); /* Grey-Cool/400 */
+  font-size: 32px;
+  margin-bottom: 40px;
+  text-align: center;
+}
+
+@media (min-width: 1200px) {
+  .cnds-heading-3 {
+    font-size: 24px;
+  }
+}
+
+@media (min-width: 810px) and (max-width: 1199px) {
+  .cnds-heading-3 {
+    font-size: 22px;
+  }
+}
+
+/* Heading 4 - Responsive: 20px → 18px (desktop) → 18px (tablet) */
+.cnds-heading-4 {
+  font-family: var(--font-geist-sans), "Geist Variable", "Geist", var(--font-fallback-sans);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 130%;
+  color: rgb(13, 13, 18); /* Grey-Cool/400 */
+  font-size: 20px;
+  margin-bottom: 40px;
+}
+
+@media (min-width: 1200px) {
+  .cnds-heading-4 {
+    font-size: 18px;
+  }
+}
+
+@media (min-width: 810px) and (max-width: 1199px) {
+  .cnds-heading-4 {
+    font-size: 18px;
+  }
+}
+
+/* Body - 16px, no breakpoints */
+.cnds-body {
+  font-family: var(--font-geist-sans), "Geist Variable", "Geist", var(--font-fallback-sans);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1.6em;
+  color: #666;
+  font-size: 16px;
+  margin-bottom: 20px;
+}
+
+/* Body Large - Responsive: 18px → 16px → 16px */
+.cnds-body-large {
+  font-family: var(--font-geist-sans), "Geist Variable", "Geist", var(--font-fallback-sans);
+  font-weight: 400;
+  letter-spacing: 0px;
+  line-height: 140%;
+  color: rgb(82, 88, 108); /* Grey-Cool/100 On Light */
+  font-size: 18px;
+  margin-bottom: 20px;
+}
+
+@media (min-width: 810px) {
+  .cnds-body-large {
+    font-size: 16px;
+  }
+}
+
+/* Body Medium - Responsive: 16px → 15px → 15px */
+.cnds-body-medium {
+  font-family: var(--font-geist-sans), "Geist Variable", "Geist", var(--font-fallback-sans);
+  font-weight: 400;
+  letter-spacing: 0px;
+  line-height: 140%;
+  color: rgb(82, 88, 108); /* Grey-Cool/100 On Light */
+  font-size: 16px;
+  margin-bottom: 20px;
+}
+
+@media (min-width: 810px) {
+  .cnds-body-medium {
+    font-size: 15px;
+  }
+}
+
+/* Body Small - Responsive: 12px → 12px → 12px */
+.cnds-body-small {
+  font-family: var(--font-geist-sans), "Geist Variable", "Geist", var(--font-fallback-sans);
+  font-weight: 400;
+  letter-spacing: 0px;
+  line-height: 160%;
+  color: rgb(118, 124, 143); /* Grey-Cool/100 On Dark */
+  font-size: 12px;
+  margin-bottom: 20px;
+}
+
+/* Label Small - 14px */
+.cnds-label-small {
+  font-family: var(--font-geist-sans), "Geist Variable", "Geist", var(--font-fallback-sans);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 20px;
+  color: rgb(13, 13, 18); /* Grey-Cool/400 */
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+/* Label Medium - Responsive: 16px → 14px → 14px */
+.cnds-label-medium {
+  font-family: var(--font-geist-sans), "Geist Variable", "Geist", var(--font-fallback-sans);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 150%;
+  color: rgb(255, 255, 255); /* White */
+  font-size: 16px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+@media (min-width: 810px) {
+  .cnds-label-medium {
+    font-size: 14px;
+  }
+}
+
+/* Label Large - Responsive: 18px → 14px → 14px */
+.cnds-label-large {
+  font-family: var(--font-geist-sans), "Geist Variable", "Geist", var(--font-fallback-sans);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 150%;
+  color: rgb(255, 255, 255); /* White */
+  font-size: 18px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+@media (min-width: 810px) {
+  .cnds-label-large {
+    font-size: 14px;
+  }
+}
+
+/* Nav Label - Responsive: 15px → 15px → 15px */
+.cnds-nav-label {
+  font-family: var(--font-geist-sans), "Geist Variable", "Geist", var(--font-fallback-sans);
+  font-weight: 500;
+  letter-spacing: 0px;
+  line-height: 16px;
+  color: rgb(13, 13, 18); /* Grey-Cool/400 */
+  font-size: 15px;
+  margin-bottom: 20px;
+}
+
+/* Link - Responsive: 18px → 16px → 16px */
+.cnds-link {
+  font-family: var(--font-geist-sans), "Geist Variable", "Geist", var(--font-fallback-sans);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 150%;
+  color: rgb(118, 124, 143); /* Grey-Cool/100 On Dark */
+  font-size: 18px;
+  margin-bottom: 20px;
+}
+
+@media (min-width: 810px) {
+  .cnds-link {
+    font-size: 16px;
+  }
+}
+
+/* Link Small - 13px */
+.cnds-link-small {
+  font-family: var(--font-geist-sans), "Geist Variable", "Geist", var(--font-fallback-sans);
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  line-height: 20px;
+  color: rgb(13, 13, 18); /* Grey-Cool/400 */
+  font-size: 13px;
+  margin-bottom: 20px;
+}
+
+/* ButtonLabel - Responsive: 16px → 15px → 14px */
+.cnds-button-label {
+  font-family: var(--font-geist-sans), "Geist Variable", "Geist", var(--font-fallback-sans);
+  font-weight: 500;
+  letter-spacing: 0px;
+  line-height: 16px;
+  color: rgb(255, 255, 255); /* White */
+  font-size: 16px;
+  margin-bottom: 20px;
+}
+
+@media (min-width: 1200px) {
+  .cnds-button-label {
+    font-size: 15px;
+  }
+}
+
+@media (min-width: 810px) and (max-width: 1199px) {
+  .cnds-button-label {
+    font-size: 14px;
+  }
+}
+
+/* 9) Notes:
    - You can now use native Tailwind utilities instead of custom color classes:
      bg-blue-50, border-blue-200, text-blue-900/800/700/600/500,
      text-gray-900/600/500, text-cyan-600, bg-amber-50, text-violet-700, etc.
    - Those map to your tokens via @theme above.
+   - CNDS text styles are available as cnds-* utilities with responsive breakpoints
+   - CNDS tokens are available via CSS variables from @createnew/tokens package
 */

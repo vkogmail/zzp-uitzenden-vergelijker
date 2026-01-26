@@ -15,19 +15,19 @@ export function MarkdownPage({ markdown }: MarkdownPageProps) {
               remarkPlugins={[remarkGfm]}
               components={{
                 h1: ({ node, ...props }) => (
-                  <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6 mt-8 first:mt-0" {...props} />
+                  <h1 className="cnds-heading-1 text-gray-900 mb-6 mt-8 first:mt-0" {...props} />
                 ),
                 h2: ({ node, ...props }) => (
-                  <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4 mt-8 border-b border-gray-200 pb-2" {...props} />
+                  <h2 className="cnds-heading-2 text-gray-900 mb-4 mt-8 border-b border-gray-200 pb-2" {...props} />
                 ),
                 h3: ({ node, ...props }) => (
-                  <h3 className="text-xl md:text-2xl font-semibold text-gray-800 mb-3 mt-6" {...props} />
+                  <h3 className="cnds-heading-3 text-gray-800 mb-3 mt-6" {...props} />
                 ),
                 h4: ({ node, ...props }) => (
-                  <h4 className="text-lg md:text-xl font-semibold text-gray-700 mb-2 mt-4" {...props} />
+                  <h4 className="cnds-heading-4 text-gray-700 mb-2 mt-4" {...props} />
                 ),
                 p: ({ node, ...props }) => (
-                  <p className="text-gray-700 mb-4 leading-relaxed" {...props} />
+                  <p className="cnds-body text-gray-700 mb-4" {...props} />
                 ),
                 ul: ({ node, ...props }) => (
                   <ul className="list-disc list-inside mb-4 space-y-2 text-gray-700" {...props} />

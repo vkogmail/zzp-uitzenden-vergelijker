@@ -89,63 +89,102 @@ export default function Calculator() {
   const [hourlyRateInput, setHourlyRateInput] = useState('100');
   const [hoursPerWeekInput, setHoursPerWeekInput] = useState('40');
   
-  // Refs for measuring text width
-  const hourlyRateMeasureRef = useRef<HTMLSpanElement>(null);
-  const hoursPerWeekMeasureRef = useRef<HTMLSpanElement>(null);
-  const [hourlyRateWidth, setHourlyRateWidth] = useState(120);
-  const [hoursPerWeekWidth, setHoursPerWeekWidth] = useState(90);
+  // Refs for measuring text width (mobile: text-2xl, desktop: text-3xl)
+  const hourlyRateMeasureRefMobile = useRef<HTMLSpanElement>(null);
+  const hourlyRateMeasureRefDesktop = useRef<HTMLSpanElement>(null);
+  const hoursPerWeekMeasureRefMobile = useRef<HTMLSpanElement>(null);
+  const hoursPerWeekMeasureRefDesktop = useRef<HTMLSpanElement>(null);
+  const [hourlyRateWidthMobile, setHourlyRateWidthMobile] = useState(120);
+  const [hourlyRateWidthDesktop, setHourlyRateWidthDesktop] = useState(120);
+  const [hoursPerWeekWidthMobile, setHoursPerWeekWidthMobile] = useState(90);
+  const [hoursPerWeekWidthDesktop, setHoursPerWeekWidthDesktop] = useState(90);
   
-  // Measure text width for hourly rate
+  // Measure text width for hourly rate (mobile)
   useEffect(() => {
     const measure = () => {
-      if (hourlyRateMeasureRef.current) {
-        const width = hourlyRateMeasureRef.current.offsetWidth;
-        // px-4 = 1rem = 16px on each side = 32px total padding + extra buffer for number input arrows
+      if (hourlyRateMeasureRefMobile.current) {
+        const width = hourlyRateMeasureRefMobile.current.offsetWidth;
         if (width > 0) {
-          setHourlyRateWidth(Math.max(width + 40, 90));
+          setHourlyRateWidthMobile(Math.max(width + 40, 90));
         }
       }
     };
-    // Use requestAnimationFrame to ensure DOM has updated
     const rafId = requestAnimationFrame(measure);
     return () => cancelAnimationFrame(rafId);
   }, [hourlyRateInput]);
   
-  // Measure text width for hours per week
+  // Measure text width for hourly rate (desktop)
   useEffect(() => {
     const measure = () => {
-      if (hoursPerWeekMeasureRef.current) {
-        const width = hoursPerWeekMeasureRef.current.offsetWidth;
-        // px-4 = 1rem = 16px on each side = 32px total padding + extra buffer for number input arrows
+      if (hourlyRateMeasureRefDesktop.current) {
+        const width = hourlyRateMeasureRefDesktop.current.offsetWidth;
         if (width > 0) {
-          setHoursPerWeekWidth(Math.max(width + 40, 70));
+          setHourlyRateWidthDesktop(Math.max(width + 32, 90));
         }
       }
     };
-    // Use requestAnimationFrame to ensure DOM has updated
+    const rafId = requestAnimationFrame(measure);
+    return () => cancelAnimationFrame(rafId);
+  }, [hourlyRateInput]);
+  
+  // Measure text width for hours per week (mobile)
+  useEffect(() => {
+    const measure = () => {
+      if (hoursPerWeekMeasureRefMobile.current) {
+        const width = hoursPerWeekMeasureRefMobile.current.offsetWidth;
+        if (width > 0) {
+          setHoursPerWeekWidthMobile(Math.max(width + 40, 70));
+        }
+      }
+    };
+    const rafId = requestAnimationFrame(measure);
+    return () => cancelAnimationFrame(rafId);
+  }, [hoursPerWeekInput]);
+  
+  // Measure text width for hours per week (desktop)
+  useEffect(() => {
+    const measure = () => {
+      if (hoursPerWeekMeasureRefDesktop.current) {
+        const width = hoursPerWeekMeasureRefDesktop.current.offsetWidth;
+        if (width > 0) {
+          setHoursPerWeekWidthDesktop(Math.max(width + 32, 70));
+        }
+      }
+    };
     const rafId = requestAnimationFrame(measure);
     return () => cancelAnimationFrame(rafId);
   }, [hoursPerWeekInput]);
   
   // Initial measurement on mount
   useEffect(() => {
-    const measureBoth = () => {
-      if (hourlyRateMeasureRef.current) {
-        const width = hourlyRateMeasureRef.current.offsetWidth;
+    const measureAll = () => {
+      if (hourlyRateMeasureRefMobile.current) {
+        const width = hourlyRateMeasureRefMobile.current.offsetWidth;
         if (width > 0) {
-          setHourlyRateWidth(width + 32);
+          setHourlyRateWidthMobile(width + 32);
         }
       }
-      if (hoursPerWeekMeasureRef.current) {
-        const width = hoursPerWeekMeasureRef.current.offsetWidth;
+      if (hourlyRateMeasureRefDesktop.current) {
+        const width = hourlyRateMeasureRefDesktop.current.offsetWidth;
         if (width > 0) {
-          setHoursPerWeekWidth(width + 32);
+          setHourlyRateWidthDesktop(width + 32);
+        }
+      }
+      if (hoursPerWeekMeasureRefMobile.current) {
+        const width = hoursPerWeekMeasureRefMobile.current.offsetWidth;
+        if (width > 0) {
+          setHoursPerWeekWidthMobile(width + 32);
+        }
+      }
+      if (hoursPerWeekMeasureRefDesktop.current) {
+        const width = hoursPerWeekMeasureRefDesktop.current.offsetWidth;
+        if (width > 0) {
+          setHoursPerWeekWidthDesktop(width + 32);
         }
       }
     };
-    // Small delay to ensure DOM is ready
     setTimeout(() => {
-      requestAnimationFrame(measureBoth);
+      requestAnimationFrame(measureAll);
     }, 0);
   }, []);
   
@@ -897,7 +936,7 @@ export default function Calculator() {
               <div className="flex items-center gap-2 mobile:hidden">
                 <div className="relative inline-block shrink-0">
                   <span
-                    ref={hourlyRateMeasureRef}
+                    ref={hourlyRateMeasureRefMobile}
                     className="text-2xl font-bold whitespace-pre opacity-0 pointer-events-none absolute"
                     aria-hidden="true"
                     style={{ visibility: 'hidden', position: 'absolute' }}
@@ -920,7 +959,7 @@ export default function Calculator() {
                         setHourlyRate([value]);
                       }
                     }}
-                    style={{ width: `${hourlyRateWidth}px` }}
+                    style={{ width: `${hourlyRateWidthMobile}px` }}
                     className="text-2xl font-bold text-gray-900 bg-gray-50 border border-gray-300 rounded-md px-3 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 cursor-text"
                   />
                 </div>
@@ -938,6 +977,7 @@ export default function Calculator() {
                 <div className="flex items-center gap-2">
                   <div className="relative inline-block">
                     <span
+                      ref={hourlyRateMeasureRefDesktop}
                       className="text-3xl font-bold whitespace-pre opacity-0 pointer-events-none absolute"
                       aria-hidden="true"
                       style={{ visibility: 'hidden', position: 'absolute' }}
@@ -960,7 +1000,7 @@ export default function Calculator() {
                           setHourlyRate([value]);
                         }
                       }}
-                      style={{ width: `${hourlyRateWidth}px` }}
+                      style={{ width: `${hourlyRateWidthDesktop}px` }}
                       className="text-3xl font-bold text-gray-900 bg-gray-50 border border-gray-300 rounded-md px-4 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 cursor-text"
                     />
                   </div>
@@ -986,7 +1026,7 @@ export default function Calculator() {
               <div className="flex items-center gap-2 mobile:hidden">
                 <div className="relative inline-block shrink-0">
                   <span
-                    ref={hoursPerWeekMeasureRef}
+                    ref={hoursPerWeekMeasureRefMobile}
                     className="text-2xl font-bold whitespace-pre opacity-0 pointer-events-none absolute"
                     aria-hidden="true"
                     style={{ visibility: 'hidden', position: 'absolute' }}
@@ -1009,7 +1049,7 @@ export default function Calculator() {
                         setHoursPerWeek([value]);
                       }
                     }}
-                    style={{ width: `${hoursPerWeekWidth}px` }}
+                    style={{ width: `${hoursPerWeekWidthMobile}px` }}
                     className="text-2xl font-bold text-gray-900 bg-gray-50 border border-gray-300 rounded-md px-3 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 cursor-text"
                   />
                 </div>
@@ -1027,6 +1067,7 @@ export default function Calculator() {
                 <div className="flex items-center gap-2">
                   <div className="relative inline-block">
                     <span
+                      ref={hoursPerWeekMeasureRefDesktop}
                       className="text-3xl font-bold whitespace-pre opacity-0 pointer-events-none absolute"
                       aria-hidden="true"
                       style={{ visibility: 'hidden', position: 'absolute' }}
@@ -1049,7 +1090,7 @@ export default function Calculator() {
                           setHoursPerWeek([value]);
                         }
                       }}
-                      style={{ width: `${hoursPerWeekWidth}px` }}
+                      style={{ width: `${hoursPerWeekWidthDesktop}px` }}
                       className="text-3xl font-bold text-gray-900 bg-gray-50 border border-gray-300 rounded-md px-4 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 cursor-text"
                     />
                   </div>

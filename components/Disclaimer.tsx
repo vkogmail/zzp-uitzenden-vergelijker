@@ -11,8 +11,8 @@ export function Disclaimer() {
             </svg>
           </div>
           <div className="text-left">
-            <h3 className="text-sm font-bold text-amber-900 mb-1">Indicatieve berekening</h3>
-            <p className="text-xs text-amber-800 leading-relaxed">
+            <h3 className="cnds-label-small text-amber-900 mb-1">Indicatieve berekening</h3>
+            <p className="cnds-body-small text-amber-800">
               Deze calculator geeft een <strong>realistische indicatie</strong> van je netto inkomen en arbeidsvoorwaarden. 
               De exacte bedragen op je loonstrook kunnen afwijken door individuele omstandigheden, 
               verschillende CAO-afspraken, loonheffingskortingen, en andere persoonlijke factoren. 
