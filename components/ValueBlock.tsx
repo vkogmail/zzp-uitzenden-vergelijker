@@ -194,7 +194,9 @@ export function ValueBlock({
             >
               <div className="flex flex-col">
                 <span className="text-sm font-semibold flex items-center gap-1.5 transition-colors" style={{ color: `var(--color-${k}-text)` }}>
-                  <Icon className="w-4 h-4" style={{ color: `var(--color-${k}-text)` }} />
+                  <span className="w-4 h-4" style={{ color: `var(--color-${k}-text)` }}>
+                    <Icon className="w-full h-full" />
+                  </span>
                   {VALUE_LABELS[k]}
                 </span>
                 {k === 'netto' && variant === 'detacheren' && (
