@@ -2,7 +2,8 @@
 # Setup git authentication for private GitHub repos
 # This script is run during Vercel build to configure git to use GITHUB_TOKEN
 
-set -e
+# Don't use set -e here because we want to continue even if some configs fail
+set +e
 
 echo "=== Git Auth Setup Script ===" >&2
 echo "GITHUB_TOKEN is set: $([ -n "$GITHUB_TOKEN" ] && echo 'YES' || echo 'NO')" >&2
@@ -18,20 +19,13 @@ if [ -n "$GITHUB_TOKEN" ]; then
   git config --global url."${TOKEN_URL}".insteadOf "git@github.com:"
   git config --global url."${TOKEN_URL}".insteadOf "https://github.com/"
   
-  # Force git to use HTTPS by disabling SSH entirely
-  # This prevents npm from using SSH even if it tries
-  export GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
-  
-  # Also set this for the current shell session
-  export GIT_ASKPASS="echo"
-  
   echo "Git configuration applied successfully" >&2
   echo "Verifying git config:" >&2
   git config --global --get-regexp url >&2
   
-  # Test the URL rewriting
-  echo "Testing URL rewriting:" >&2
-  echo "  ssh://git@github.com/test -> $(git config --global --get-regexp 'url.*ssh://git@github.com' || echo 'not mapped')" >&2
+  # Also write to a file that can be sourced by npm install
+  echo "export GITHUB_TOKEN=\"${GITHUB_TOKEN}\"" > /tmp/git-env.sh
+  echo "export GIT_SSH_COMMAND=\"ssh -o StrictHostKeyChecking=no\"" >> /tmp/git-env.sh
 else
   echo "ERROR: GITHUB_TOKEN not set. Private repo access will fail." >&2
   exit 1
