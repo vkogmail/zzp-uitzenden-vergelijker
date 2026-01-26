@@ -9,10 +9,13 @@ echo "GITHUB_TOKEN is set: $([ -n "$GITHUB_TOKEN" ] && echo 'YES' || echo 'NO')"
 
 if [ -n "$GITHUB_TOKEN" ]; then
   echo "Configuring git to use GITHUB_TOKEN for GitHub access" >&2
+  # Configure all possible GitHub URL formats
   git config --global url."https://${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/"
   git config --global url."https://${GITHUB_TOKEN}@github.com/".insteadOf "ssh://git@github.com/"
   git config --global url."https://${GITHUB_TOKEN}@github.com/".insteadOf "git@github.com:"
+  git config --global url."https://${GITHUB_TOKEN}@github.com/".insteadOf "git+ssh://git@github.com/"
   echo "Git configuration applied successfully" >&2
+  echo "Verifying git config:" >&2
   git config --global --get-regexp url >&2
 else
   echo "ERROR: GITHUB_TOKEN not set. Private repo access will fail." >&2
