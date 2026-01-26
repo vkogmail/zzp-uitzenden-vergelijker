@@ -1,3 +1,3 @@
 {
-  "buildCommand": "git config --global url.\"https://${GITHUB_TOKEN}@github.com/\".insteadOf \"https://github.com/\" && git config --global url.\"https://${GITHUB_TOKEN}@github.com/\".insteadOf \"ssh://git@github.com/\" && npm install && npm run build"
+  "installCommand": "bash scripts/setup-git-auth.sh && npm install"
 }
