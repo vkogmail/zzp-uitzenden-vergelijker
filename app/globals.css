@@ -3,7 +3,7 @@
 
 @import "tailwindcss";
 /* Import CNDS tokens - but skip the @import inside it by importing the file differently */
-@import "@createnew/tokens/tokens.css" layer(tokens);
+@import "@createnew/tokens/dist/tokens.css" layer(tokens);
 
 /* === CreateNew Tailwind v4 globals (full replacement) ===
    - CNDS tokens are now available via CSS variables
