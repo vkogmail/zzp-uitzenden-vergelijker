@@ -26,6 +26,10 @@ if [ -n "$GITHUB_TOKEN" ]; then
   # Also write to a file that can be sourced by npm install
   echo "export GITHUB_TOKEN=\"${GITHUB_TOKEN}\"" > /tmp/git-env.sh
   echo "export GIT_SSH_COMMAND=\"ssh -o StrictHostKeyChecking=no\"" >> /tmp/git-env.sh
+  
+  # Configure .npmrc with token for GitHub packages
+  echo "//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}" >> .npmrc
+  echo "//github.com/:_authToken=${GITHUB_TOKEN}" >> .npmrc
 else
   echo "ERROR: GITHUB_TOKEN not set. Private repo access will fail." >&2
   exit 1
