@@ -294,52 +294,114 @@ export default function Calculator() {
           {/* Fixed Configuration Button */}
           <button
             onClick={() => setShowConfig(!showConfig)}
-            className="fixed bottom-8 right-8 bg-gray-800 hover:bg-gray-700 text-white p-4 rounded-full shadow-lg transition-all z-50 flex items-center gap-2 cursor-pointer"
+            className="fixed bottom-8 right-8 p-4 rounded-full transition-all z-50 flex items-center gap-2 cursor-pointer"
+            style={{
+              background: 'var(--color-surface-dark)',
+              color: 'var(--color-white)',
+              boxShadow: 'var(--shadow-l)',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.opacity = '0.9';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.opacity = '1';
+            }}
             title="Configuratie aanpassen"
           >
             <Settings className="w-6 h-6" />
-            {showConfig && <span className="text-sm font-medium pr-2">Sluiten</span>}
+            {showConfig && <span className="pr-2" style={{ fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)' }}>Sluiten</span>}
           </button>
 
           {/* Configuration Panel */}
           {showConfig && (
-        <div className="fixed inset-0 bg-black/50 z-40 flex items-start justify-end p-4 overflow-y-auto" onClick={() => setShowConfig(false)}>
-          <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl my-8" onClick={(e) => e.stopPropagation()}>
-            <div className="sticky top-0 bg-gray-800 text-white p-6 rounded-t-xl z-10">
+        <div 
+          className="fixed inset-0 z-40 flex items-start justify-end p-4 overflow-y-auto" 
+          style={{ background: 'var(--color-overlay)' }}
+          onClick={() => setShowConfig(false)}
+        >
+          <div 
+            className="rounded-xl w-full max-w-2xl my-8" 
+            style={{ 
+              background: 'var(--color-surface-default)', 
+              boxShadow: 'var(--shadow-xl)' 
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div 
+              className="sticky top-0 p-6 rounded-t-xl z-10"
+              style={{ 
+                background: 'var(--color-surface-dark)', 
+                color: 'var(--color-white)' 
+              }}
+            >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <Settings className="w-6 h-6" />
-                  <h2 className="text-xl font-bold">Calculator Configuratie</h2>
+                  <h2 style={{ fontSize: 'var(--font-size-xl)', fontWeight: 'var(--font-weight-bold)' }}>Calculator Configuratie</h2>
                 </div>
                 <button
                   onClick={() => setConfig(defaultConfig)}
-                  className="text-sm bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-lg transition-colors cursor-pointer"
+                  className="px-4 py-2 rounded-lg transition-colors cursor-pointer"
+                  style={{
+                    fontSize: 'var(--font-size-sm)',
+                    background: 'var(--grey-cool-200)',
+                    color: 'var(--color-white)',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.opacity = '0.9';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.opacity = '1';
+                  }}
                 >
                   Reset naar standaard
                 </button>
               </div>
-              <p className="text-gray-300 text-sm mt-2">Pas percentages, CAO-instellingen en berekeningsparameters aan</p>
+              <p className="mt-2" style={{ color: 'var(--color-foreground-muted-on-dark)', fontSize: 'var(--font-size-sm)' }}>Pas percentages, CAO-instellingen en berekeningsparameters aan</p>
             </div>
             
             <div className="p-6 space-y-6 max-h-[calc(100vh-200px)] overflow-y-auto">
               {/* Berekeningen Uitleg */}
-              <div className="space-y-4 bg-green-50 p-4 rounded-lg border border-green-200">
-                <h3 className="font-bold text-lg text-green-900 flex items-center gap-2">
+              <div className="space-y-4 p-4 rounded-lg border" style={{ 
+                background: 'var(--green-5)', 
+                borderColor: 'var(--green-50)' 
+              }}>
+                <h3 className="font-bold flex items-center gap-2" style={{ 
+                  fontSize: 'var(--font-size-lg)', 
+                  color: 'var(--green-300)' 
+                }}>
                   <CalculatorIcon className="w-5 h-5" />
                   Hoe werken de berekeningen?
                 </h3>
                 <Accordion type="multiple" defaultValue={["detacheren-berekening", "zzp-berekening", "vergelijking"]} className="w-full">
                   <AccordionItem value="detacheren-berekening" className="border-0">
-                    <AccordionTrigger className="text-sm font-semibold text-green-800 hover:no-underline py-2">
+                    <AccordionTrigger className="py-2 hover:no-underline" style={{ 
+                      fontSize: 'var(--font-size-sm)', 
+                      fontWeight: 'var(--font-weight-semibold)', 
+                      color: 'var(--green-300)' 
+                    }}>
                       Detacheren Berekening
                     </AccordionTrigger>
-                    <AccordionContent className="text-sm text-green-700 space-y-3 pt-2">
-                      <div className="bg-white p-3 rounded border border-green-200">
+                    <AccordionContent className="space-y-3 pt-2" style={{ 
+                      fontSize: 'var(--font-size-sm)', 
+                      color: 'var(--green-200)' 
+                    }}>
+                      <div className="p-3 rounded border" style={{ 
+                        background: 'var(--color-surface-default)', 
+                        borderColor: 'var(--green-50)' 
+                      }}>
                         <p className="font-semibold mb-2">Stap 1: Klanttarief → Bruto uurtarief</p>
-                        <p className="text-xs text-gray-600 mb-2">
+                        <p className="mb-2" style={{ 
+                          fontSize: 'var(--font-size-xs)', 
+                          color: 'var(--color-foreground-muted)' 
+                        }}>
                           Het klanttarief wordt omgezet naar bruto uurtarief via de conversiefactor (standaard 1.9776).
                         </p>
-                        <code className="text-xs bg-gray-100 p-1 rounded block">
+                        <code className="p-1 rounded block" style={{ 
+                          fontSize: 'var(--font-size-xs)', 
+                          background: 'var(--color-surface-sunken)', 
+                          borderRadius: 'var(--radius-s)' 
+                        }}>
                           Bruto uurtarief = Klanttarief × Conversiefactor
                         </code>
                       </div>
@@ -348,7 +410,11 @@ export default function Calculator() {
                         <p className="text-xs text-gray-600 mb-2">
                           CreateNew houdt een marge in (standaard 15%): 5% winst + 10% kosten/risico.
                         </p>
-                        <code className="text-xs bg-gray-100 p-1 rounded block">
+                        <code className="p-1 rounded block" style={{ 
+                          fontSize: 'var(--font-size-xs)', 
+                          background: 'var(--color-surface-sunken)', 
+                          borderRadius: 'var(--radius-s)' 
+                        }}>
                           Netto uurtarief = Bruto uurtarief × (1 - Marge CreateNew)
                         </code>
                       </div>
@@ -357,7 +423,11 @@ export default function Calculator() {
                         <p className="text-xs text-gray-600 mb-2">
                           Maandelijkse uren: 52 weken ÷ 12 maanden × uren per week.
                         </p>
-                        <code className="text-xs bg-gray-100 p-1 rounded block">
+                        <code className="p-1 rounded block" style={{ 
+                          fontSize: 'var(--font-size-xs)', 
+                          background: 'var(--color-surface-sunken)', 
+                          borderRadius: 'var(--radius-s)' 
+                        }}>
                           Bruto maandsalaris = Netto uurtarief × Maanduren
                         </code>
                       </div>
@@ -367,7 +437,11 @@ export default function Calculator() {
                           Pensioen wordt berekend op pensioengevend loon (bruto minus franchise van €9,24/uur).
                           Werkgever en werknemer betalen beide een percentage.
                         </p>
-                        <code className="text-xs bg-gray-100 p-1 rounded block">
+                        <code className="p-1 rounded block" style={{ 
+                          fontSize: 'var(--font-size-xs)', 
+                          background: 'var(--color-surface-sunken)', 
+                          borderRadius: 'var(--radius-s)' 
+                        }}>
                           Pensioengrondslag = Bruto - (Franchise × Maanduren)<br/>
                           Pensioen = Pensioengrondslag × (Werkgever% + Werknemer%)
                         </code>
@@ -378,7 +452,11 @@ export default function Calculator() {
                           Progressieve belastingschijven (2026): Schijf 1 (35,75%), Schijf 2 (37,56%), Schijf 3 (49,50%).
                           Loonheffingskortingen (arbeidskorting + algemene heffingskorting) worden afgetrokken.
                         </p>
-                        <code className="text-xs bg-gray-100 p-1 rounded block">
+                        <code className="p-1 rounded block" style={{ 
+                          fontSize: 'var(--font-size-xs)', 
+                          background: 'var(--color-surface-sunken)', 
+                          borderRadius: 'var(--radius-s)' 
+                        }}>
                           Belastbaar loon = Bruto - Pensioen - AZV - PAWW<br/>
                           Belasting = Progressief berekend per schijf<br/>
                           Netto = Belastbaar - Belasting + Kortingen
@@ -395,16 +473,30 @@ export default function Calculator() {
                   </AccordionItem>
                   
                   <AccordionItem value="zzp-berekening" className="border-0">
-                    <AccordionTrigger className="text-sm font-semibold text-green-800 hover:no-underline py-2">
+                    <AccordionTrigger className="py-2 hover:no-underline" style={{ 
+                      fontSize: 'var(--font-size-sm)', 
+                      fontWeight: 'var(--font-weight-semibold)', 
+                      color: 'var(--green-300)' 
+                    }}>
                       ZZP Berekening
                     </AccordionTrigger>
-                    <AccordionContent className="text-sm text-green-700 space-y-3 pt-2">
-                      <div className="bg-white p-3 rounded border border-green-200">
+                    <AccordionContent className="space-y-3 pt-2" style={{ 
+                      fontSize: 'var(--font-size-sm)', 
+                      color: 'var(--green-200)' 
+                    }}>
+                      <div className="p-3 rounded border" style={{ 
+                        background: 'var(--color-surface-default)', 
+                        borderColor: 'var(--green-50)' 
+                      }}>
                         <p className="font-semibold mb-2">Stap 1: Uren berekening</p>
                         <p className="text-xs text-gray-600 mb-2">
                           Uren per jaar = uren per week × 52. Onwerkbaar (vakantie/feestdagen) en ziekte correctie worden afgetrokken.
                         </p>
-                        <code className="text-xs bg-gray-100 p-1 rounded block">
+                        <code className="p-1 rounded block" style={{ 
+                          fontSize: 'var(--font-size-xs)', 
+                          background: 'var(--color-surface-sunken)', 
+                          borderRadius: 'var(--radius-s)' 
+                        }}>
                           Uren per jaar = Uren/week × 52<br/>
                           Onwerkbaar uren = Uren per jaar × Onwerkbaar%<br/>
                           Netto uren = Uren per jaar - Onwerkbaar uren<br/>
@@ -415,7 +507,11 @@ export default function Calculator() {
                       </div>
                       <div className="bg-white p-3 rounded border border-green-200">
                         <p className="font-semibold mb-2">Stap 2: Effectieve omzet</p>
-                        <code className="text-xs bg-gray-100 p-1 rounded block">
+                        <code className="p-1 rounded block" style={{ 
+                          fontSize: 'var(--font-size-xs)', 
+                          background: 'var(--color-surface-sunken)', 
+                          borderRadius: 'var(--radius-s)' 
+                        }}>
                           Effectieve omzet = Effectief uren/maand × Uurtarief
                         </code>
                       </div>
@@ -424,7 +520,11 @@ export default function Calculator() {
                         <p className="text-xs text-gray-600 mb-2">
                           Marge CreateNew (5%) en kosten freelance bv (10%: incl verzekeringen).
                         </p>
-                        <code className="text-xs bg-gray-100 p-1 rounded block">
+                        <code className="p-1 rounded block" style={{ 
+                          fontSize: 'var(--font-size-xs)', 
+                          background: 'var(--color-surface-sunken)', 
+                          borderRadius: 'var(--radius-s)' 
+                        }}>
                           Marge CreateNew = Omzet × 5%<br/>
                           Inkomen na marge CreateNew = Omzet - Marge CreateNew<br/>
                           Kosten = Omzet × 10%<br/>
@@ -437,7 +537,11 @@ export default function Calculator() {
                           Zelfde systeem als detacheren: franchise €9,24/uur, werkgever + werknemer percentages.
                           Berekeningsbasis is inkomen na marge en kosten.
                         </p>
-                        <code className="text-xs bg-gray-100 p-1 rounded block">
+                        <code className="p-1 rounded block" style={{ 
+                          fontSize: 'var(--font-size-xs)', 
+                          background: 'var(--color-surface-sunken)', 
+                          borderRadius: 'var(--radius-s)' 
+                        }}>
                           Pensioengrondslag = (Inkomen na marge en kosten) - (Franchise × Maanduren)<br/>
                           Pensioen = Pensioengrondslag × (Werkgever% + Werknemer%)
                         </code>
@@ -449,7 +553,11 @@ export default function Calculator() {
                           Winst voor belasting - MKB-vrijstelling (13.31%) = belastbaar inkomen.
                           Inkomstenbelasting + ZVW - kortingen = totale belasting.
                         </p>
-                        <code className="text-xs bg-gray-100 p-1 rounded block">
+                        <code className="p-1 rounded block" style={{ 
+                          fontSize: 'var(--font-size-xs)', 
+                          background: 'var(--color-surface-sunken)', 
+                          borderRadius: 'var(--radius-s)' 
+                        }}>
                           Belastbaar inkomen (jaar) = Inkomen na marge CreateNew × 12<br/>
                           Aftrekposten = (Pensioen + Kosten) × 12<br/>
                           Winst voor belasting = Belastbaar inkomen - Aftrekposten<br/>
@@ -463,30 +571,52 @@ export default function Calculator() {
                   </AccordionItem>
                   
                   <AccordionItem value="vergelijking" className="border-0">
-                    <AccordionTrigger className="text-sm font-semibold text-green-800 hover:no-underline py-2">
+                    <AccordionTrigger className="py-2 hover:no-underline" style={{ 
+                      fontSize: 'var(--font-size-sm)', 
+                      fontWeight: 'var(--font-weight-semibold)', 
+                      color: 'var(--green-300)' 
+                    }}>
                       Vergelijking Detacheren vs ZZP
                     </AccordionTrigger>
-                    <AccordionContent className="text-sm text-green-700 space-y-3 pt-2">
-                      <div className="bg-white p-3 rounded border border-green-200">
+                    <AccordionContent className="space-y-3 pt-2" style={{ 
+                      fontSize: 'var(--font-size-sm)', 
+                      color: 'var(--green-200)' 
+                    }}>
+                      <div className="p-3 rounded border" style={{ 
+                        background: 'var(--color-surface-default)', 
+                        borderColor: 'var(--green-50)' 
+                      }}>
                         <p className="font-semibold mb-2">"Dit ontvang je elke maand op je rekening"</p>
-                        <ul className="text-xs text-gray-600 space-y-1 list-disc list-inside">
+                        <ul className="space-y-1 list-disc list-inside" style={{ 
+                          fontSize: 'var(--font-size-xs)', 
+                          color: 'var(--color-foreground-muted)' 
+                        }}>
                           <li><strong>Detacheren:</strong> Netto na belasting (echte uitbetaling)</li>
                           <li><strong>ZZP:</strong> Netto na belastingreservering (indicatief, 40% gereserveerd)</li>
                         </ul>
-                        <p className="text-xs text-gray-600 mt-2">
+                        <p className="mt-2" style={{ 
+                          fontSize: 'var(--font-size-xs)', 
+                          color: 'var(--color-foreground-muted)' 
+                        }}>
                           Dit maakt de vergelijking eerlijk: beide kanten tonen wat je daadwerkelijk op je rekening ontvangt.
                         </p>
                       </div>
                       <div className="bg-white p-3 rounded border border-green-200">
                         <p className="font-semibold mb-2">Pensioen</p>
-                        <ul className="text-xs text-gray-600 space-y-1 list-disc list-inside">
+                        <ul className="space-y-1 list-disc list-inside" style={{ 
+                          fontSize: 'var(--font-size-xs)', 
+                          color: 'var(--color-foreground-muted)' 
+                        }}>
                           <li><strong>Detacheren:</strong> Automatisch opgebouwd, verplicht</li>
                           <li><strong>ZZP:</strong> Eigen pensioenopbouw (vrijwillig), zelfde StiPP-structuur</li>
                         </ul>
                       </div>
                       <div className="bg-white p-3 rounded border border-green-200">
                         <p className="font-semibold mb-2">Kosten & Risico</p>
-                        <ul className="text-xs text-gray-600 space-y-1 list-disc list-inside">
+                        <ul className="space-y-1 list-disc list-inside" style={{ 
+                          fontSize: 'var(--font-size-xs)', 
+                          color: 'var(--color-foreground-muted)' 
+                        }}>
                           <li><strong>Detacheren:</strong> Marge CreateNew (15%) + extra uitkeringen in loonstructuur</li>
                           <li><strong>ZZP:</strong> Marge CreateNew (5%) + kosten freelance bv (10%) + belasting (volgens ZZP tarieven met MKB-vrijstelling)</li>
                         </ul>
