@@ -9,14 +9,25 @@ echo "GITHUB_TOKEN is set: $([ -n "$GITHUB_TOKEN" ] && echo 'YES' || echo 'NO')"
 
 if [ -n "$GITHUB_TOKEN" ]; then
   echo "Configuring git to use GITHUB_TOKEN for GitHub access" >&2
-  # Configure all possible GitHub URL formats
-  git config --global url."https://${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/"
-  git config --global url."https://${GITHUB_TOKEN}@github.com/".insteadOf "ssh://git@github.com/"
-  git config --global url."https://${GITHUB_TOKEN}@github.com/".insteadOf "git@github.com:"
-  git config --global url."https://${GITHUB_TOKEN}@github.com/".insteadOf "git+ssh://git@github.com/"
+  TOKEN_URL="https://${GITHUB_TOKEN}@github.com/"
+  
+  # Configure all possible GitHub URL formats - order matters!
+  # Map SSH URLs first, then HTTPS
+  git config --global url."${TOKEN_URL}".insteadOf "ssh://git@github.com/"
+  git config --global url."${TOKEN_URL}".insteadOf "git+ssh://git@github.com/"
+  git config --global url."${TOKEN_URL}".insteadOf "git@github.com:"
+  git config --global url."${TOKEN_URL}".insteadOf "https://github.com/"
+  
+  # Also set GIT_SSH_COMMAND to prevent SSH usage
+  export GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no"
+  
   echo "Git configuration applied successfully" >&2
   echo "Verifying git config:" >&2
   git config --global --get-regexp url >&2
+  
+  # Test the URL rewriting
+  echo "Testing URL rewriting:" >&2
+  echo "  ssh://git@github.com/test -> $(git config --global --get-regexp 'url.*ssh://git@github.com' || echo 'not mapped')" >&2
 else
   echo "ERROR: GITHUB_TOKEN not set. Private repo access will fail." >&2
   exit 1
