@@ -134,7 +134,9 @@ export function ValueBlock({
                 {VALUE_LABELS[k]}
               </span>
               <div className="flex items-center justify-between shrink-0">
-                <Icon className="w-4 h-4 shrink-0 transition-colors" style={{ color: `var(--color-${k}-text)` }} />
+                <span className="w-4 h-4 shrink-0 transition-colors" style={{ color: `var(--color-${k}-text)` }}>
+                  <Icon className="w-full h-full" />
+                </span>
                 <span className="text-sm font-bold transition-colors" style={{ color: `var(--color-${k}-text)` }}>
                   {formatCurrency(v)}
                 </span>
