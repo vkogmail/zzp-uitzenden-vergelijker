@@ -23,7 +23,7 @@
     "tailwind-merge": "^3.2.0"
   },
   "devDependencies": {
-    "@createnew/tokens": "github:CreateNewCo/CNDS#main",
+    "@createnew/tokens": "https://github.com/CreateNewCo/CNDS.git#main",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
