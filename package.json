@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "preinstall": "bash scripts/setup-git-auth.sh",
+    "postinstall": "npm rebuild lightningcss || true",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
