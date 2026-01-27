@@ -9,7 +9,7 @@ export function MarkdownPage({ markdown }: MarkdownPageProps) {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-4xl mx-auto px-4 py-8 md:py-12">
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 md:p-8 lg:p-10">
+        <div className="bg-white rounded-2xl border border-gray-200 p-6 md:p-8 lg:p-10" style={{ boxShadow: 'rgba(13, 13, 18, 0.05) 0px 2px 4px 0px' }}>
           <div className="prose prose-lg max-w-none">
             <ReactMarkdown
               remarkPlugins={[remarkGfm]}

@@ -925,7 +925,7 @@ export default function Calculator() {
 
       {/* SECTION 2: Controls (shared across all tabs) */}
       <div className="max-w-5xl mx-auto px-4 mt-3">
-        <div className="bg-white p-4 mobile:p-8 rounded-2xl shadow-sm border border-gray-200">
+        <div className="bg-white p-4 mobile:p-8 rounded-2xl border border-gray-200" style={{ boxShadow: 'rgba(13, 13, 18, 0.05) 0px 2px 4px 0px' }}>
           <div className="grid mobile:grid-cols-2 mobile:gap-6 gap-4">
             {/* Hourly Rate */}
             <div className="space-y-2 mobile:space-y-3">
@@ -1159,7 +1159,7 @@ export default function Calculator() {
           {/* Vergelijk de Waarde – Verdeling marge, kosten, belasting, pensioen, netto */}
           <div className="max-w-5xl mx-auto space-y-6">
 
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 mobile:p-10 space-y-6">
+            <div className="bg-white rounded-2xl border border-gray-200 p-4 mobile:p-10 space-y-6" style={{ boxShadow: 'rgba(13, 13, 18, 0.05) 0px 2px 4px 0px' }}>
               <div className="grid grid-cols-2 gap-4 mobile:gap-10 min-h-[70vh] mobile:min-h-0 mb-0">
                 {/* Detacheren – Waarde-blok */}
                 <ValueBlock
@@ -1273,7 +1273,7 @@ export default function Calculator() {
       <div className="max-w-5xl mx-auto mt-3" style={{ paddingLeft: '1rem', paddingRight: '1rem' }}>
       <section>
         <Accordion type="single" collapsible defaultValue="" className="w-full">
-            <AccordionItem value="breakdown" className="border border-gray-200 rounded-xl overflow-hidden bg-white shadow-sm">
+            <AccordionItem value="breakdown" className="border border-gray-200 rounded-xl overflow-hidden bg-white" style={{ boxShadow: 'rgba(13, 13, 18, 0.05) 0px 2px 4px 0px' }}>
                 <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-gray-50 transition-colors">
                     <div className="flex flex-col items-start text-left">
                         <span className="text-lg font-bold text-gray-900">Volledige opbouw van jouw tarief</span>
@@ -1662,7 +1662,7 @@ export default function Calculator() {
         {/* Detailed Breakdown for ZZP */}
         <section>
           <Accordion type="single" collapsible defaultValue="" className="w-full">
-            <AccordionItem value="breakdown" className="border border-gray-200 rounded-xl overflow-hidden bg-white shadow-sm">
+            <AccordionItem value="breakdown" className="border border-gray-200 rounded-xl overflow-hidden bg-white" style={{ boxShadow: 'rgba(13, 13, 18, 0.05) 0px 2px 4px 0px' }}>
               <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-gray-50 transition-colors">
                 <div className="flex flex-col items-start text-left">
                   <span className="text-lg font-bold text-gray-900">Volledige opbouw van je ZZP-inkomen</span>
