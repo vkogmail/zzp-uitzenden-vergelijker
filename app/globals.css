@@ -1,5 +1,6 @@
 @import "tailwindcss";
-@import "@createnew/tokens/tokens.css";
+/* @import "@createnew/tokens/tokens.css"; */
+/* TODO: Uncomment when @createnew/tokens package is built and dist/tokens.css is available */
 
 /* === CreateNew Tailwind v4 globals (full replacement) ===
    - CNDS tokens are now available via CSS variables
