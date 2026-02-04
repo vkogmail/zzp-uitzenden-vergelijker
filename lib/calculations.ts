@@ -728,7 +728,9 @@ export function calculateZZPDetailed(
   hoursPerWeek: number,
   config: CalculatorConfig = defaultCalculatorConfig,
   detacherenEmployeePension?: number, // Optioneel: pensioen uit detacheren berekening (volgens Excel: "Pensioen (uit deta calc)")
-  detacherenEmployerPension?: number  // Optioneel: werkgeverspensioen uit detacheren berekening
+  detacherenEmployerPension?: number, // Optioneel: werkgeverspensioen uit detacheren berekening
+  overrideOverheadCosts?: number,     // Optioneel: door gebruiker ingevoerde bedrijfskosten (maandelijks)
+  overridePensionTotal?: number      // Optioneel: door gebruiker ingevoerd totaal pensioen (maandelijks)
 ): ZZPResult {
   // STAP 1: Uren per jaar berekenen (volgens Excel)
   const WEEKS_PER_YEAR = 52;
@@ -747,18 +749,33 @@ export function calculateZZPDetailed(
   // STAP 4: Marge en kosten (volgens Excel structuur)
   const companyMargin = effectiveRevenue * config.zzpCompanyMarginRate; // C15 = B15*B12 (5%)
   const incomeAfterMargin = effectiveRevenue - companyMargin; // B16 = B12-C15
-  const businessCosts = effectiveRevenue * config.zzpBusinessCostsRate; // C17 = B17*B12 (10%)
+  const businessCosts = overrideOverheadCosts !== undefined && overrideOverheadCosts >= 0
+    ? overrideOverheadCosts
+    : effectiveRevenue * config.zzpBusinessCostsRate; // C17 = B17*B12 (10%) of door gebruiker ingevoerd
   const incomeAfterMarginAndCosts = incomeAfterMargin - businessCosts; // B18 = B16-C17
 
   // STAP 5: Pensioenberekening
-  // Volgens Excel: "Pensioen (uit deta calc)" - gebruik hetzelfde pensioen als detacheren
+  // Volgens Excel: "Pensioen (uit deta calc)" - of door gebruiker ingevoerd totaal
   let employeePensionVal: number;
   let employerPensionVal: number;
   let basePensionableWage: number;
   let pensionCompensationVal: number;
   let pensionableWageVal: number;
 
-  if (detacherenEmployeePension !== undefined && detacherenEmployerPension !== undefined) {
+  if (overridePensionTotal !== undefined && overridePensionTotal >= 0) {
+    // Door gebruiker ingevoerd totaal pensioen: verdeel volgens config-ratio werkgever/werknemer
+    const totalPensionRate = config.employerPensionRate + config.employeePensionRate;
+    if (totalPensionRate > 0) {
+      employerPensionVal = overridePensionTotal * (config.employerPensionRate / totalPensionRate);
+      employeePensionVal = overridePensionTotal * (config.employeePensionRate / totalPensionRate);
+    } else {
+      employerPensionVal = overridePensionTotal / 2;
+      employeePensionVal = overridePensionTotal / 2;
+    }
+    pensionableWageVal = employerPensionVal + employeePensionVal;
+    basePensionableWage = pensionableWageVal;
+    pensionCompensationVal = 0;
+  } else if (detacherenEmployeePension !== undefined && detacherenEmployerPension !== undefined) {
     // Gebruik pensioen uit detacheren berekening (volgens Excel)
     employeePensionVal = detacherenEmployeePension;
     employerPensionVal = detacherenEmployerPension;

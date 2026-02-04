@@ -237,16 +237,22 @@ export default function Calculator() {
     );
   }, [hourlyRate, hoursPerWeek, config]);
 
+  // Door gebruiker ingevoerde bedrijfskosten en pensioen (alleen voor ZZP/Freelance)
+  const [overrideBedrijfskosten, setOverrideBedrijfskosten] = useState<number | null>(null);
+  const [overridePensioen, setOverridePensioen] = useState<number | null>(null);
+
   const zzpResult = useMemo(() => {
-    // Gebruik pensioen uit detacheren berekening (volgens Excel: "Pensioen (uit deta calc)")
+    // Gebruik pensioen uit detacheren berekening, tenzij gebruiker eigen waarde heeft ingevoerd
     return calculateZZPDetailed(
       hourlyRate[0],
       hoursPerWeek[0],
       config,
       result.reservationBreakdown.employeePension, // Pensioen uit detacheren
-      result.employerPension // Werkgeverspensioen uit detacheren
+      result.employerPension, // Werkgeverspensioen uit detacheren
+      overrideBedrijfskosten ?? undefined,
+      overridePensioen ?? undefined
     );
-  }, [hourlyRate, hoursPerWeek, config, result.reservationBreakdown.employeePension, result.employerPension]);
+  }, [hourlyRate, hoursPerWeek, config, result.reservationBreakdown.employeePension, result.employerPension, overrideBedrijfskosten, overridePensioen]);
 
   // Comparison mappers (ONLY for comparison header view)
   const detacherenComparable = useMemo(() => employeeResultToComparable(result), [result]);
@@ -1171,7 +1177,7 @@ export default function Calculator() {
                   formatCurrency={formatCurrency}
                   variant="detacheren"
                 />
-                {/* ZZP – Waarde-blok */}
+                {/* ZZP – Waarde-blok (Bedrijfskosten en Pensioen bewerkbaar voor freelancer) */}
                 <ValueBlock
                   title="Freelance"
                   subtitle="Ondernemerschap"
@@ -1182,6 +1188,15 @@ export default function Calculator() {
                   variant="zzp"
                   baseTotal={detacherenValueBreakdown.total}
                   correction={detacherenValueBreakdown.total - zzpValueBreakdown.total}
+                  editableKeys={['kosten', 'pensioen']}
+                  onEdit={(key, value) => {
+                    if (key === 'kosten') setOverrideBedrijfskosten(value);
+                    if (key === 'pensioen') setOverridePensioen(value);
+                  }}
+                  onClearEdit={(key) => {
+                    if (key === 'kosten') setOverrideBedrijfskosten(null);
+                    if (key === 'pensioen') setOverridePensioen(null);
+                  }}
                 />
               </div>
 
@@ -1637,19 +1652,19 @@ export default function Calculator() {
               </div>
             </div>
             <div className="grid grid-cols-3 gap-3 mt-auto pt-4 border-t border-gray-200">
-              <div className="bg-netto-100 rounded-lg p-3 border border-netto-400/20">
+              <div className="bg-netto-100 rounded-lg p-3 border border-netto-400/20 min-w-0">
                 <div className="text-base font-bold text-netto-text">{formatCurrency(zzpNetAfterTaxIndicative)}</div>
-                <div className="text-[10px] text-netto-text/80 font-medium uppercase tracking-wide md:whitespace-nowrap">besteedbaar inkomen</div>
+                <div className="text-[10px] text-netto-text/80 font-medium uppercase tracking-wide break-words">besteedbaar inkomen</div>
                 <div className="text-[10px] text-netto-text/60">{formatHourly(zzpNetAfterTaxIndicative, zzpResult.monthlyHours)}/u</div>
               </div>
-              <div className="bg-kosten-100 rounded-lg p-3 border border-kosten-400/20">
+              <div className="bg-kosten-100 rounded-lg p-3 border border-kosten-400/20 min-w-0">
                 <div className="text-base font-bold text-kosten-text">{formatCurrency(zzpResult.costsBreakdown.overheadCosts)}</div>
-                <div className="text-[10px] text-kosten-text/80 font-medium uppercase tracking-wide">BEDRIJFSKOSTEN</div>
+                <div className="text-[10px] text-kosten-text/80 font-medium uppercase tracking-wide break-words">BEDRIJFSKOSTEN</div>
                 <div className="text-[10px] text-kosten-text/60">{formatHourly(zzpResult.costsBreakdown.overheadCosts, zzpResult.monthlyHours)}/u</div>
               </div>
-              <div className="bg-pensioen-100 rounded-lg p-3 border border-pensioen-400/20">
+              <div className="bg-pensioen-100 rounded-lg p-3 border border-pensioen-400/20 min-w-0">
                 <div className="text-base font-bold text-pensioen-text">{formatCurrency(zzpResult.employerPension + zzpResult.reservationBreakdown.employeePension)}</div>
-                <div className="text-[10px] text-pensioen-text font-medium uppercase tracking-wide">
+                <div className="text-[10px] text-pensioen-text font-medium uppercase tracking-wide break-words">
                   PENSIOEN INLEG
                 </div>
                 <div className="text-[10px] text-pensioen-text/70">Voor later</div>
