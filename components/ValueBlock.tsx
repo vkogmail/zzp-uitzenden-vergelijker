@@ -89,6 +89,9 @@ export function ValueBlock({
   const [editInputValue, setEditInputValue] = useState('');
   const [popoverAnchor, setPopoverAnchor] = useState<DOMRect | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const editingKeyRef = useRef<EditableKey | null>(null);
+  const blurTimestampRef = useRef(0);
+  editingKeyRef.current = editingKey;
 
   const isEditable = (k: string): k is EditableKey =>
     (k === 'kosten' || k === 'pensioen') && editableKeys.includes(k as EditableKey) && !!onEdit;
@@ -113,13 +116,16 @@ export function ValueBlock({
   }, [editingKey, popoverAnchor]);
 
   // Sluit popover bij scroll zodat hij niet op de verkeerde plek blijft staan.
-  // Korte grace-period na open zodat focus/scroll-into-view op mobile niet meteen sluit.
+  // Grace na open en na blur (keyboard dismiss op mobile) zodat scroll niet meteen sluit.
   useEffect(() => {
     if (editingKey === null) return;
     const openedAt = Date.now();
-    const GRACE_MS = 600;
+    const GRACE_AFTER_OPEN_MS = 600;
+    const GRACE_AFTER_BLUR_MS = 800;
     const onScroll = () => {
-      if (Date.now() - openedAt < GRACE_MS) return;
+      const now = Date.now();
+      if (now - openedAt < GRACE_AFTER_OPEN_MS) return;
+      if (now - blurTimestampRef.current < GRACE_AFTER_BLUR_MS) return;
       closePopover();
     };
     window.addEventListener('scroll', onScroll, true);
@@ -133,6 +139,15 @@ export function ValueBlock({
       onEdit(editingKey, Math.round(parsed * 100) / 100);
     }
     closePopover();
+  };
+
+  // Native keyboard "Done"/checkmark op iOS: blur eerst, dan na korte delay opslaan als popover nog open is.
+  // Overlay-klik sluit eerder, dan is editingKeyRef al null en slaan we niet op.
+  const handleInputBlur = () => {
+    blurTimestampRef.current = Date.now();
+    setTimeout(() => {
+      if (editingKeyRef.current !== null && onEdit) handleSaveEdit();
+    }, 150);
   };
   
   // Calculate percentages for vertical bar chart
@@ -352,6 +367,7 @@ export function ValueBlock({
                   step={10}
                   value={editInputValue}
                   onChange={(e) => setEditInputValue(e.target.value)}
+                  onBlur={handleInputBlur}
                   onKeyDown={(e) => { if (e.key === 'Enter') handleSaveEdit(); if (e.key === 'Escape') closePopover(); }}
                   className="w-full min-w-0 box-border px-2.5 py-1.5 text-base border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 mb-2"
                 />
