@@ -117,7 +117,7 @@ export function ValueBlock({
   useEffect(() => {
     if (editingKey === null) return;
     const openedAt = Date.now();
-    const GRACE_MS = 400;
+    const GRACE_MS = 600;
     const onScroll = () => {
       if (Date.now() - openedAt < GRACE_MS) return;
       closePopover();
@@ -353,7 +353,7 @@ export function ValueBlock({
                   value={editInputValue}
                   onChange={(e) => setEditInputValue(e.target.value)}
                   onKeyDown={(e) => { if (e.key === 'Enter') handleSaveEdit(); if (e.key === 'Escape') closePopover(); }}
-                  className="w-full min-w-0 box-border px-2.5 py-1.5 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 mb-2"
+                  className="w-full min-w-0 box-border px-2.5 py-1.5 text-base border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 mb-2"
                 />
                 <button
                   type="button"
