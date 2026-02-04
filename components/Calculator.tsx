@@ -1613,11 +1613,10 @@ export default function Calculator() {
 
             {/* Step 2: Costs - Match Marge color from bar chart */}
             <div className="bg-marge-100 p-6 rounded-xl border border-marge-400/20 flex flex-col relative flex-[0.67]">
-              <div className="text-xs font-bold uppercase tracking-wider text-marge-text whitespace-nowrap">KOSTEN & RISICO</div>
+              <div className="text-xs font-bold uppercase tracking-wider text-marge-text whitespace-nowrap">MARGE CREATENEW</div>
               <div className="flex flex-col mt-2">
                 <div className="flex flex-col mb-2">
                   <span className="text-2xl font-bold text-marge-text">{formatCurrency(zzpResult.costsBreakdown.entrepreneurRisk)}</span>
-                  <span className="text-xs text-marge-text">Marge CreateNew ({(config.zzpCompanyMarginRate * 100).toFixed(0)}%)</span>
                 </div>
               </div>
             </div>
@@ -1628,8 +1627,8 @@ export default function Calculator() {
             <div className="flex items-start justify-between gap-4">
               <div className="flex flex-col">
                 <div className="text-xs font-bold uppercase tracking-wider text-gray-400">JOUW TOTALE BELONING</div>
-                <span className="text-2xl font-bold text-gray-900 mt-2">{formatCurrency(zzpResult.revenueAfterCosts)}</span>
-                <span className="text-sm font-medium text-gray-500">{formatHourly(zzpResult.revenueAfterCosts, zzpResult.monthlyHours)} /uur</span>
+                <span className="text-2xl font-bold text-gray-900 mt-2">{formatCurrency(zzpResult.revenueAfterMargin)}</span>
+                <span className="text-sm font-medium text-gray-500">{formatHourly(zzpResult.revenueAfterMargin, zzpResult.monthlyHours)} /uur</span>
               </div>
               <div className="flex flex-col items-end">
                 <span className="text-xs text-gray-500 uppercase tracking-wide">JOUW TOTALE OPBRENGST</span>

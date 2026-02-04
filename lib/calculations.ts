@@ -203,7 +203,8 @@ export interface ZZPResult {
   // Totals
   revenueTotal: number;              // Effectieve omzet (facturabel)
   costsTotal: number;                // Totale kosten (marge + kosten)
-  revenueAfterCosts: number;         // Inkomen na marge en kosten
+  revenueAfterMargin: number;        // Inkomen na alleen 5% marge CreateNew (voor weergave "JOUW TOTALE BELONING")
+  revenueAfterCosts: number;         // Inkomen na marge en kosten (5% + 10%)
   reservationsTotal: number;          // Pensioen + andere reserveringen
   netBeforeTax: number;              // Inkomen vóór belasting (maandelijks)
   netAfterTax: number;               // Netto na belasting (maandelijks, volgens Excel)
@@ -859,7 +860,8 @@ export function calculateZZPDetailed(
     // Totalen
     revenueTotal: effectiveRevenue, // Effectieve omzet (facturabel)
     costsTotal: companyMargin + businessCosts, // Marge + kosten
-    revenueAfterCosts: incomeAfterMarginAndCosts, // Inkomen na marge en kosten
+    revenueAfterMargin: incomeAfterMargin, // Inkomen na alleen 5% marge (voor weergave "JOUW TOTALE BELONING")
+    revenueAfterCosts: incomeAfterMarginAndCosts, // Inkomen na marge en kosten (5% + 10%)
     reservationsTotal: employeePensionVal, // Pensioen reservering
     netBeforeTax: netBeforeTax, // Inkomen voor belasting (maandelijks, voor UI)
     netAfterTax: netMonthly, // Netto na belasting (maandelijks, volgens Excel)
