@@ -221,7 +221,7 @@ export function ValueBlock({
               background: 'repeating-linear-gradient(45deg, transparent, transparent 4px, rgba(156, 163, 175, 0.15) 4px, rgba(156, 163, 175, 0.15) 5px)'
             }}
           >
-            <span className="text-[10px] font-medium text-gray-500 leading-tight">
+            <span className="text-xs font-medium text-gray-500 leading-tight min-h-[2.5em]">
               Reservering vakantie- en feestdagen
             </span>
             <div className="flex items-center justify-between shrink-0 mt-auto">
