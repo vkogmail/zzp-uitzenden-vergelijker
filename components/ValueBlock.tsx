@@ -112,10 +112,16 @@ export function ValueBlock({
     }
   }, [editingKey, popoverAnchor]);
 
-  // Sluit popover bij scroll zodat hij niet op de verkeerde plek blijft staan
+  // Sluit popover bij scroll zodat hij niet op de verkeerde plek blijft staan.
+  // Korte grace-period na open zodat focus/scroll-into-view op mobile niet meteen sluit.
   useEffect(() => {
     if (editingKey === null) return;
-    const onScroll = () => closePopover();
+    const openedAt = Date.now();
+    const GRACE_MS = 400;
+    const onScroll = () => {
+      if (Date.now() - openedAt < GRACE_MS) return;
+      closePopover();
+    };
     window.addEventListener('scroll', onScroll, true);
     return () => window.removeEventListener('scroll', onScroll, true);
   }, [editingKey]);
